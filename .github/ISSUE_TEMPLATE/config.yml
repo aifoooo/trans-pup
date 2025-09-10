@@ -1,0 +1,7 @@
+contact_links:
+  - name: GitHub Community Support
+    url: https://github.com/aifoooo/trans-pup/discussions
+    about: Please leave your questions here or on Discord - Link below "Security Bug Bounty"
+  - name: GitHub Security Bug Bounty
+    url: https://discord.gg/RhETcmdW
+    about: Please report security vulnerabilities here(Send DM to susamlu or tell us on chat, you want to report it).

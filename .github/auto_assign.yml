@@ -1,0 +1,10 @@
+addReviewers: true
+
+reviewers:
+  - susamlu
+
+addAssignees: author
+
+filterLabels:
+  exclude:
+    - dependencies
