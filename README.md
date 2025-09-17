@@ -1,8 +1,4 @@
-# TransPup 
-
-[TOC]
-
-## 介绍
+## TransPup 
 
 TransPup 像贴心小狗，帮你轻松搞定英文网页浏览的单词难题。
 
