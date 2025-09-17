@@ -1,7 +1,7 @@
 {
   "name": "trans-pup",
   "version": "0.5.0",
-  "description": "chrome extension boilerplate",
+  "description": "translation plugin",
   "license": "MIT",
   "private": true,
   "sideEffects": false,
