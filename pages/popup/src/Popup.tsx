@@ -12,7 +12,7 @@ const Popup = () => {
       <div className="flex-grow">
         <header className="flex items-center justify-between bg-gray-50 px-4 py-2">
           <div className="flex items-center space-x-2">
-            <img src={chrome.runtime.getURL(logo)} className="h-6 w-6" alt="logo" />
+            <img src={chrome.runtime.getURL(logo)} className="h-5 w-5" alt="logo" />
             <h1 className="text-base font-medium">TransPup</h1>
           </div>
         </header>

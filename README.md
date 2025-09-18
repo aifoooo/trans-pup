@@ -12,9 +12,11 @@ TransPup 像贴心小狗，帮你轻松搞定英文网页浏览的单词难题�
 
 ## 如何使用
 
-1. 运行：
+1. 安装 **pnpm**：`npm install -g pnpm`
+2. 安装依赖：`pnpm install`
+3. 编译打包：
    - 开发 `pnpm dev`
    - 生产 `pnpm build`
-2. 在 Chrome 浏览器中打开：`chrome://extensions`
-3. 确保「开发者模式」已开启；
-4. 点击「加载未打包的扩展程序」，选择 `dist` 文件夹，导入插件。
+4. 在 Chrome 浏览器中打开：`chrome://extensions`
+5. 确保「开发者模式」已开启；
+6. 点击「加载未打包的扩展程序」，选择 `dist` 文件夹，导入插件。
