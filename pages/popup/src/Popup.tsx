@@ -1,11 +1,16 @@
 import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import { ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
+import { useState } from 'react';
 
 const Popup = () => {
-  useStorage(exampleThemeStorage);
   const logo = 'popup/icon-34.png';
+
+  useStorage(exampleThemeStorage);
+  const [autoCollection, setAutoCollection] = useState(false);
+  const [autoAnnotation, setAutoAnnotation] = useState(false);
+  const [wordTranslation, setWordTranslation] = useState(false);
 
   return (
     <div className="flex h-screen flex-col">
@@ -23,18 +28,9 @@ const Popup = () => {
             placeholder="按下 Enter 翻译文本框内的文本"></textarea>
 
           <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-normal">启用自动收集</span>
-              <button className="relative inline-flex h-5 w-9 items-center rounded-full bg-gray-300 transition-colors focus:outline-none">
-                <span className="absolute left-0.5 inline-block h-4 w-4 rounded-full bg-white transition-transform" />
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-normal">启用自动标注</span>
-              <button className="relative inline-flex h-5 w-9 items-center rounded-full bg-gray-300 transition-colors focus:outline-none">
-                <span className="absolute left-0.5 inline-block h-4 w-4 rounded-full bg-white transition-transform" />
-              </button>
-            </div>
+            <ToggleSwitch label="启用自动收集" checked={autoCollection} onChange={setAutoCollection} />
+            <ToggleSwitch label="启用自动标注" checked={autoAnnotation} onChange={setAutoAnnotation} />
+            <ToggleSwitch label="启用划词翻译" checked={wordTranslation} onChange={setWordTranslation} />
           </div>
         </div>
       </div>
