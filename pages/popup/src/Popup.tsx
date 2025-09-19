@@ -21,21 +21,20 @@ const Popup = () => {
             <h1 className="text-base font-medium">TransPup</h1>
           </div>
         </header>
-        <div className="px-4 pt-4">
+        <div className="px-6 pt-5">
           <textarea
-            className="w-full resize-none rounded-md border border-gray-300 p-2"
+            className="w-full resize-none rounded-md border border-gray-300 p-2 text-sm"
             rows={2}
             placeholder="按下 Enter 翻译文本框内的文本"></textarea>
-
-          <div className="mt-4 space-y-3">
-            <ToggleSwitch label="启用自动收集" checked={autoCollection} onChange={setAutoCollection} />
-            <ToggleSwitch label="启用自动标注" checked={autoAnnotation} onChange={setAutoAnnotation} />
-            <ToggleSwitch label="启用划词翻译" checked={wordTranslation} onChange={setWordTranslation} />
-          </div>
+        </div>
+        <div className="mt-4 space-y-3 border-t border-gray-200 px-6 pt-5">
+          <ToggleSwitch label="启用自动收集" checked={autoCollection} onChange={setAutoCollection} />
+          <ToggleSwitch label="启用自动标注" checked={autoAnnotation} onChange={setAutoAnnotation} />
+          <ToggleSwitch label="启用划词翻译" checked={wordTranslation} onChange={setWordTranslation} />
         </div>
       </div>
 
-      <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-4 py-3 text-xs text-gray-500">
+      <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-6 py-3 text-xs text-gray-500">
         <span>v0.5.0</span>
         <a
           href="https://github.com/aifoooo/trans-pup.git"
