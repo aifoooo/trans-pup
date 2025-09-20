@@ -1,7 +1,7 @@
 import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage } from '@extension/storage';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner, SettingIcon } from '@extension/ui';
 
 const Popup = () => {
   const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
@@ -13,6 +13,14 @@ const Popup = () => {
           <div className="flex items-center space-x-2">
             <h1 className="text-base font-medium">TransPup</h1>
           </div>
+          <button
+            onClick={() => {
+              console.log('Open settings');
+            }}
+            className="rounded-full p-1 transition-colors hover:bg-gray-200"
+            aria-label="Settings">
+            <SettingIcon />
+          </button>
         </header>
         <div className="px-6 pt-5">
           <textarea
