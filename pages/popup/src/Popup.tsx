@@ -1,14 +1,10 @@
 import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
+import { globalConfigStorage } from '@extension/storage';
 import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
-import { useState } from 'react';
 
 const Popup = () => {
-  useStorage(exampleThemeStorage);
-  const [autoCollection, setAutoCollection] = useState(false);
-  const [autoAnnotation, setAutoAnnotation] = useState(false);
-  const [wordTranslation, setWordTranslation] = useState(false);
+  const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
 
   return (
     <div className="flex h-screen flex-col">
@@ -25,9 +21,21 @@ const Popup = () => {
             placeholder="按下 Enter 翻译文本框内的文本"></textarea>
         </div>
         <div className="mt-4 space-y-3 border-t border-gray-200 px-6 pt-5">
-          <ToggleSwitch label="启用自动收集" checked={autoCollection} onChange={setAutoCollection} />
-          <ToggleSwitch label="启用自动标注" checked={autoAnnotation} onChange={setAutoAnnotation} />
-          <ToggleSwitch label="启用划词翻译" checked={wordTranslation} onChange={setWordTranslation} />
+          <ToggleSwitch
+            label="启用自动收集"
+            checked={autoCollection}
+            onChange={globalConfigStorage.toggleAutoCollection}
+          />
+          <ToggleSwitch
+            label="启用自动标注"
+            checked={autoAnnotation}
+            onChange={globalConfigStorage.toggleAutoAnnotation}
+          />
+          <ToggleSwitch
+            label="启用划词翻译"
+            checked={wordTranslation}
+            onChange={globalConfigStorage.toggleWordTranslation}
+          />
         </div>
       </div>
 

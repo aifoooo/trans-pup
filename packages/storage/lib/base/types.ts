@@ -52,3 +52,15 @@ export interface ThemeStateType {
 export type ThemeStorageType = BaseStorageType<ThemeStateType> & {
   toggle: () => Promise<void>;
 };
+
+export interface GlobalConfigStateType {
+  autoCollection: boolean;
+  autoAnnotation: boolean;
+  wordTranslation: boolean;
+}
+
+export type GlobalConfigStorageType = BaseStorageType<GlobalConfigStateType> & {
+  toggleAutoCollection: () => Promise<void>;
+  toggleAutoAnnotation: () => Promise<void>;
+  toggleWordTranslation: () => Promise<void>;
+};
