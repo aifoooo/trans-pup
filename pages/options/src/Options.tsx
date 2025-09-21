@@ -119,9 +119,9 @@ const Options = () => {
       const contentAreaChild = contentAreaRef.current?.firstElementChild as HTMLElement | undefined;
       if (contentAreaChild) {
         if (resetContentAreaChildClassName) {
-          contentAreaChild.className = 'min-w-2xl ml-72 max-w-2xl bg-white';
+          contentAreaChild.className = 'min-w-2xl ml-72 max-w-2xl flex-1 overflow-y-auto bg-white';
         } else {
-          contentAreaChild.className = 'min-w-2xl mx-auto max-w-2xl bg-white';
+          contentAreaChild.className = 'min-w-2xl mx-auto max-w-2xl flex-1 overflow-y-auto bg-white';
         }
       }
     };
@@ -183,25 +183,28 @@ const Options = () => {
         <span className="text-sm text-gray-500">v0.5.0</span>
       </header>
 
-      <div className={cn('App-body', 'mt-16 w-full')}>
+      <div className={cn('App-body', 'w-full')}>
         {/* 左侧导航栏 */}
         <div
           className={cn(
             'App-menu',
             'absolute left-0 top-16 w-64 bg-white py-2 transition-all duration-300 ease-in-out',
-            isMenuVisible ? 'translate-x-0' : '-translate-x-full', // 使用 transform 实现滑动效果
+            'flex flex-col',
+            isMenuVisible ? 'translate-x-0' : '-translate-x-full',
           )}>
-          <SidebarMenu
-            activeMenu={activeMenu}
-            setActiveMenu={setActiveMenu}
-            menuItems={menuItems}
-            onMenuSelect={() => {
-              if (isMenuVisible && !isMenuPinned) {
-                setIsMenuVisible(false);
-                setUserManuallyOpenedMenu(false);
-              }
-            }}
-          />
+          <div className="flex-1 overflow-y-auto">
+            <SidebarMenu
+              activeMenu={activeMenu}
+              setActiveMenu={setActiveMenu}
+              menuItems={menuItems}
+              onMenuSelect={() => {
+                if (isMenuVisible && !isMenuPinned) {
+                  setIsMenuVisible(false);
+                  setUserManuallyOpenedMenu(false);
+                }
+              }}
+            />
+          </div>
         </div>
 
         {/* 蒙板层 */}
@@ -217,8 +220,8 @@ const Options = () => {
         )}
 
         {/* 右侧内容区 */}
-        <div ref={contentAreaRef} className="flex-1 overflow-auto pb-6 pt-2">
-          <div className="min-w-2xl mx-auto max-w-2xl bg-white">
+        <div ref={contentAreaRef} className="mt-16 flex h-screen flex-col pb-6 pt-2">
+          <div className="min-w-2xl mx-auto max-w-2xl flex-1 overflow-y-auto bg-white">
             {activeMenu === 'general' && <GeneralSettings />}
             {activeMenu === 'coming-soon' && <ComingSoonContent />}
           </div>
