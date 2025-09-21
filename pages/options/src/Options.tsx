@@ -75,18 +75,25 @@ const ComingSoonContent = () => (
   </div>
 );
 
-const Options = () => {
-  const logo = chrome.runtime.getURL('icon-128.png');
-
-  const [, setWindowWidth] = useState(window.innerWidth);
-  const [isMenuVisible, setIsMenuVisible] = useState(true);
-  const [activeMenu, setActiveMenu] = useState('general');
-
-  // 判断菜单是否固定显示（被钉住）
+const getMenuPinningInfo = () => {
   const breakpointRem = 80;
   const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
   const breakpointPx = breakpointRem * rootFontSize;
   const isMenuPinned = window.innerWidth >= breakpointPx;
+
+  return { breakpointPx, isMenuPinned };
+};
+
+const Options = () => {
+  const logo = chrome.runtime.getURL('icon-128.png');
+
+  const [, setWindowWidth] = useState(window.innerWidth);
+  const { isMenuPinned } = getMenuPinningInfo();
+  const [isMenuVisible, setIsMenuVisible] = useState(() => {
+    const { isMenuPinned } = getMenuPinningInfo();
+    return isMenuPinned;
+  });
+  const [activeMenu, setActiveMenu] = useState('general');
 
   // 监听窗口大小变化
   useEffect(() => {
