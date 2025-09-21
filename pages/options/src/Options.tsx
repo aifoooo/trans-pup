@@ -1,9 +1,73 @@
 import '@src/Options.css';
+
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
 import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
 import { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
+
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: ReactNode;
+}
+
+const SidebarMenu = ({
+  activeMenu,
+  setActiveMenu,
+  menuItems,
+}: {
+  activeMenu: string;
+  setActiveMenu: (id: string) => void;
+  menuItems: MenuItem[];
+}) => (
+  <div className="flex flex-col gap-0">
+    {menuItems.map(item => (
+      <button
+        key={item.id}
+        className={cn(
+          'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium',
+          activeMenu === item.id ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
+        )}
+        onClick={() => setActiveMenu(item.id)}>
+        {item.icon}
+        <span>{item.label}</span>
+      </button>
+    ))}
+  </div>
+);
+
+const GeneralSettings = () => (
+  <div className="mx-auto max-w-2xl bg-white">
+    <h2 className="mb-4 text-left text-base">腾讯翻译</h2>
+
+    <form className="flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
+      <div className="flex items-center space-x-2">
+        <label className="text-sm font-medium text-gray-700" htmlFor="name">
+          SecretId:
+        </label>
+        <span className="text-sm text-gray-400">（如何获取？）</span>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <label className="text-sm font-medium text-gray-700" htmlFor="email">
+          SecretKey:
+        </label>
+        <span className="text-sm text-gray-400">（如何获取？）</span>
+      </div>
+    </form>
+  </div>
+);
+
+const ComingSoonContent = () => (
+  <div className="mx-auto max-w-2xl bg-white">
+    <h2 className="mb-4 text-left text-base">更多功能</h2>
+    <form className="flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
+      <span className="text-base text-gray-700">Coming soon...</span>
+    </form>
+  </div>
+);
 
 const Options = () => {
   const logo = chrome.runtime.getURL('icon-128.png');
@@ -39,6 +103,29 @@ const Options = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const menuItems: MenuItem[] = [
+    {
+      id: 'general',
+      label: '基本设置',
+      icon: (
+        <IoSettingsOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'general' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className={cn('App', 'bg-white')}>
       <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center bg-white px-6">
@@ -55,55 +142,13 @@ const Options = () => {
             'absolute left-0 top-16 w-64 bg-white py-2 transition-all duration-300 ease-in-out',
             isMenuVisible ? 'translate-x-0' : '-translate-x-full', // 使用 transform 实现滑动效果
           )}>
-          <div className="flex flex-col gap-0">
-            <button
-              className={cn(
-                'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium',
-                activeMenu === 'general' ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
-              )}
-              onClick={() => setActiveMenu('general')}>
-              <IoSettingsOutline
-                size={18}
-                className={cn('mr-6', activeMenu === 'general' ? 'text-blue-600' : 'text-gray-700')}
-              />
-              <span>基本设置</span>
-            </button>
-            <button
-              className={cn(
-                'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium',
-                activeMenu === 'coming-soon' ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
-              )}
-              onClick={() => setActiveMenu('coming-soon')}>
-              <IoRocketOutline
-                size={18}
-                className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
-              />
-              <span>敬请期待</span>
-            </button>
-          </div>
+          <SidebarMenu activeMenu={activeMenu} setActiveMenu={setActiveMenu} menuItems={menuItems} />
         </div>
 
         {/* 右侧内容区 */}
         <div className="flex-1 overflow-auto px-6 pb-6 pt-2">
-          <div className={'mx-auto max-w-2xl bg-white'}>
-            <h2 className="mb-4 text-left text-base">腾讯翻译</h2>
-
-            <form className="flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
-              <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700" htmlFor="name">
-                  SecretId:
-                </label>
-                <span className="text-sm text-gray-400">（如何获取？）</span>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-700" htmlFor="email">
-                  SecretKey:
-                </label>
-                <span className="text-sm text-gray-400">（如何获取？）</span>
-              </div>
-            </form>
-          </div>
+          {activeMenu === 'general' && <GeneralSettings />}
+          {activeMenu === 'coming-soon' && <ComingSoonContent />}
         </div>
       </div>
     </div>
