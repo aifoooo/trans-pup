@@ -94,6 +94,7 @@ const Options = () => {
     return isMenuPinned;
   });
   const [activeMenu, setActiveMenu] = useState('general');
+  const [userManuallyOpenedMenu, setUserManuallyOpenedMenu] = useState(false);
 
   // 监听窗口大小变化
   useEffect(() => {
@@ -105,6 +106,7 @@ const Options = () => {
         setIsMenuVisible(true);
       } else {
         setIsMenuVisible(false);
+        setUserManuallyOpenedMenu(false);
       }
     };
 
@@ -141,6 +143,8 @@ const Options = () => {
     },
   ];
 
+  const shouldShowOverlay = userManuallyOpenedMenu && isMenuVisible && !isMenuPinned;
+
   return (
     <div className={cn('App', 'bg-white')}>
       <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center bg-white px-6">
@@ -151,7 +155,10 @@ const Options = () => {
         ) : (
           <button
             className="mr-2 rounded p-1 hover:bg-gray-100 focus:outline-none"
-            onClick={() => setIsMenuVisible(true)}
+            onClick={() => {
+              setIsMenuVisible(true);
+              setUserManuallyOpenedMenu(true);
+            }}
             aria-label="展开菜单">
             <IoMenuOutline size={24} />
           </button>
@@ -175,16 +182,20 @@ const Options = () => {
             onMenuSelect={() => {
               if (isMenuVisible && !isMenuPinned) {
                 setIsMenuVisible(false);
+                setUserManuallyOpenedMenu(false);
               }
             }}
           />
         </div>
 
         {/* 蒙板层 */}
-        {isMenuVisible && !isMenuPinned && (
+        {shouldShowOverlay && (
           <button
             className="fixed inset-y-0 left-64 right-0 z-10 bg-black bg-opacity-50"
-            onClick={() => setIsMenuVisible(false)}
+            onClick={() => {
+              setIsMenuVisible(false);
+              setUserManuallyOpenedMenu(false);
+            }}
             aria-label="关闭菜单"
           />
         )}
