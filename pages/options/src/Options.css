@@ -19,6 +19,14 @@
   justify-content: center;
 }
 
+.App-body {
+  height: 100vh;
+}
+
+.App-menu {
+  height: calc(100vh - 4rem);
+}
+
 code {
   background: rgba(148, 163, 184, 0.5);
   border-radius: 0.25rem;
