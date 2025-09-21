@@ -5,7 +5,7 @@ import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import { IoMenuOutline } from '@react-icons/all-files/io5/IoMenuOutline';
 import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
 import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 interface MenuItem {
@@ -45,9 +45,8 @@ const SidebarMenu = ({
 );
 
 const GeneralSettings = () => (
-  <div className="mx-auto max-w-2xl bg-white">
+  <div>
     <h2 className="mb-4 text-left text-base">腾讯翻译</h2>
-
     <form className="flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
       <div className="flex items-center space-x-2">
         <label className="text-sm font-medium text-gray-700" htmlFor="name">
@@ -55,7 +54,6 @@ const GeneralSettings = () => (
         </label>
         <span className="text-sm text-gray-400">（如何获取？）</span>
       </div>
-
       <div className="flex items-center space-x-2">
         <label className="text-sm font-medium text-gray-700" htmlFor="email">
           SecretKey:
@@ -67,7 +65,7 @@ const GeneralSettings = () => (
 );
 
 const ComingSoonContent = () => (
-  <div className="mx-auto max-w-2xl bg-white">
+  <div>
     <h2 className="mb-4 text-left text-base">更多功能</h2>
     <form className="flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
       <span className="text-base text-gray-700">Coming soon...</span>
@@ -76,7 +74,7 @@ const ComingSoonContent = () => (
 );
 
 const getMenuPinningInfo = () => {
-  const breakpointRem = 80;
+  const breakpointRem = 60; // 16 rem + 2 rem + 42 rem
   const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
   const breakpointPx = breakpointRem * rootFontSize;
   const isMenuPinned = window.innerWidth >= breakpointPx;
@@ -95,18 +93,36 @@ const Options = () => {
   });
   const [activeMenu, setActiveMenu] = useState('general');
   const [userManuallyOpenedMenu, setUserManuallyOpenedMenu] = useState(false);
+  const contentAreaRef = useRef<HTMLDivElement>(null);
 
   // 监听窗口大小变化
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
 
-      // 当窗口宽度小于 80rem (1280px) 时隐藏菜单栏
-      if (isMenuPinned) {
-        setIsMenuVisible(true);
-      } else {
+      // 当窗口宽度小于 60rem (960px) 时隐藏菜单栏
+      if (!isMenuPinned) {
         setIsMenuVisible(false);
         setUserManuallyOpenedMenu(false);
+      } else {
+        setIsMenuVisible(true);
+      }
+
+      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const minBreakpointRem = 60; // 16 rem + 2 rem + 42 rem
+      const maxBreakpointRem = 78; // 16 rem + 2 rem + 42 rem + 2rem + 16rem
+      const minBreakpointPx = minBreakpointRem * rootFontSize;
+      const maxBreakpointPx = maxBreakpointRem * rootFontSize;
+      const resetContentAreaChildClassName =
+        window.innerWidth >= minBreakpointPx && window.innerWidth <= maxBreakpointPx;
+
+      const contentAreaChild = contentAreaRef.current?.firstElementChild as HTMLElement | undefined;
+      if (contentAreaChild) {
+        if (resetContentAreaChildClassName) {
+          contentAreaChild.className = 'min-w-2xl ml-72 max-w-2xl bg-white';
+        } else {
+          contentAreaChild.className = 'min-w-2xl mx-auto max-w-2xl bg-white';
+        }
       }
     };
 
@@ -201,9 +217,11 @@ const Options = () => {
         )}
 
         {/* 右侧内容区 */}
-        <div className="flex-1 overflow-auto px-6 pb-6 pt-2">
-          {activeMenu === 'general' && <GeneralSettings />}
-          {activeMenu === 'coming-soon' && <ComingSoonContent />}
+        <div ref={contentAreaRef} className="flex-1 overflow-auto pb-6 pt-2">
+          <div className="min-w-2xl mx-auto max-w-2xl bg-white">
+            {activeMenu === 'general' && <GeneralSettings />}
+            {activeMenu === 'coming-soon' && <ComingSoonContent />}
+          </div>
         </div>
       </div>
     </div>
