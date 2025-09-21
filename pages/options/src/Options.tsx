@@ -2,6 +2,7 @@ import '@src/Options.css';
 
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import { IoMenuOutline } from '@react-icons/all-files/io5/IoMenuOutline';
 import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
 import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
 import { useState, useEffect } from 'react';
@@ -17,20 +18,25 @@ const SidebarMenu = ({
   activeMenu,
   setActiveMenu,
   menuItems,
+  onMenuSelect,
 }: {
   activeMenu: string;
   setActiveMenu: (id: string) => void;
   menuItems: MenuItem[];
+  onMenuSelect?: (id: string) => void;
 }) => (
   <div className="flex flex-col gap-0">
     {menuItems.map(item => (
       <button
         key={item.id}
         className={cn(
-          'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium',
+          'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium focus:outline-none',
           activeMenu === item.id ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
         )}
-        onClick={() => setActiveMenu(item.id)}>
+        onClick={() => {
+          setActiveMenu(item.id);
+          onMenuSelect?.(item.id);
+        }}>
         {item.icon}
         <span>{item.label}</span>
       </button>
@@ -76,20 +82,22 @@ const Options = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(true);
   const [activeMenu, setActiveMenu] = useState('general');
 
+  // 判断菜单是否固定显示（被钉住）
+  const breakpointRem = 80;
+  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const breakpointPx = breakpointRem * rootFontSize;
+  const isMenuPinned = window.innerWidth >= breakpointPx;
+
   // 监听窗口大小变化
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
 
       // 当窗口宽度小于 80rem (1280px) 时隐藏菜单栏
-      const breakpointRem = 80;
-      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const breakpointPx = breakpointRem * rootFontSize;
-
-      if (window.innerWidth < breakpointPx) {
-        setIsMenuVisible(false);
-      } else {
+      if (isMenuPinned) {
         setIsMenuVisible(true);
+      } else {
+        setIsMenuVisible(false);
       }
     };
 
@@ -101,7 +109,7 @@ const Options = () => {
 
     // 清理事件监听器
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isMenuPinned]);
 
   const menuItems: MenuItem[] = [
     {
@@ -129,7 +137,18 @@ const Options = () => {
   return (
     <div className={cn('App', 'bg-white')}>
       <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center bg-white px-6">
-        <img src={logo} className="mr-2 h-6 w-6" alt="Logo" />
+        {isMenuVisible ? (
+          <>
+            <img src={logo} className="mr-2 h-6 w-6" alt="Logo" />
+          </>
+        ) : (
+          <button
+            className="mr-2 rounded p-1 hover:bg-gray-100 focus:outline-none"
+            onClick={() => setIsMenuVisible(true)}
+            aria-label="展开菜单">
+            <IoMenuOutline size={24} />
+          </button>
+        )}
         <h1 className="mr-2 text-lg font-bold">TransPup</h1>
         <span className="text-sm text-gray-500">v0.5.0</span>
       </header>
@@ -142,8 +161,26 @@ const Options = () => {
             'absolute left-0 top-16 w-64 bg-white py-2 transition-all duration-300 ease-in-out',
             isMenuVisible ? 'translate-x-0' : '-translate-x-full', // 使用 transform 实现滑动效果
           )}>
-          <SidebarMenu activeMenu={activeMenu} setActiveMenu={setActiveMenu} menuItems={menuItems} />
+          <SidebarMenu
+            activeMenu={activeMenu}
+            setActiveMenu={setActiveMenu}
+            menuItems={menuItems}
+            onMenuSelect={() => {
+              if (isMenuVisible && !isMenuPinned) {
+                setIsMenuVisible(false);
+              }
+            }}
+          />
         </div>
+
+        {/* 蒙板层 */}
+        {isMenuVisible && !isMenuPinned && (
+          <button
+            className="fixed inset-y-0 left-64 right-0 z-10 bg-black bg-opacity-50"
+            onClick={() => setIsMenuVisible(false)}
+            aria-label="关闭菜单"
+          />
+        )}
 
         {/* 右侧内容区 */}
         <div className="flex-1 overflow-auto px-6 pb-6 pt-2">

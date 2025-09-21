@@ -19,7 +19,7 @@ const Popup = () => {
               chrome.runtime.openOptionsPage();
             }}
             className="rounded-full p-1 transition-colors hover:bg-gray-200"
-            aria-label="Settings">
+            aria-label="设置">
             <IoSettingsOutline size={18} className="text-gray-500" />
           </button>
         </header>
