@@ -15,7 +15,7 @@ TransPup 像贴心小狗，帮你轻松搞定英文网页浏览的单词难题�
 1. 环境准备
    - 安装 **pnpm**：`npm install -g pnpm`
 2. 项目初始化
-   - 安装依赖：`pnpm install`
+   - 安装依赖：`pnpm install` 或者 `pnpm install --registry=https://registry.npmmirror.com`
 3. 开发与构建
    - 开发模式：`pnpm dev`
    - 生产打包：`pnpm build`

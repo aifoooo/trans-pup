@@ -1,6 +1,8 @@
 import '@src/Options.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
+import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
 import { useState, useEffect } from 'react';
 
 const Options = () => {
@@ -56,19 +58,27 @@ const Options = () => {
           <div className="flex flex-col gap-0">
             <button
               className={cn(
-                'w-full rounded-r-full px-6 py-2 text-left text-base font-medium',
+                'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium',
                 activeMenu === 'general' ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
               )}
               onClick={() => setActiveMenu('general')}>
-              基本设置
+              <IoSettingsOutline
+                size={18}
+                className={cn('mr-6', activeMenu === 'general' ? 'text-blue-600' : 'text-gray-700')}
+              />
+              <span>基本设置</span>
             </button>
             <button
               className={cn(
-                'w-full rounded-r-full px-6 py-2 text-left text-base font-medium',
+                'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium',
                 activeMenu === 'coming-soon' ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
               )}
               onClick={() => setActiveMenu('coming-soon')}>
-              敬请期待
+              <IoRocketOutline
+                size={18}
+                className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+              />
+              <span>敬请期待</span>
             </button>
           </div>
         </div>

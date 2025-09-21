@@ -1,7 +1,8 @@
 import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage } from '@extension/storage';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner, SettingIcon } from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
+import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
 
 const Popup = () => {
   const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
@@ -19,7 +20,7 @@ const Popup = () => {
             }}
             className="rounded-full p-1 transition-colors hover:bg-gray-200"
             aria-label="Settings">
-            <SettingIcon />
+            <IoSettingsOutline size={18} className="text-gray-500" />
           </button>
         </header>
         <div className="px-6 pt-5">
