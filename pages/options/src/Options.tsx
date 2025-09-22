@@ -5,6 +5,8 @@ import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import { IoMenuOutline } from '@react-icons/all-files/io5/IoMenuOutline';
 import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
 import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
+import ComingSoonContent from '@src/components/ComingSoonContent';
+import GeneralSettings from '@src/components/GeneralSettings';
 import { useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 
@@ -41,35 +43,6 @@ const SidebarMenu = ({
         <span>{item.label}</span>
       </button>
     ))}
-  </div>
-);
-
-const GeneralSettings = () => (
-  <div>
-    <h2 className="mb-4 text-left text-base">腾讯翻译</h2>
-    <form className="mb-8 flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
-      <div className="flex items-center space-x-2">
-        <label className="text-sm font-medium text-gray-700" htmlFor="name">
-          SecretId:
-        </label>
-        <span className="text-sm text-gray-400">（如何获取？）</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <label className="text-sm font-medium text-gray-700" htmlFor="email">
-          SecretKey:
-        </label>
-        <span className="text-sm text-gray-400">（如何获取？）</span>
-      </div>
-    </form>
-  </div>
-);
-
-const ComingSoonContent = () => (
-  <div>
-    <h2 className="mb-4 text-left text-base">更多功能</h2>
-    <form className="mb-8 flex flex-col space-y-4 rounded-lg border border-gray-200 px-8 py-6 shadow-lg">
-      <span className="text-base text-gray-700">Coming soon...</span>
-    </form>
   </div>
 );
 
