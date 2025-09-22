@@ -7,44 +7,9 @@ import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
 import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
 import ComingSoonContent from '@src/components/ComingSoonContent';
 import GeneralSettings from '@src/components/GeneralSettings';
+import SidebarMenu from '@src/components/SidebarMenu';
 import { useState, useEffect, useRef } from 'react';
-import type { ReactNode } from 'react';
-
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: ReactNode;
-}
-
-const SidebarMenu = ({
-  activeMenu,
-  setActiveMenu,
-  menuItems,
-  onMenuSelect,
-}: {
-  activeMenu: string;
-  setActiveMenu: (id: string) => void;
-  menuItems: MenuItem[];
-  onMenuSelect?: (id: string) => void;
-}) => (
-  <div className="flex flex-col gap-0">
-    {menuItems.map(item => (
-      <button
-        key={item.id}
-        className={cn(
-          'flex w-full items-center rounded-r-full px-6 py-2 text-left text-base font-medium focus:outline-none',
-          activeMenu === item.id ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100',
-        )}
-        onClick={() => {
-          setActiveMenu(item.id);
-          onMenuSelect?.(item.id);
-        }}>
-        {item.icon}
-        <span>{item.label}</span>
-      </button>
-    ))}
-  </div>
-);
+import type { MenuItem } from '@src/components/SidebarMenu';
 
 const getMenuPinningInfo = () => {
   const breakpointRem = 60; // 16 rem + 2 rem + 42 rem
