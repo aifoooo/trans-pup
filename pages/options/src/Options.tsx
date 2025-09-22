@@ -24,17 +24,33 @@ const Options = () => {
   const logo = chrome.runtime.getURL('icon-128.png');
 
   const [, setWindowWidth] = useState(window.innerWidth);
-  const { isMenuPinned } = getMenuPinningInfo();
+  const [activeMenu, setActiveMenu] = useState('general');
   const [isMenuVisible, setIsMenuVisible] = useState(() => {
     const { isMenuPinned } = getMenuPinningInfo();
     return isMenuPinned;
   });
-  const [activeMenu, setActiveMenu] = useState('general');
   const [userManuallyOpenedMenu, setUserManuallyOpenedMenu] = useState(false);
+
   const contentAreaRef = useRef<HTMLDivElement>(null);
+  const { isMenuPinned } = getMenuPinningInfo();
 
   // 监听窗口大小变化
   useEffect(() => {
+    const updateContentAreaClass = () => {
+      const { minBreakpointPx, maxBreakpointPx } = calculateBreakpoints({
+        minBreakpointPx: 60, // 16 rem + 2 rem + 42 rem
+        maxBreakpointPx: 78, // 16 rem + 2 rem + 42 rem + 2rem + 16rem
+      });
+      const shouldShiftContent = window.innerWidth >= minBreakpointPx && window.innerWidth <= maxBreakpointPx;
+
+      const contentAreaChild = contentAreaRef.current?.firstElementChild as HTMLElement | undefined;
+      if (contentAreaChild) {
+        contentAreaChild.className = shouldShiftContent
+          ? 'min-w-2xl ml-72 max-w-2xl flex-1 overflow-y-auto bg-white'
+          : 'min-w-2xl mx-auto max-w-2xl flex-1 overflow-y-auto bg-white';
+      }
+    };
+
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
 
@@ -46,21 +62,7 @@ const Options = () => {
         setIsMenuVisible(true);
       }
 
-      const { minBreakpointPx, maxBreakpointPx } = calculateBreakpoints({
-        minBreakpointPx: 60, // 16 rem + 2 rem + 42 rem
-        maxBreakpointPx: 78, // 16 rem + 2 rem + 42 rem + 2rem + 16rem
-      });
-      const resetContentAreaChildClassName =
-        window.innerWidth >= minBreakpointPx && window.innerWidth <= maxBreakpointPx;
-
-      const contentAreaChild = contentAreaRef.current?.firstElementChild as HTMLElement | undefined;
-      if (contentAreaChild) {
-        if (resetContentAreaChildClassName) {
-          contentAreaChild.className = 'min-w-2xl ml-72 max-w-2xl flex-1 overflow-y-auto bg-white';
-        } else {
-          contentAreaChild.className = 'min-w-2xl mx-auto max-w-2xl flex-1 overflow-y-auto bg-white';
-        }
-      }
+      updateContentAreaClass();
     };
 
     // 初始化时检查窗口大小
