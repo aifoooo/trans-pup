@@ -30,8 +30,8 @@ const Popup = () => {
               <IoSearchOutline className="h-4 w-4 text-gray-400" />
             </div>
             <input
-              className="w-full resize-none rounded-full border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 text-sm hover:bg-gray-100 focus:bg-gray-50 focus:outline-none"
-              placeholder="按下 Enter 翻译文本框内的文本"
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-2 pl-8 pr-4 text-sm hover:bg-gray-200 focus:bg-gray-50"
+              placeholder="按下 Enter 进行翻译"
             />
           </div>
         </div>

@@ -29,13 +29,18 @@ const Options = () => {
     const { isMenuPinned } = getMenuPinningInfo();
     return isMenuPinned;
   });
+  const [isScrolled, setIsScrolled] = useState(false);
   const [userManuallyOpenedMenu, setUserManuallyOpenedMenu] = useState(false);
 
+  const menuAreaRef = useRef<HTMLDivElement>(null);
   const contentAreaRef = useRef<HTMLDivElement>(null);
   const { isMenuPinned } = getMenuPinningInfo();
 
   // 监听窗口大小变化
   useEffect(() => {
+    const contentArea = contentAreaRef.current;
+    const menuArea = menuAreaRef.current;
+
     const updateContentAreaClass = () => {
       const { minBreakpointPx, maxBreakpointPx } = calculateBreakpoints({
         minBreakpointPx: 60, // 16 rem + 2 rem + 42 rem
@@ -49,6 +54,13 @@ const Options = () => {
           ? 'min-w-2xl ml-72 max-w-2xl flex-1 overflow-y-auto bg-white'
           : 'min-w-2xl mx-auto max-w-2xl flex-1 overflow-y-auto bg-white';
       }
+    };
+
+    const handleScroll = () => {
+      const isContentScrolled = (contentAreaRef.current?.scrollTop || 0) > 0;
+      const isMenuScrolled = (menuAreaRef.current?.scrollTop || 0) > 0;
+
+      setIsScrolled(isContentScrolled || isMenuScrolled);
     };
 
     const handleResize = () => {
@@ -70,9 +82,15 @@ const Options = () => {
 
     // 添加事件监听器
     window.addEventListener('resize', handleResize);
+    contentArea?.addEventListener('scroll', handleScroll);
+    menuArea?.addEventListener('scroll', handleScroll);
 
     // 清理事件监听器
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      contentArea?.removeEventListener('scroll', handleScroll);
+      menuArea?.removeEventListener('scroll', handleScroll);
+    };
   }, [isMenuPinned]);
 
   const menuItems: MenuItem[] = [
@@ -96,13 +114,197 @@ const Options = () => {
         />
       ),
     },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
+    {
+      id: 'coming-soon',
+      label: '敬请期待-test',
+      icon: (
+        <IoRocketOutline
+          size={18}
+          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+        />
+      ),
+    },
   ];
 
   const shouldShowOverlay = userManuallyOpenedMenu && isMenuVisible && !isMenuPinned;
 
   return (
     <div className={cn('App', 'overflow-hidden bg-white')}>
-      <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center bg-white px-6">
+      <header
+        className={cn(
+          'fixed inset-x-0 top-0 z-10 flex h-16 items-center bg-white px-6 transition-shadow duration-300',
+          isScrolled ? 'border-b border-gray-200 shadow-md' : '',
+        )}>
         {isMenuVisible ? (
           <>
             <img src={logo} className="mr-2 h-6 w-6" alt="Logo" />
@@ -129,7 +331,7 @@ const Options = () => {
             'App-menu absolute left-0 top-16 flex w-64 flex-col bg-white py-2 transition-transform duration-300 ease-in-out',
             isMenuVisible ? 'translate-x-0' : '-translate-x-full',
           )}>
-          <div className="flex-1 overflow-y-auto">
+          <div ref={menuAreaRef} className="flex-1 overflow-y-auto">
             <SidebarMenu
               activeMenu={activeMenu}
               setActiveMenu={setActiveMenu}
