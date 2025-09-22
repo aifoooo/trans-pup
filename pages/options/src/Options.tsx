@@ -1,6 +1,6 @@
 import '@src/Options.css';
 
-import { withErrorBoundary, withSuspense } from '@extension/shared';
+import { withErrorBoundary, withSuspense, calculateBreakpoints } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import { IoMenuOutline } from '@react-icons/all-files/io5/IoMenuOutline';
 import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
@@ -12,9 +12,9 @@ import { useState, useEffect, useRef } from 'react';
 import type { MenuItem } from '@src/components/SidebarMenu';
 
 const getMenuPinningInfo = () => {
-  const breakpointRem = 60; // 16 rem + 2 rem + 42 rem
-  const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-  const breakpointPx = breakpointRem * rootFontSize;
+  const { breakpointPx } = calculateBreakpoints({
+    breakpointPx: 60, // 16 rem + 2 rem + 42 rem
+  });
   const isMenuPinned = window.innerWidth >= breakpointPx;
 
   return { breakpointPx, isMenuPinned };
@@ -46,11 +46,10 @@ const Options = () => {
         setIsMenuVisible(true);
       }
 
-      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const minBreakpointRem = 60; // 16 rem + 2 rem + 42 rem
-      const maxBreakpointRem = 78; // 16 rem + 2 rem + 42 rem + 2rem + 16rem
-      const minBreakpointPx = minBreakpointRem * rootFontSize;
-      const maxBreakpointPx = maxBreakpointRem * rootFontSize;
+      const { minBreakpointPx, maxBreakpointPx } = calculateBreakpoints({
+        minBreakpointPx: 60, // 16 rem + 2 rem + 42 rem
+        maxBreakpointPx: 78, // 16 rem + 2 rem + 42 rem + 2rem + 16rem
+      });
       const resetContentAreaChildClassName =
         window.innerWidth >= minBreakpointPx && window.innerWidth <= maxBreakpointPx;
 
