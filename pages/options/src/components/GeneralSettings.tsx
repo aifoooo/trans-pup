@@ -1,5 +1,5 @@
 import { tencentTranslatorConfigStorage } from '@extension/storage';
-import EditableField from '@src/components/EditableField';
+import EditableInputFieldSet from '@src/components/EditableInputFieldSet';
 import { useState, useEffect } from 'react';
 import { RiQuestionnaireLine } from 'react-icons/ri';
 
@@ -37,16 +37,24 @@ const GeneralSettings = () => {
     };
   }, []);
 
-  const handleSecretIdSave = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const saveSecretId = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       await tencentTranslatorConfigStorage.saveSecretId(secretId);
     }
   };
 
-  const handleSecretKeySave = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const saveSecretIdOnBlur = async () => {
+    await tencentTranslatorConfigStorage.saveSecretId(secretId);
+  };
+
+  const saveSecretKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       await tencentTranslatorConfigStorage.saveSecretKey(secretKey);
     }
+  };
+
+  const saveSecretKeyOnBlur = async () => {
+    await tencentTranslatorConfigStorage.saveSecretKey(secretKey);
   };
 
   return (
@@ -65,21 +73,23 @@ const GeneralSettings = () => {
           </a>
         </label>
         <div className="flex flex-col gap-2">
-          <EditableField
-            label="SecretId"
+          <EditableInputFieldSet
             id="secretId"
+            label="SecretId"
             value={secretId}
             onChange={setSecretId}
-            onSave={handleSecretIdSave}
             masked={false}
+            onSave={saveSecretId}
+            onBlurSave={saveSecretIdOnBlur}
           />
-          <EditableField
-            label="SecretKey"
+          <EditableInputFieldSet
             id="secretKey"
+            label="SecretKey"
             value={secretKey}
             onChange={setSecretKey}
-            onSave={handleSecretKeySave}
             masked={true}
+            onSave={saveSecretKey}
+            onBlurSave={saveSecretKeyOnBlur}
           />
         </div>
       </form>

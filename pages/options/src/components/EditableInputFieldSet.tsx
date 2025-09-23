@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { FaRegEdit } from 'react-icons/fa';
 
-interface EditableFieldProps {
-  label: string;
+interface EditableInputFieldSetProps {
   id: string;
+  label: string;
   value: string;
   onChange: (value: string) => void;
   masked?: boolean; // 是否需要脱敏
   placeholder?: string;
   onSave?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onBlurSave?: () => void; // 失去焦点时的保存回调
 }
 
 const maskValue = (value: string): string => {
@@ -18,7 +19,16 @@ const maskValue = (value: string): string => {
   return '•'.repeat(value.length);
 };
 
-const EditableField = ({ label, id, value, onChange, masked = false, placeholder, onSave }: EditableFieldProps) => {
+const EditableInputFieldSet = ({
+  id,
+  label,
+  value,
+  onChange,
+  masked = false,
+  placeholder,
+  onSave,
+  onBlurSave,
+}: EditableInputFieldSetProps) => {
   const [editing, setEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -31,8 +41,16 @@ const EditableField = ({ label, id, value, onChange, masked = false, placeholder
   const handleSave = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       setEditing(false);
+      onSave?.(e);
     }
-    onSave?.(e);
+  };
+
+  const handleBlur = () => {
+    setEditing(false);
+    // 如果有提供失去焦点时的保存回调，则执行它
+    if (onBlurSave) {
+      onBlurSave();
+    }
   };
 
   return (
@@ -46,6 +64,7 @@ const EditableField = ({ label, id, value, onChange, masked = false, placeholder
           id={id}
           type="text"
           value={editing || !masked ? value : maskValue(value)}
+          onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           readOnly={!editing}
           className={`max-w-[calc(100%-1.5rem)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap border-0 px-0 text-sm focus:outline-none focus:ring-0 ${
@@ -53,8 +72,7 @@ const EditableField = ({ label, id, value, onChange, masked = false, placeholder
           }`}
           onClick={() => !editing && setEditing(true)}
           onKeyDown={handleSave}
-          onBlur={() => setEditing(false)}
-          onChange={e => onChange(e.target.value)}
+          onBlur={handleBlur}
         />
         {!editing && (
           <FaRegEdit
@@ -67,4 +85,4 @@ const EditableField = ({ label, id, value, onChange, masked = false, placeholder
   );
 };
 
-export default EditableField;
+export default EditableInputFieldSet;
