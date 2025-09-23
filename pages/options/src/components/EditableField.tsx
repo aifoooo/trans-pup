@@ -15,7 +15,7 @@ const maskValue = (value: string): string => {
   if (!value) {
     return '';
   }
-  return '*'.repeat(value.length);
+  return '•'.repeat(value.length);
 };
 
 const EditableField = ({ label, id, value, onChange, masked = false, placeholder, onSave }: EditableFieldProps) => {
