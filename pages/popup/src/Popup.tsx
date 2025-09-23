@@ -26,7 +26,7 @@ const Popup = () => {
         <div className="space-y-4 px-6 py-5">
           <textarea
             className="w-full resize-none rounded-lg bg-gray-100 p-4 text-sm hover:bg-gray-200 focus:bg-gray-100"
-            placeholder="按下 Enter 进行翻译"
+            placeholder="按下 Enter 翻译文本框内文本"
             rows={2}
           />
           <div className="space-y-3 rounded-lg bg-gray-100 p-4">
