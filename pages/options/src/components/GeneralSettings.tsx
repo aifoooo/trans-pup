@@ -1,20 +1,51 @@
+import { tencentTranslatorConfigStorage } from '@extension/storage';
 import EditableField from '@src/components/EditableField';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RiQuestionnaireLine } from 'react-icons/ri';
 
 const GeneralSettings = () => {
   const [secretId, setSecretId] = useState('');
   const [secretKey, setSecretKey] = useState('');
 
-  const handleSecretIdSave = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  // 加载已保存的配置并在配置变化时更新界面
+  useEffect(() => {
+    // 定义加载配置的函数
+    const loadConfig = async () => {
+      const config = tencentTranslatorConfigStorage.getSnapshot();
+      if (config) {
+        setSecretId(config.secretId || '');
+        setSecretKey(config.secretKey || '');
+      }
+    };
+
+    // 初始加载配置
+    loadConfig();
+
+    // 订阅配置变化，当存储中的配置发生变化时更新组件状态
+    // subscribe 方法返回一个取消订阅的函数
+    const unsubscribe = tencentTranslatorConfigStorage.subscribe(() => {
+      const config = tencentTranslatorConfigStorage.getSnapshot();
+      if (config) {
+        setSecretId(config.secretId || '');
+        setSecretKey(config.secretKey || '');
+      }
+    });
+
+    // 组件卸载时取消订阅，防止内存泄漏
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const handleSecretIdSave = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      // 可以在这里添加保存逻辑
+      await tencentTranslatorConfigStorage.saveSecretId(secretId);
     }
   };
 
-  const handleSecretKeySave = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSecretKeySave = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      // 可以在这里添加保存逻辑
+      await tencentTranslatorConfigStorage.saveSecretKey(secretKey);
     }
   };
 

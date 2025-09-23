@@ -21,8 +21,12 @@
     "format": "prettier . --write --ignore-path ../../.prettierignore",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "@extension/storage": "workspace:*",
+    "crypto-js": "^4.2.0"
+  },
   "devDependencies": {
     "@extension/tsconfig": "workspace:*",
-    "tencentcloud-sdk-nodejs-tmt": "^4.0.3"
+    "@types/crypto-js": "^4.2.2"
   }
 }

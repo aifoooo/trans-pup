@@ -23,7 +23,9 @@
     "@extension/i18n": "workspace:*",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
+    "@extension/translator": "workspace:*",
     "@extension/ui": "workspace:*",
+    "crypto-js": "^4.2.0",
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
