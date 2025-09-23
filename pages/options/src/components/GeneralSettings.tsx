@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { RiQuestionnaireLine } from 'react-icons/ri';
 
 const GeneralSettings = () => {
-  const [secretId, setSecretId] = useState('');
-  const [secretKey, setSecretKey] = useState('');
+  const [tencentSecretId, setTencentSecretId] = useState('');
+  const [tencentSecretKey, setTencentSecretKey] = useState('');
 
   // 加载已保存的配置并在配置变化时更新界面
   useEffect(() => {
@@ -13,8 +13,8 @@ const GeneralSettings = () => {
     const loadConfig = async () => {
       const config = tencentTranslatorConfigStorage.getSnapshot();
       if (config) {
-        setSecretId(config.secretId || '');
-        setSecretKey(config.secretKey || '');
+        setTencentSecretId(config.secretId || '');
+        setTencentSecretKey(config.secretKey || '');
       }
     };
 
@@ -26,8 +26,8 @@ const GeneralSettings = () => {
     const unsubscribe = tencentTranslatorConfigStorage.subscribe(() => {
       const config = tencentTranslatorConfigStorage.getSnapshot();
       if (config) {
-        setSecretId(config.secretId || '');
-        setSecretKey(config.secretKey || '');
+        setTencentSecretId(config.secretId || '');
+        setTencentSecretKey(config.secretKey || '');
       }
     });
 
@@ -37,24 +37,24 @@ const GeneralSettings = () => {
     };
   }, []);
 
-  const saveSecretId = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const saveTencentSecretId = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      await tencentTranslatorConfigStorage.saveSecretId(secretId);
+      await tencentTranslatorConfigStorage.saveSecretId(tencentSecretId);
     }
   };
 
-  const saveSecretIdOnBlur = async () => {
-    await tencentTranslatorConfigStorage.saveSecretId(secretId);
+  const saveTencentSecretIdOnBlur = async () => {
+    await tencentTranslatorConfigStorage.saveSecretId(tencentSecretId);
   };
 
-  const saveSecretKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const saveTencentSecretKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      await tencentTranslatorConfigStorage.saveSecretKey(secretKey);
+      await tencentTranslatorConfigStorage.saveSecretKey(tencentSecretKey);
     }
   };
 
-  const saveSecretKeyOnBlur = async () => {
-    await tencentTranslatorConfigStorage.saveSecretKey(secretKey);
+  const saveTencentSecretKeyOnBlur = async () => {
+    await tencentTranslatorConfigStorage.saveSecretKey(tencentSecretKey);
   };
 
   return (
@@ -74,22 +74,22 @@ const GeneralSettings = () => {
         </label>
         <div className="flex flex-col gap-2">
           <EditableInputFieldSet
-            id="secretId"
+            id="tencentSecretId"
             label="SecretId"
-            value={secretId}
-            onChange={setSecretId}
+            value={tencentSecretId}
+            onChange={setTencentSecretId}
             masked={false}
-            onSave={saveSecretId}
-            onBlurSave={saveSecretIdOnBlur}
+            onSave={saveTencentSecretId}
+            onBlurSave={saveTencentSecretIdOnBlur}
           />
           <EditableInputFieldSet
-            id="secretKey"
+            id="tencentSecretKey"
             label="SecretKey"
-            value={secretKey}
-            onChange={setSecretKey}
+            value={tencentSecretKey}
+            onChange={setTencentSecretKey}
             masked={true}
-            onSave={saveSecretKey}
-            onBlurSave={saveSecretKeyOnBlur}
+            onSave={saveTencentSecretKey}
+            onBlurSave={saveTencentSecretKeyOnBlur}
           />
         </div>
       </form>
