@@ -2,7 +2,7 @@ import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage } from '@extension/storage';
 import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
-import { IoSearchOutline, IoSettingsOutline } from 'react-icons/io5';
+import { IoSettingsOutline } from 'react-icons/io5';
 
 const Popup = () => {
   const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
@@ -23,33 +23,29 @@ const Popup = () => {
             <IoSettingsOutline size={18} className="text-gray-500" />
           </button>
         </header>
-        <div className="relative px-6 pb-2 pt-5">
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <IoSearchOutline className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              className="w-full rounded-full border border-gray-200 bg-gray-50 py-2 pl-8 pr-4 text-sm hover:bg-gray-200 focus:bg-gray-50"
-              placeholder="按下 Enter 进行翻译"
+        <div className="space-y-4 px-6 py-5">
+          <textarea
+            className="w-full resize-none rounded-lg bg-gray-100 p-4 text-sm hover:bg-gray-200 focus:bg-gray-100"
+            placeholder="按下 Enter 进行翻译"
+            rows={2}
+          />
+          <div className="space-y-3 rounded-lg bg-gray-100 p-4">
+            <ToggleSwitch
+              label="启用自动收集"
+              checked={autoCollection}
+              onChange={globalConfigStorage.toggleAutoCollection}
+            />
+            <ToggleSwitch
+              label="启用自动标注"
+              checked={autoAnnotation}
+              onChange={globalConfigStorage.toggleAutoAnnotation}
+            />
+            <ToggleSwitch
+              label="启用划词翻译"
+              checked={wordTranslation}
+              onChange={globalConfigStorage.toggleWordTranslation}
             />
           </div>
-        </div>
-        <div className="mt-4 space-y-3 border-t border-gray-200 pl-8 pr-6 pt-2 pt-5">
-          <ToggleSwitch
-            label="启用自动收集"
-            checked={autoCollection}
-            onChange={globalConfigStorage.toggleAutoCollection}
-          />
-          <ToggleSwitch
-            label="启用自动标注"
-            checked={autoAnnotation}
-            onChange={globalConfigStorage.toggleAutoAnnotation}
-          />
-          <ToggleSwitch
-            label="启用划词翻译"
-            checked={wordTranslation}
-            onChange={globalConfigStorage.toggleWordTranslation}
-          />
         </div>
       </div>
 
