@@ -1,8 +1,8 @@
-import * as tencentcloud from 'tencentcloud-sdk-nodejs-tmt';
+import { tmt } from 'tencentcloud-sdk-nodejs-tmt';
 import type { TranslatorInterface } from '../base/index.js';
 
 // 腾讯云翻译客户端
-const TmtClient = tencentcloud.tmt.v20180321.Client;
+const TmtClient = tmt.v20180321.Client;
 
 export class TencentTranslator implements TranslatorInterface {
   private client: InstanceType<typeof TmtClient>;

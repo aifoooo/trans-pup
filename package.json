@@ -19,6 +19,11 @@
     "type-check": "turbo type-check",
     "base-build": "pnpm clean:bundle && turbo build",
     "build": "pnpm set-global-env && pnpm base-build",
+    "build:analyze-all": "pnpm build:analyze-devtools-panel && pnpm build:analyze-options && pnpm build:analyze-popup && pnpm build:analyze-side-panel",
+    "build:analyze-devtools-panel": "vite-bundle-visualizer -c pages/devtools-panel/vite.config.mts --entry pages/devtools-panel/index.html",
+    "build:analyze-options": "vite-bundle-visualizer -c pages/options/vite.config.mts --entry pages/options/index.html",
+    "build:analyze-popup": "vite-bundle-visualizer -c pages/popup/vite.config.mts --entry pages/popup/index.html",
+    "build:analyze-side-panel": "vite-bundle-visualizer -c pages/side-panel/vite.config.mts --entry pages/side-panel/index.html",
     "build:firefox": "pnpm set-global-env CLI_CEB_FIREFOX=true && pnpm base-build",
     "base-dev": "pnpm clean:bundle && turbo ready && turbo watch dev",
     "dev": "pnpm set-global-env CLI_CEB_DEV=true && pnpm base-dev",
@@ -82,6 +87,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "vite": "^6.3.6",
+    "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-node-polyfills": "^0.23.0"
   },
   "lint-staged": {
