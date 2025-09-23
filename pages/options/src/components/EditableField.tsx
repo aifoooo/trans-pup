@@ -1,5 +1,5 @@
-import { FaRegEdit } from '@react-icons/all-files/fa/FaRegEdit';
 import { useState, useRef, useEffect } from 'react';
+import { FaRegEdit } from 'react-icons/fa';
 
 interface EditableFieldProps {
   label: string;

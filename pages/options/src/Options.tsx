@@ -2,13 +2,11 @@ import '@src/Options.css';
 
 import { withErrorBoundary, withSuspense, calculateBreakpoints } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
-import { IoMenuOutline } from '@react-icons/all-files/io5/IoMenuOutline';
-import { IoRocketOutline } from '@react-icons/all-files/io5/IoRocketOutline';
-import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
 import ComingSoonContent from '@src/components/ComingSoonContent';
 import GeneralSettings from '@src/components/GeneralSettings';
 import SidebarMenu from '@src/components/SidebarMenu';
 import { useState, useEffect, useRef } from 'react';
+import { IoSettingsOutline, IoRocketOutline, IoMenuOutline } from 'react-icons/io5';
 import type { MenuItem } from '@src/components/SidebarMenu';
 
 const getMenuPinningInfo = () => {

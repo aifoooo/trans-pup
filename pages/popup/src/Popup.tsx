@@ -2,8 +2,7 @@ import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage } from '@extension/storage';
 import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
-import { IoSearchOutline } from '@react-icons/all-files/io5/IoSearchOutline';
-import { IoSettingsOutline } from '@react-icons/all-files/io5/IoSettingsOutline';
+import { IoSearchOutline, IoSettingsOutline } from 'react-icons/io5';
 
 const Popup = () => {
   const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);

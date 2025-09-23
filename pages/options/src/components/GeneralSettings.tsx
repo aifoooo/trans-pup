@@ -1,6 +1,6 @@
-import { RiQuestionnaireLine } from '@react-icons/all-files/ri/RiQuestionnaireLine';
 import EditableField from '@src/components/EditableField';
 import { useState } from 'react';
+import { RiQuestionnaireLine } from 'react-icons/ri';
 
 const GeneralSettings = () => {
   const [secretId, setSecretId] = useState('');
