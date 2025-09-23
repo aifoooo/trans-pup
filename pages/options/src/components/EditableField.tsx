@@ -48,7 +48,7 @@ const EditableField = ({ label, id, value, onChange, masked = false, placeholder
           value={editing || !masked ? value : maskValue(value)}
           placeholder={placeholder}
           readOnly={!editing}
-          className={`flex-1 border-0 px-0 text-sm focus:outline-none focus:ring-0 ${
+          className={`max-w-[calc(100%-1.5rem)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap border-0 px-0 text-sm focus:outline-none focus:ring-0 ${
             editing ? 'bg-white text-gray-700' : 'cursor-pointer bg-transparent text-gray-400'
           }`}
           onClick={() => !editing && setEditing(true)}
