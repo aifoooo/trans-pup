@@ -32,6 +32,7 @@ const Options = () => {
   const logo = chrome.runtime.getURL('icon-128.png');
 
   // 状态变量
+  const [, setWindowWidth] = useState(window.innerWidth);
   const [activeMenu, setActiveMenu] = useState('general');
   const [isMenuVisible, setIsMenuVisible] = useState(() => {
     const { isMenuPinned } = calculateMenuPinningInfo();
@@ -81,6 +82,8 @@ const Options = () => {
     };
 
     const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+
       // 当窗口宽度小于 60rem (960px) 时隐藏菜单栏
       if (!isMenuPinned) {
         setIsMenuVisible(false);
