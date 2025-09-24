@@ -21,16 +21,24 @@ const Popup = () => {
   const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
 
   // 检查是否存在有效的翻译器配置
+  // 该副作用用于在组件挂载时检查翻译服务的可用性
+  // 主要检查两个方面：
+  // 1. 全局 translator 实例是否已创建
+  // 2. 用户是否配置了腾讯云翻译服务的凭证
+  // 如果任一条件满足，则设置 hasTranslator 状态为 true，表示翻译功能可用
   useEffect(() => {
     const checkTranslator = async () => {
-      // 检查当前 translator 是否存在
+      // 检查全局 translator 实例是否已存在
+      // 这个实例在应用启动时可能已经创建好了
       if (translator) {
         setHasTranslator(true);
         return;
       }
 
-      // 如果当前 translator 不存在，检查配置
+      // 如果全局 translator 实例不存在，则检查用户配置
+      // 获取存储中的腾讯云翻译配置
       const config = tencentTranslatorConfigStorage.getSnapshot();
+      // 检查配置中是否包含有效的密钥信息
       const hasValidConfig =
         config &&
         config.secretId &&
@@ -38,8 +46,10 @@ const Popup = () => {
         config.secretKey &&
         config.secretKey.trim() !== '';
 
+      // 检查环境变量中是否配置了腾讯云密钥
       const hasEnvVars = process.env.TENCENTCLOUD_SECRET_ID && process.env.TENCENTCLOUD_SECRET_KEY;
 
+      // 如果配置或环境变量中任一包含有效密钥，则认为翻译服务可用
       setHasTranslator(!!(hasValidConfig || hasEnvVars));
     };
 
