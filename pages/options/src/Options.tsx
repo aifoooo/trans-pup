@@ -9,9 +9,19 @@ import { useState, useEffect, useRef } from 'react';
 import { IoSettingsOutline, IoRocketOutline, IoMenuOutline } from 'react-icons/io5';
 import type { MenuItem } from '@src/components/SidebarMenu';
 
-const getMenuPinningInfo = () => {
+// 定义断点常量
+const MENU_BREAKPOINT_REM = 60;
+const MIN_CONTENT_SHIFT_REM = 60;
+const MAX_CONTENT_SHIFT_REM = 78;
+
+/**
+ * 计算菜单是否应该固定显示
+ * 根据窗口宽度和断点值判断菜单是否应该始终保持可见
+ * @returns 包含断点像素值和菜单是否应固定显示的状态值
+ */
+const calculateMenuPinningInfo = () => {
   const { breakpointPx } = calculateBreakpoints({
-    breakpointPx: 60, // 16 rem + 2 rem + 42 rem
+    breakpointPx: MENU_BREAKPOINT_REM, // 16 rem + 2 rem + 42 rem
   });
   const isMenuPinned = window.innerWidth >= breakpointPx;
 
@@ -21,29 +31,38 @@ const getMenuPinningInfo = () => {
 const Options = () => {
   const logo = chrome.runtime.getURL('icon-128.png');
 
-  const [, setWindowWidth] = useState(window.innerWidth);
+  // 状态变量
   const [activeMenu, setActiveMenu] = useState('general');
   const [isMenuVisible, setIsMenuVisible] = useState(() => {
-    const { isMenuPinned } = getMenuPinningInfo();
+    const { isMenuPinned } = calculateMenuPinningInfo();
     return isMenuPinned;
   });
   const [isScrolled, setIsScrolled] = useState(false);
   const [userManuallyOpenedMenu, setUserManuallyOpenedMenu] = useState(false);
 
+  // 引用变量
   const menuAreaRef = useRef<HTMLDivElement>(null);
   const contentAreaRef = useRef<HTMLDivElement>(null);
-  const { isMenuPinned } = getMenuPinningInfo();
+
+  // 计算变量
+  const { isMenuPinned } = calculateMenuPinningInfo();
 
   // 监听窗口大小变化
   useEffect(() => {
     const contentArea = contentAreaRef.current;
     const menuArea = menuAreaRef.current;
 
-    const updateContentAreaClass = () => {
-      const { minBreakpointPx, maxBreakpointPx } = calculateBreakpoints({
-        minBreakpointPx: 60, // 16 rem + 2 rem + 42 rem
-        maxBreakpointPx: 78, // 16 rem + 2 rem + 42 rem + 2rem + 16rem
-      });
+    // 预先计算断点值，避免在函数内重复计算
+    const { minBreakpointPx, maxBreakpointPx } = calculateBreakpoints({
+      minBreakpointPx: MIN_CONTENT_SHIFT_REM, // 16 rem + 2 rem + 42 rem
+      maxBreakpointPx: MAX_CONTENT_SHIFT_REM, // 16 rem + 2 rem + 42 rem + 2rem + 16rem
+    });
+
+    /**
+     * 根据窗口宽度调整内容区域的布局
+     * 当窗口宽度在特定范围内时，调整内容区域的布局以适应不同屏幕宽度下的显示
+     */
+    const adjustContentAreaLayout = () => {
       const shouldShiftContent = window.innerWidth >= minBreakpointPx && window.innerWidth <= maxBreakpointPx;
 
       const contentAreaChild = contentAreaRef.current?.firstElementChild as HTMLElement | undefined;
@@ -62,8 +81,6 @@ const Options = () => {
     };
 
     const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-
       // 当窗口宽度小于 60rem (960px) 时隐藏菜单栏
       if (!isMenuPinned) {
         setIsMenuVisible(false);
@@ -72,10 +89,10 @@ const Options = () => {
         setIsMenuVisible(true);
       }
 
-      updateContentAreaClass();
+      adjustContentAreaLayout();
     };
 
-    // 初始化时检查窗口大小
+    // 根据屏幕大小，初始化界面布局
     handleResize();
 
     // 添加事件监听器
