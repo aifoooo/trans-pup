@@ -50,7 +50,8 @@ const Popup = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
 
-      // 清除之前的错误信息
+      // 清除之前的翻译信息
+      setTranslatedText('');
       setError('');
 
       // 检查输入文本是否为空
@@ -93,7 +94,7 @@ const Popup = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex flex-col">
       <div className="flex-grow">
         <header className="flex items-center justify-between bg-gray-50 px-4 py-2">
           <div className="flex items-center space-x-2">
@@ -113,7 +114,11 @@ const Popup = () => {
             <textarea
               ref={textareaRef}
               value={inputText}
-              onChange={e => setInputText(e.target.value)}
+              onChange={e => {
+                setInputText(e.target.value);
+                setTranslatedText('');
+                setError('');
+              }}
               onKeyDown={handleTranslate}
               className="w-full resize-none rounded-lg bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
               placeholder="按下 Enter 翻译文本框内文本"
