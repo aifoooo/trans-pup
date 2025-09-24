@@ -7,13 +7,18 @@ import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 
 const Popup = () => {
-  const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
+  // 状态变量
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [, setHasTranslator] = useState(false);
+
+  // 引用变量
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 配置状态
+  const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
 
   // 检查是否存在有效的翻译器配置
   useEffect(() => {
@@ -50,50 +55,32 @@ const Popup = () => {
 
       // 检查输入文本是否为空
       if (!inputText.trim()) {
-        setError('请输入要翻译的文本');
         return;
       }
 
-      // 检查翻译器是否可用
-      if (!translator) {
+      // 确定要使用的翻译器实例
+      let translatorToUse = translator;
+      if (!translatorToUse) {
         // 再次尝试创建翻译器实例
-        const newTranslator = createTranslator();
-        if (!newTranslator) {
+        translatorToUse = createTranslator();
+        if (!translatorToUse) {
           setError('请先配置腾讯云翻译服务的 SecretId 和 SecretKey');
           return;
         }
-        // 如果创建成功，使用新创建的翻译器
-        try {
-          setIsLoading(true);
-
-          // 检测源语言
-          const sourceLanguage = await newTranslator.detect(inputText);
-
-          // 翻译文本（源语言是中文时翻译成英文，源语言不是中文时翻译成中文）
-          const result = await newTranslator.translate(
-            inputText,
-            sourceLanguage,
-            sourceLanguage === 'zh' ? 'en' : 'zh',
-          );
-
-          setTranslatedText(result);
-        } catch (err) {
-          console.error('Translation error:', err);
-          setError(err instanceof Error ? err.message : '翻译失败');
-        } finally {
-          setIsLoading(false);
-        }
-        return;
       }
 
       try {
         setIsLoading(true);
 
         // 检测源语言
-        const sourceLanguage = await translator.detect(inputText);
+        const sourceLanguage = await translatorToUse.detect(inputText);
 
         // 翻译文本（源语言是中文时翻译成英文，源语言不是中文时翻译成中文）
-        const result = await translator.translate(inputText, sourceLanguage, sourceLanguage === 'zh' ? 'en' : 'zh');
+        const result = await translatorToUse.translate(
+          inputText,
+          sourceLanguage,
+          sourceLanguage === 'zh' ? 'en' : 'zh',
+        );
 
         setTranslatedText(result);
       } catch (err) {
@@ -121,14 +108,14 @@ const Popup = () => {
             <IoSettingsOutline size={18} className="text-gray-500" />
           </button>
         </header>
-        <div className="space-y-4 px-6 py-5">
+        <div className="space-y-5 px-6 py-5">
           <div className="relative">
             <textarea
               ref={textareaRef}
               value={inputText}
               onChange={e => setInputText(e.target.value)}
               onKeyDown={handleTranslate}
-              className="w-full resize-none rounded-lg bg-gray-100 p-4 text-sm hover:bg-gray-200 focus:bg-gray-100"
+              className="w-full resize-none rounded-lg bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
               placeholder="按下 Enter 翻译文本框内文本"
               rows={2}
             />
@@ -138,8 +125,8 @@ const Popup = () => {
               </div>
             )}
           </div>
-          {error && <div className="px-2 text-sm text-red-500">{error}</div>}
-          {translatedText && <div className="rounded-lg bg-gray-100 p-4 text-sm">{translatedText}</div>}
+          {error && <div className="rounded-lg bg-red-100 p-4 text-sm">{error}</div>}
+          {translatedText && <div className="rounded-lg bg-green-100 p-4 text-sm">{translatedText}</div>}
           <div className="space-y-3 rounded-lg bg-gray-100 p-4">
             <ToggleSwitch
               label="启用自动收集"
