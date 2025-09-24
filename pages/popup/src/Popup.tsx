@@ -4,7 +4,7 @@ import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/
 import { createTranslator, translator } from '@extension/translator';
 import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
 import { useState, useRef, useEffect } from 'react';
-import { IoSettingsOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoReloadCircle } from 'react-icons/io5';
 
 const Popup = () => {
   // 状态变量
@@ -135,8 +135,10 @@ const Popup = () => {
               rows={2}
             />
             {isLoading && (
-              <div className="absolute bottom-2 right-2">
-                <LoadingSpinner />
+              <div className="absolute bottom-1 right-1">
+                <div className="flex items-center justify-center">
+                  <IoReloadCircle className="h-4 w-4 animate-spin text-blue-500" />
+                </div>
               </div>
             )}
           </div>
