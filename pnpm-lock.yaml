@@ -322,6 +322,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      react-icons:
+        specifier: ^5.5.0
+        version: 5.5.0(react@19.1.1)
       tailwind-merge:
         specifier: ^3.3.0
         version: 3.3.1

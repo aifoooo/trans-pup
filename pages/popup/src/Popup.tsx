@@ -2,9 +2,9 @@ import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
 import { createTranslator, translator } from '@extension/translator';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner } from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner } from '@extension/ui';
 import { useState, useRef, useEffect } from 'react';
-import { IoSettingsOutline, IoReloadCircle } from 'react-icons/io5';
+import { IoSettingsOutline } from 'react-icons/io5';
 
 const Popup = () => {
   // 状态变量
@@ -134,13 +134,7 @@ const Popup = () => {
               placeholder="按下 Enter 翻译文本框内文本"
               rows={2}
             />
-            {isLoading && (
-              <div className="absolute bottom-1 right-1">
-                <div className="flex items-center justify-center">
-                  <IoReloadCircle className="h-4 w-4 animate-spin text-blue-500" />
-                </div>
-              </div>
-            )}
+            {isLoading && <InlineLoadingSpinner />}
           </div>
           {error && <div className="rounded-lg bg-red-100 p-4 text-sm">{error}</div>}
           {translatedText && <div className="rounded-lg bg-green-100 p-4 text-sm">{translatedText}</div>}
