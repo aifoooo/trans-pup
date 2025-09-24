@@ -130,10 +130,8 @@ const Popup = () => {
                 setError('');
               }}
               onKeyDown={handleTranslate}
-              className={`w-full resize-none rounded-lg p-4 align-middle text-sm ${
-                translatedText || error
-                  ? 'border border-blue-500 bg-blue-100 hover:bg-blue-200 focus:bg-blue-100'
-                  : 'bg-gray-100 hover:bg-gray-200 focus:bg-gray-100'
+              className={`w-full resize-none rounded-lg bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100 ${
+                translatedText || error ? 'border-2 border-blue-500' : ''
               }`}
               placeholder="按下 Enter 翻译文本框内文本"
               rows={2}
@@ -141,8 +139,8 @@ const Popup = () => {
             {isLoading && <InlineLoadingSpinner />}
           </div>
           {error && (
-            <div className="flex flex-col rounded-lg border border-red-500 bg-red-100 text-sm">
-              <div className="flex flex-row items-center border-b border-red-500 px-4 py-2 font-medium">
+            <div className="flex flex-col space-y-2 rounded-lg border border-red-500 bg-red-100 p-4 text-sm">
+              <div className="flex flex-row items-center font-medium">
                 <img
                   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACNklEQVR4AezTA+wcQRTH8fkbQW0jrq2gCGvbtts4qWK7NqLatm3b5vnu9ZtkLpnsaXdrTPI57pvfWzwlIr/U/wZ+eQPO1jjJw2Csw1OEEMZzbMBg5KvvuMzwPngGSeElBn7P4CwsgsThgwcSx0Jkfo8GFkMMdzAKZY1jymI07kIMi741vCfEMB+5SY7PjdNwH7fh2XgK0ebZrEuzNPEcOW4fOtEeIs/htNzDdexHUzcNrIZoU1zUpylX6/jtGpilVr04gctq0euzauujOfxW2vYey6U0pmE9DmAjZqFGsuBCWANJIICZyEwSnIWZCEASWINC1vBSuAGxYS+KxAnPx3aIDTdQKhqehkMQLYIVaINa6IGDEMMtVDHCi+EkxHAQ3VALbbAcEYh2CGmKjTpAtBDaK2MZTU5GGKKdM8IvQQzTkRbnKrVHCKJ1UGy0EaLNTvGAtocHj1GVDcriFkQLY0CKB3Q2RNuo2OgNRCtvY0rq6vBKuA3RAuhqY0LKQ7Q3ygj3OxizqnhsCW/noN4P6kDwJ4hW0EZxdTyBaB60chBeEKJ9UpYJGGEj/JW5AVooJ2u5jFDmJBA6BqK9RtUEhQ3xHqJ9QEOH4VXxGqKNUQTm4j5Ee4XRKGEUNsMHiPYKDRwEl8Boy9W7j9zok90YHoiFRx25d0mtDHssc+7He5s8EAsPGlvHqx7uQaIIv6lWhbxG4fdwD3UTzXguhmMX4efMM/9Gr7ATI/F1yI2Tge8XjDpg1AEAsMEBDrhlyj8AAAAASUVORK5CYII="
                   alt="腾讯云"
@@ -150,14 +148,14 @@ const Popup = () => {
                 />
                 <span>腾讯翻译</span>
               </div>
-              <div className="p-4">
+              <div>
                 <span className="text-red-500">{error}</span>
               </div>
             </div>
           )}
           {translatedText && (
-            <div className="flex flex-col rounded-lg border border-green-500 bg-green-100 text-sm">
-              <div className="flex flex-row items-center border-b border-green-500 px-4 py-2 font-medium">
+            <div className="flex flex-col space-y-2 rounded-lg border border-green-500 bg-green-100 p-4 text-sm">
+              <div className="flex flex-row items-center font-medium">
                 <img
                   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACNklEQVR4AezTA+wcQRTH8fkbQW0jrq2gCGvbtts4qWK7NqLatm3b5vnu9ZtkLpnsaXdrTPI57pvfWzwlIr/U/wZ+eQPO1jjJw2Csw1OEEMZzbMBg5KvvuMzwPngGSeElBn7P4CwsgsThgwcSx0Jkfo8GFkMMdzAKZY1jymI07kIMi741vCfEMB+5SY7PjdNwH7fh2XgK0ebZrEuzNPEcOW4fOtEeIs/htNzDdexHUzcNrIZoU1zUpylX6/jtGpilVr04gctq0euzauujOfxW2vYey6U0pmE9DmAjZqFGsuBCWANJIICZyEwSnIWZCEASWINC1vBSuAGxYS+KxAnPx3aIDTdQKhqehkMQLYIVaINa6IGDEMMtVDHCi+EkxHAQ3VALbbAcEYh2CGmKjTpAtBDaK2MZTU5GGKKdM8IvQQzTkRbnKrVHCKJ1UGy0EaLNTvGAtocHj1GVDcriFkQLY0CKB3Q2RNuo2OgNRCtvY0rq6vBKuA3RAuhqY0LKQ7Q3ygj3OxizqnhsCW/noN4P6kDwJ4hW0EZxdTyBaB60chBeEKJ9UpYJGGEj/JW5AVooJ2u5jFDmJBA6BqK9RtUEhQ3xHqJ9QEOH4VXxGqKNUQTm4j5Ee4XRKGEUNsMHiPYKDRwEl8Boy9W7j9zok90YHoiFRx25d0mtDHssc+7He5s8EAsPGlvHqx7uQaIIv6lWhbxG4fdwD3UTzXguhmMX4efMM/9Gr7ATI/F1yI2Tge8XjDpg1AEAsMEBDrhlyj8AAAAASUVORK5CYII="
                   alt="腾讯云"
@@ -165,28 +163,30 @@ const Popup = () => {
                 />
                 <span>腾讯翻译</span>
               </div>
-              <div className="p-4">
+              <div>
                 <span>{translatedText}</span>
               </div>
             </div>
           )}
-          <div className="space-y-3 rounded-lg bg-gray-100 p-4">
-            <ToggleSwitch
-              label="启用自动收集"
-              checked={autoCollection}
-              onChange={globalConfigStorage.toggleAutoCollection}
-            />
-            <ToggleSwitch
-              label="启用自动标注"
-              checked={autoAnnotation}
-              onChange={globalConfigStorage.toggleAutoAnnotation}
-            />
-            <ToggleSwitch
-              label="启用划词翻译"
-              checked={wordTranslation}
-              onChange={globalConfigStorage.toggleWordTranslation}
-            />
-          </div>
+          {!translatedText && !error && (
+            <div className="space-y-3 rounded-lg bg-gray-100 p-4">
+              <ToggleSwitch
+                label="启用自动收集"
+                checked={autoCollection}
+                onChange={globalConfigStorage.toggleAutoCollection}
+              />
+              <ToggleSwitch
+                label="启用自动标注"
+                checked={autoAnnotation}
+                onChange={globalConfigStorage.toggleAutoAnnotation}
+              />
+              <ToggleSwitch
+                label="启用划词翻译"
+                checked={wordTranslation}
+                onChange={globalConfigStorage.toggleWordTranslation}
+              />
+            </div>
+          )}
         </div>
       </div>
 
