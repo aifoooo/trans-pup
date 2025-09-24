@@ -130,7 +130,9 @@ const Popup = () => {
                 setError('');
               }}
               onKeyDown={handleTranslate}
-              className="w-full resize-none rounded-lg bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
+              className={`w-full resize-none rounded-lg border-2 bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:border-blue-600 focus:bg-gray-100 ${
+                translatedText || error ? 'border-blue-600' : 'border-gray-100 hover:border-gray-200'
+              }`}
               placeholder="按下 Enter 翻译文本框内文本"
               rows={2}
             />
