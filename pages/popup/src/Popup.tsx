@@ -136,8 +136,22 @@ const Popup = () => {
             />
             {isLoading && <InlineLoadingSpinner />}
           </div>
-          {error && <div className="rounded-lg bg-red-100 p-4 text-sm">{error}</div>}
-          {translatedText && <div className="rounded-lg bg-green-100 p-4 text-sm">{translatedText}</div>}
+          {error && (
+            <div className="flex flex-col rounded-lg border border-red-500 bg-red-100 text-sm">
+              <div className="border-b border-red-500 px-4 py-2 font-medium">腾讯翻译</div>
+              <div className="p-4">
+                <span className="text-red-500">{error}</span>
+              </div>
+            </div>
+          )}
+          {translatedText && (
+            <div className="flex flex-col rounded-lg border border-green-500 bg-green-100 text-sm">
+              <div className="border-b border-green-500 px-4 py-2 font-medium">腾讯翻译</div>
+              <div className="p-4">
+                <span>{translatedText}</span>
+              </div>
+            </div>
+          )}
           <div className="space-y-3 rounded-lg bg-gray-100 p-4">
             <ToggleSwitch
               label="启用自动收集"
