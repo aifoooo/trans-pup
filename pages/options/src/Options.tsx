@@ -166,7 +166,7 @@ const Options = () => {
         {/* 左侧导航栏 */}
         <div
           className={cn(
-            'App-menu absolute left-0 top-16 flex w-64 flex-col bg-white py-2 transition-transform duration-300 ease-in-out',
+            'App-menu absolute left-0 top-16 z-10 flex w-64 flex-col bg-white py-2 transition-transform duration-300 ease-in-out',
             isMenuVisible ? 'translate-x-0' : '-translate-x-full',
           )}>
           <div ref={menuAreaRef} className="flex-1 overflow-y-auto">
