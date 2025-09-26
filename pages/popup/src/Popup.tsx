@@ -188,7 +188,7 @@ const Popup = () => {
         </div>
       </div>
 
-      <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-6 py-3 text-xs text-gray-500">
+      <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-8 py-3 text-xs text-gray-500">
         <span>v0.5.0</span>
         <button
           onClick={async () => {
