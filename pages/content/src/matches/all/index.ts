@@ -1,5 +1,5 @@
-import { sampleFunction } from '@src/sample-function';
+import { collectWords } from '@src/collect-words';
 
 console.log('[CEB] All content script loaded');
 
-void sampleFunction();
+void collectWords();
