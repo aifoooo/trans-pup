@@ -18,7 +18,7 @@ type VocabularyStorageType = BaseStorageType<string[]> & {
 // 创建词汇本存储实例
 const storage = createStorage<string[]>('vocabulary-storage-key', [], {
   storageEnum: StorageEnum.Local,
-  liveUpdate: false,
+  liveUpdate: true,
 });
 
 // 单词验证函数 - 检查是否为合法英文单词
@@ -65,7 +65,7 @@ const vocabularyStorage: VocabularyStorageType = {
     // 检查单词是否已存在
     const exists = currentVocabulary.includes(normalizedWord);
     if (exists) {
-      console.log(`[vocabulary-storage] Word already exists: ${normalizedWord}`);
+      console.debug(`[vocabulary-storage] Word already exists: ${normalizedWord}`);
       return;
     }
 
@@ -100,7 +100,7 @@ const vocabularyStorage: VocabularyStorageType = {
 
       // 检查单词是否已存在
       if (existingWords.has(normalizedWord)) {
-        console.log(`[vocabulary-storage] Word already exists: ${normalizedWord}`);
+        console.debug(`[vocabulary-storage] Word already exists: ${normalizedWord}`);
         continue;
       }
 
