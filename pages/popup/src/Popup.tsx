@@ -190,13 +190,51 @@ const Popup = () => {
 
       <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-6 py-3 text-xs text-gray-500">
         <span>v0.5.0</span>
-        <a
-          href="https://github.com/aifoooo/trans-pup.git"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={async () => {
+            try {
+              console.log('Attempting to open side panel...');
+              console.log('chrome.sidePanel:', chrome.sidePanel);
+
+              if (chrome.sidePanel) {
+                // 获取当前标签页信息
+                const [tab] = await chrome.tabs.query({
+                  active: true,
+                  currentWindow: true,
+                });
+                console.log('Current tab:', tab);
+
+                if (!tab || !tab.id) {
+                  console.error('Failed to get current tab information');
+                  alert('Failed to get current tab information');
+                  return;
+                }
+
+                // 先设置选项确保侧边栏在当前标签页启用
+                await chrome.sidePanel.setOptions({
+                  tabId: tab.id,
+                  path: 'side-panel/index.html',
+                  enabled: true,
+                });
+                console.log('Side panel options set');
+
+                // 打开侧边栏，使用tabId参数
+                await chrome.sidePanel.open({
+                  tabId: tab.id,
+                });
+                console.log('Side panel opened successfully');
+              } else {
+                console.error('chrome.sidePanel API is not available');
+                alert('Side panel API is not available in your browser');
+              }
+            } catch (error) {
+              console.error('Failed to open side panel:', error);
+              alert(`Failed to open side panel: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+          }}
           className="text-blue-500 hover:underline">
-          GitHub
-        </a>
+          单词本
+        </button>
       </footer>
     </div>
   );
