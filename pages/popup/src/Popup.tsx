@@ -193,43 +193,21 @@ const Popup = () => {
         <button
           onClick={async () => {
             try {
-              console.log('Attempting to open side panel...');
-              console.log('chrome.sidePanel:', chrome.sidePanel);
+              // 获取当前标签页信息
+              const [tab] = await chrome.tabs.query({
+                active: true,
+                currentWindow: true,
+              });
 
-              if (chrome.sidePanel) {
-                // 获取当前标签页信息
-                const [tab] = await chrome.tabs.query({
-                  active: true,
-                  currentWindow: true,
-                });
-                console.log('Current tab:', tab);
-
-                if (!tab || !tab.id) {
-                  console.error('Failed to get current tab information');
-                  alert('Failed to get current tab information');
-                  return;
-                }
-
-                // 先设置选项确保侧边栏在当前标签页启用
-                await chrome.sidePanel.setOptions({
-                  tabId: tab.id,
-                  path: 'side-panel/index.html',
-                  enabled: true,
-                });
-                console.log('Side panel options set');
-
-                // 打开侧边栏，使用tabId参数
-                await chrome.sidePanel.open({
-                  tabId: tab.id,
-                });
-                console.log('Side panel opened successfully');
-              } else {
-                console.error('chrome.sidePanel API is not available');
-                alert('Side panel API is not available in your browser');
+              if (!tab?.id) {
+                throw new Error('无法获取当前标签页信息');
               }
+
+              // 打开侧边栏
+              await chrome.sidePanel.open({ tabId: tab.id });
             } catch (error) {
-              console.error('Failed to open side panel:', error);
-              alert(`Failed to open side panel: ${error instanceof Error ? error.message : 'Unknown error'}`);
+              console.error('打开单词本失败:', error);
+              alert(`打开单词本失败: ${error instanceof Error ? error.message : '未知错误'}`);
             }
           }}
           className="text-blue-500 hover:underline">
