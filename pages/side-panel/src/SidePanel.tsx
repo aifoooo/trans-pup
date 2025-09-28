@@ -1,8 +1,9 @@
 import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
+import { exampleThemeStorage, vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import StatCard from '@src/components/StatCard';
+import { useEffect, useState } from 'react';
 import { AiFillRead } from 'react-icons/ai';
 import { FaRegStar } from 'react-icons/fa';
 import { IoBagHandleOutline, IoSearch } from 'react-icons/io5';
@@ -10,6 +11,53 @@ import { MdOutlineNewLabel } from 'react-icons/md';
 
 const SidePanel = () => {
   useStorage(exampleThemeStorage);
+  const [vocabularyCount, setVocabularyCount] = useState(0);
+  const [words, setWords] = useState<{ word: string; translation: string }[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage] = useState(1); // 固定显示第一页
+  const pageSize = 10; // 每页显示10个单词
+
+  // 获取词汇表总数
+  useEffect(() => {
+    const fetchVocabularyCount = async () => {
+      try {
+        const words = await vocabularyStorage.get();
+        setVocabularyCount(words.length);
+      } catch (error) {
+        console.error('Failed to fetch vocabulary count:', error);
+      }
+    };
+
+    fetchVocabularyCount();
+
+    // 监听变化
+    const unsubscribe = vocabularyStorage.subscribe(() => {
+      fetchVocabularyCount();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // 获取单词列表
+  useEffect(() => {
+    const fetchWords = async () => {
+      try {
+        const result = await vocabularyStorage.getWords(currentPage, pageSize, searchTerm);
+        // 使用默认翻译，因为还没有实现查词功能
+        const wordsWithDefaultTranslation = result.words.map(word => ({
+          word,
+          translation: '默认翻译',
+        }));
+        setWords(wordsWithDefaultTranslation);
+      } catch (error) {
+        console.error('Failed to fetch words:', error);
+      }
+    };
+
+    fetchWords();
+  }, [currentPage, pageSize, searchTerm]);
 
   return (
     <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')}>
@@ -17,13 +65,28 @@ const SidePanel = () => {
       <div className="grid grid-cols-2 gap-4">
         <StatCard
           title="新单词"
-          value={22222}
-          color="green"
+          value={vocabularyCount}
+          colorClass="bg-green-500"
           icon={<MdOutlineNewLabel className="h-4 w-4 text-white" />}
         />
-        <StatCard title="学习中" value={0} color="red" icon={<AiFillRead className="h-4 w-4 text-white" />} />
-        <StatCard title="已掌握" value={0} color="blue" icon={<IoBagHandleOutline className="h-4 w-4 text-white" />} />
-        <StatCard title="已收藏" value={0} color="yellow" icon={<FaRegStar className="h-4 w-4 text-white" />} />
+        <StatCard
+          title="学习中"
+          value={0}
+          colorClass="bg-red-500"
+          icon={<AiFillRead className="h-4 w-4 text-white" />}
+        />
+        <StatCard
+          title="已掌握"
+          value={0}
+          colorClass="bg-blue-500"
+          icon={<IoBagHandleOutline className="h-4 w-4 text-white" />}
+        />
+        <StatCard
+          title="已收藏"
+          value={0}
+          colorClass="bg-yellow-500"
+          icon={<FaRegStar className="h-4 w-4 text-white" />}
+        />
       </div>
 
       {/* 单词列表区域 */}
@@ -38,28 +101,14 @@ const SidePanel = () => {
               <input
                 type="text"
                 placeholder="搜索单词"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full rounded-lg bg-gray-100 py-1.5 pl-8 pr-2 text-sm hover:bg-gray-200 focus:bg-gray-100"
               />
             </div>
           </div>
           <ul className="divide-y divide-gray-200 border-t border-gray-200">
-            {[
-              {
-                word: 'abandon',
-                translation: '放弃；抛弃；遗弃；离弃；放弃（信念、信仰或看法）；中止；不再有；沉湎于（某种情感）',
-              },
-              { word: 'breadth', translation: '宽度；广度；范围' },
-              { word: 'funnel', translation: '漏斗' },
-              { word: 'invalidate', translation: '使无效；使作废；证明…… 错误' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-              { word: 'fictional', translation: '虚构的' },
-            ].map((item, index) => (
+            {words.map((item, index) => (
               <li
                 key={index}
                 className="flex items-center justify-between space-x-2 px-4 py-2 transition-colors hover:bg-gray-50">

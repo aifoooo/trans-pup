@@ -131,7 +131,7 @@ const Popup = () => {
                 setError('');
               }}
               onKeyDown={handleTranslate}
-              className="w-full resize-none rounded-lg bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
+              className="w-full resize-none rounded-lg bg-gray-100 px-4 py-2.5 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
               placeholder="按下 Enter 翻译文本框内文本"
               rows={2}
             />

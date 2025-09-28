@@ -13,6 +13,8 @@ type VocabularyStorageType = BaseStorageType<string[]> & {
   removeWord: (word: string) => Promise<void>;
   // 清空词汇本
   clear: () => Promise<void>;
+  // 分页获取单词
+  getWords: (page: number, pageSize: number, search?: string) => Promise<{ words: string[]; total: number }>;
 };
 
 // 创建词汇本存储实例
@@ -141,6 +143,29 @@ const vocabularyStorage: VocabularyStorageType = {
   clear: async () => {
     await storage.set([]);
     console.log('[vocabulary-storage] Cleared all words');
+  },
+
+  // 分页获取单词
+  getWords: async (page: number, pageSize: number, search?: string) => {
+    // 获取当前所有单词
+    let words = await storage.get();
+
+    // 如果有搜索关键字，则进行过滤
+    if (search) {
+      const searchLower = search.toLowerCase();
+      words = words.filter(word => word.includes(searchLower));
+    }
+
+    // 计算分页数据
+    const total = words.length;
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedWords = words.slice(start, end);
+
+    return {
+      words: paginatedWords,
+      total,
+    };
   },
 };
 
