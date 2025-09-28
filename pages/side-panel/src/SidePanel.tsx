@@ -2,6 +2,7 @@ import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import StatCard from '@src/components/StatCard';
 import { AiFillRead } from 'react-icons/ai';
 import { FaRegStar } from 'react-icons/fa';
 import { IoBagHandleOutline, IoSearch } from 'react-icons/io5';
@@ -14,42 +15,15 @@ const SidePanel = () => {
     <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')}>
       {/* 状态卡片区域 */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col rounded-lg border border-green-500 bg-white p-2.5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500">
-              <MdOutlineNewLabel className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold">22222</span>
-          </div>
-          <span className="mt-1 text-sm font-medium text-gray-400">新单词</span>
-        </div>
-        <div className="flex flex-col rounded-lg bg-white p-2.5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
-              <AiFillRead className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold">0</span>
-          </div>
-          <span className="mt-1 text-sm font-medium text-gray-400">学习中</span>
-        </div>
-        <div className="flex flex-col rounded-lg bg-white p-2.5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500">
-              <IoBagHandleOutline className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold">0</span>
-          </div>
-          <span className="mt-1 text-sm font-medium text-gray-400">已掌握</span>
-        </div>
-        <div className="flex flex-col rounded-lg bg-white p-2.5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-500">
-              <FaRegStar className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold">0</span>
-          </div>
-          <span className="mt-1 text-sm font-medium text-gray-400">已收藏</span>
-        </div>
+        <StatCard
+          title="新单词"
+          value={22222}
+          color="green"
+          icon={<MdOutlineNewLabel className="h-4 w-4 text-white" />}
+        />
+        <StatCard title="学习中" value={0} color="red" icon={<AiFillRead className="h-4 w-4 text-white" />} />
+        <StatCard title="已掌握" value={0} color="blue" icon={<IoBagHandleOutline className="h-4 w-4 text-white" />} />
+        <StatCard title="已收藏" value={0} color="yellow" icon={<FaRegStar className="h-4 w-4 text-white" />} />
       </div>
 
       {/* 单词列表区域 */}
