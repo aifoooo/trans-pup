@@ -3,7 +3,7 @@ import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import StatCard from '@src/components/StatCard';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AiFillRead } from 'react-icons/ai';
 import { FaRegStar } from 'react-icons/fa';
 import { IoBagHandleOutline, IoSearch } from 'react-icons/io5';
@@ -14,8 +14,10 @@ const SidePanel = () => {
   const [vocabularyCount, setVocabularyCount] = useState(0);
   const [words, setWords] = useState<{ word: string; translation: string }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage] = useState(1); // 固定显示第一页
-  const pageSize = 10; // 每页显示10个单词
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20; // 调整分页大小为20
+  const [hasMore, setHasMore] = useState(true); // 是否还有更多数据
+  const [loading, setLoading] = useState(false); // 是否正在加载
 
   // 获取词汇表总数
   useEffect(() => {
@@ -41,23 +43,58 @@ const SidePanel = () => {
   }, []);
 
   // 获取单词列表
-  useEffect(() => {
-    const fetchWords = async () => {
+  const fetchWords = useCallback(
+    async (page: number, search: string) => {
+      setLoading(true);
       try {
-        const result = await vocabularyStorage.getWords(currentPage, pageSize, searchTerm);
+        const result = await vocabularyStorage.getWords(page, pageSize, search);
         // 使用默认翻译，因为还没有实现查词功能
         const wordsWithDefaultTranslation = result.words.map(word => ({
           word,
           translation: '默认翻译',
         }));
-        setWords(wordsWithDefaultTranslation);
+
+        // 如果是第一页，替换数据；否则追加数据
+        if (page === 1) {
+          setWords(wordsWithDefaultTranslation);
+        } else {
+          setWords(prevWords => [...prevWords, ...wordsWithDefaultTranslation]);
+        }
+
+        // 检查是否还有更多数据
+        setHasMore(result.words.length === pageSize);
       } catch (error) {
         console.error('Failed to fetch words:', error);
+      } finally {
+        setLoading(false);
       }
-    };
+    },
+    [pageSize],
+  );
 
-    fetchWords();
-  }, [currentPage, pageSize, searchTerm]);
+  // 初始加载和搜索时重新加载
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchWords(1, searchTerm);
+  }, [fetchWords, searchTerm]);
+
+  // 加载更多数据
+  const loadMore = () => {
+    if (hasMore && !loading) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchWords(nextPage, searchTerm);
+    }
+  };
+
+  // 处理滚动到底部的事件
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    // 当滚动到底部时加载更多
+    if (scrollHeight - scrollTop <= clientHeight + 10) {
+      loadMore();
+    }
+  };
 
   return (
     <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')}>
@@ -90,9 +127,11 @@ const SidePanel = () => {
       </div>
 
       {/* 单词列表区域 */}
-      <div className="mt-6">
+      <div className="mt-6 flex min-h-0 flex-1 flex-col">
         <h2 className="mb-2 text-lg font-semibold">新单词</h2>
-        <div className="overflow-hidden rounded-lg bg-white shadow-sm">
+        <div
+          className="flex min-h-0 flex-1 flex-col overflow-hidden overflow-y-auto rounded-lg bg-white shadow-sm"
+          onScroll={handleScroll}>
           <div className="p-3">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
@@ -107,7 +146,7 @@ const SidePanel = () => {
               />
             </div>
           </div>
-          <ul className="divide-y divide-gray-200 border-t border-gray-200">
+          <ul className="flex-1 divide-y divide-gray-200 border-t border-gray-200">
             {words.map((item, index) => (
               <li
                 key={index}
@@ -116,6 +155,11 @@ const SidePanel = () => {
                 <span className="truncate whitespace-nowrap text-sm text-gray-400">{item.translation}</span>
               </li>
             ))}
+            {loading && (
+              <li className="flex justify-center py-4">
+                <LoadingSpinner />
+              </li>
+            )}
           </ul>
         </div>
       </div>
