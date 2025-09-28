@@ -120,7 +120,7 @@ const Popup = () => {
             <IoSettingsOutline size={18} className="text-gray-500" />
           </button>
         </header>
-        <div className="space-y-5 px-6 py-5">
+        <div className="space-y-5 px-5 py-5">
           <div className="relative">
             <textarea
               ref={textareaRef}
@@ -131,7 +131,7 @@ const Popup = () => {
                 setError('');
               }}
               onKeyDown={handleTranslate}
-              className="w-full resize-none rounded-lg bg-gray-100 px-4 py-2.5 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
+              className="w-full resize-none rounded-lg bg-gray-100 p-4 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
               placeholder="按下 Enter 翻译文本框内文本"
               rows={2}
             />
@@ -142,17 +142,17 @@ const Popup = () => {
           {!translatedText && !error && (
             <div className="space-y-3 rounded-lg bg-gray-100 p-4">
               <ToggleSwitch
-                label="启用自动收集"
+                label="自动收集"
                 checked={autoCollection}
                 onChange={globalConfigStorage.toggleAutoCollection}
               />
               <ToggleSwitch
-                label="启用自动标注"
+                label="自动标注"
                 checked={autoAnnotation}
                 onChange={globalConfigStorage.toggleAutoAnnotation}
               />
               <ToggleSwitch
-                label="启用划词翻译"
+                label="划词翻译"
                 checked={wordTranslation}
                 onChange={globalConfigStorage.toggleWordTranslation}
               />
