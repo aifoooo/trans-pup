@@ -51,11 +51,22 @@ const SidePanel = () => {
     setLoading(true);
     try {
       const result = await vocabularyStorage.getWords(page, PAGE_SIZE, search);
+
+      // 检查 result.words 是否存在且为数组
+      if (!result.words || !Array.isArray(result.words)) {
+        setWords([]);
+        setHasMore(false);
+        return;
+      }
+
       // 使用默认翻译，因为还没有实现查词功能
-      const wordsWithDefaultTranslation = result.words.map(word => ({
-        word,
-        translation: '默认翻译',
-      }));
+      const wordsWithDefaultTranslation = result.words.map(wordItem => {
+        const wordValue = typeof wordItem === 'string' ? wordItem : JSON.stringify(wordItem);
+        return {
+          word: wordValue,
+          translation: '默认翻译',
+        };
+      });
 
       // 如果是第一页，替换数据；否则追加数据
       setWords(page === 1 ? wordsWithDefaultTranslation : prevWords => [...prevWords, ...wordsWithDefaultTranslation]);
@@ -64,6 +75,8 @@ const SidePanel = () => {
       setHasMore(result.words.length === PAGE_SIZE);
     } catch (error) {
       console.error('Failed to fetch words:', error);
+      setWords([]);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
