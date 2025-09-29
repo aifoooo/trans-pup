@@ -5,7 +5,6 @@ const GeneralSettings = () => {
     if (confirm('确定要清空单词本吗？此操作无法撤销。')) {
       try {
         await vocabularyStorage.clear();
-        alert('单词本已清空！');
       } catch (error) {
         console.error('清空单词本失败:', error);
         alert('清空单词本失败，请重试。');
