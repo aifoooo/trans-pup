@@ -1,6 +1,6 @@
 import '@src/SidePanel.css';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, vocabularyStorage } from '@extension/storage';
+import { withErrorBoundary, withSuspense } from '@extension/shared';
+import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import StatCard from '@src/components/StatCard';
 import { useEffect, useState, useCallback } from 'react';
@@ -9,13 +9,18 @@ import { FaRegStar } from 'react-icons/fa';
 import { IoBagHandleOutline, IoSearch } from 'react-icons/io5';
 import { MdOutlineNewLabel } from 'react-icons/md';
 
+type WordItem = {
+  word: string;
+  translation: string;
+};
+
+const PAGE_SIZE = 20;
+
 const SidePanel = () => {
-  useStorage(exampleThemeStorage);
   const [vocabularyCount, setVocabularyCount] = useState(0);
-  const [words, setWords] = useState<{ word: string; translation: string }[]>([]);
+  const [words, setWords] = useState<WordItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 20; // 调整分页大小为20
   const [hasMore, setHasMore] = useState(true); // 是否还有更多数据
   const [loading, setLoading] = useState(false); // 是否正在加载
 
@@ -30,12 +35,11 @@ const SidePanel = () => {
       }
     };
 
-    fetchVocabularyCount();
-
     // 监听变化
-    const unsubscribe = vocabularyStorage.subscribe(() => {
-      fetchVocabularyCount();
-    });
+    const unsubscribe = vocabularyStorage.subscribe(fetchVocabularyCount);
+
+    // 初始加载
+    fetchVocabularyCount();
 
     return () => {
       unsubscribe();
@@ -43,34 +47,27 @@ const SidePanel = () => {
   }, []);
 
   // 获取单词列表
-  const fetchWords = useCallback(
-    async (page: number, search: string) => {
-      setLoading(true);
-      try {
-        const result = await vocabularyStorage.getWords(page, pageSize, search);
-        // 使用默认翻译，因为还没有实现查词功能
-        const wordsWithDefaultTranslation = result.words.map(word => ({
-          word,
-          translation: '默认翻译',
-        }));
+  const fetchWords = useCallback(async (page: number, search: string) => {
+    setLoading(true);
+    try {
+      const result = await vocabularyStorage.getWords(page, PAGE_SIZE, search);
+      // 使用默认翻译，因为还没有实现查词功能
+      const wordsWithDefaultTranslation = result.words.map(word => ({
+        word,
+        translation: '默认翻译',
+      }));
 
-        // 如果是第一页，替换数据；否则追加数据
-        if (page === 1) {
-          setWords(wordsWithDefaultTranslation);
-        } else {
-          setWords(prevWords => [...prevWords, ...wordsWithDefaultTranslation]);
-        }
+      // 如果是第一页，替换数据；否则追加数据
+      setWords(page === 1 ? wordsWithDefaultTranslation : prevWords => [...prevWords, ...wordsWithDefaultTranslation]);
 
-        // 检查是否还有更多数据
-        setHasMore(result.words.length === pageSize);
-      } catch (error) {
-        console.error('Failed to fetch words:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [pageSize],
-  );
+      // 检查是否还有更多数据
+      setHasMore(result.words.length === PAGE_SIZE);
+    } catch (error) {
+      console.error('Failed to fetch words:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // 初始加载和搜索时重新加载
   useEffect(() => {
@@ -79,13 +76,13 @@ const SidePanel = () => {
   }, [fetchWords, searchTerm]);
 
   // 加载更多数据
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (hasMore && !loading) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
       fetchWords(nextPage, searchTerm);
     }
-  };
+  }, [currentPage, fetchWords, hasMore, loading, searchTerm]);
 
   // 处理滚动到底部的事件
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
