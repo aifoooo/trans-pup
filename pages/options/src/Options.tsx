@@ -2,11 +2,12 @@ import '@src/Options.css';
 
 import { withErrorBoundary, withSuspense, calculateBreakpoints } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
-import ComingSoonContent from '@src/components/ComingSoonContent';
 import GeneralSettings from '@src/components/GeneralSettings';
 import SidebarMenu from '@src/components/SidebarMenu';
+import TranslationService from '@src/components/TranslationService';
 import { useState, useEffect, useRef } from 'react';
-import { IoSettingsOutline, IoRocketOutline, IoMenuOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoMenuOutline } from 'react-icons/io5';
+import { MdOutlineTranslate } from 'react-icons/md';
 import type { MenuItem } from '@src/components/SidebarMenu';
 
 // 定义断点常量
@@ -123,12 +124,12 @@ const Options = () => {
       ),
     },
     {
-      id: 'coming-soon',
-      label: '敬请期待',
+      id: 'translation-service',
+      label: '翻译服务',
       icon: (
-        <IoRocketOutline
+        <MdOutlineTranslate
           size={18}
-          className={cn('mr-6', activeMenu === 'coming-soon' ? 'text-blue-600' : 'text-gray-700')}
+          className={cn('mr-6', activeMenu === 'translation-service' ? 'text-blue-600' : 'text-gray-700')}
         />
       ),
     },
@@ -200,7 +201,7 @@ const Options = () => {
         <div ref={contentAreaRef} className="mt-16 flex-1 overflow-y-auto pt-2">
           <div className="min-w-2xl mx-auto max-w-2xl bg-white">
             {activeMenu === 'general' && <GeneralSettings />}
-            {activeMenu === 'coming-soon' && <ComingSoonContent />}
+            {activeMenu === 'translation-service' && <TranslationService />}
           </div>
         </div>
       </div>
