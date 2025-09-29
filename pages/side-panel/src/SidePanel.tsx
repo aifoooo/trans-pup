@@ -17,33 +17,27 @@ type WordItem = {
 const PAGE_SIZE = 20;
 
 const SidePanel = () => {
+  // 主要数据状态
   const [vocabularyCount, setVocabularyCount] = useState(0);
   const [words, setWords] = useState<WordItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+
+  // 分页相关状态
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true); // 是否还有更多数据
-  const [loading, setLoading] = useState(false); // 是否正在加载
+  const [hasMore, setHasMore] = useState(true);
+
+  // 搜索和加载状态
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [vocabularyUpdateCount, setVocabularyUpdateCount] = useState(0);
 
   // 获取词汇表总数
-  useEffect(() => {
-    const fetchVocabularyCount = async () => {
-      try {
-        const words = await vocabularyStorage.get();
-        setVocabularyCount(words.length);
-      } catch (error) {
-        console.error('Failed to fetch vocabulary count:', error);
-      }
-    };
-
-    // 监听变化
-    const unsubscribe = vocabularyStorage.subscribe(fetchVocabularyCount);
-
-    // 初始加载
-    fetchVocabularyCount();
-
-    return () => {
-      unsubscribe();
-    };
+  const fetchVocabularyCount = useCallback(async () => {
+    try {
+      const words = await vocabularyStorage.get();
+      setVocabularyCount(words.length);
+    } catch (error) {
+      console.error('Failed to fetch vocabulary count:', error);
+    }
   }, []);
 
   // 获取单词列表
@@ -84,9 +78,10 @@ const SidePanel = () => {
 
   // 初始加载和搜索时重新加载
   useEffect(() => {
+    fetchVocabularyCount();
     setCurrentPage(1);
     fetchWords(1, searchTerm);
-  }, [fetchWords, searchTerm]);
+  }, [fetchVocabularyCount, fetchWords, searchTerm, vocabularyUpdateCount]);
 
   // 加载更多数据
   const loadMore = useCallback(() => {
@@ -105,6 +100,19 @@ const SidePanel = () => {
       loadMore();
     }
   };
+
+  // 监听词汇存储变化以刷新数据
+  const handleVocabularyChange = useCallback(() => {
+    setVocabularyUpdateCount(prev => prev + 1);
+  }, []);
+
+  // 订阅词汇存储的变化
+  useEffect(() => {
+    const unsubscribe = vocabularyStorage.subscribe(handleVocabularyChange);
+    return () => {
+      unsubscribe();
+    };
+  }, [handleVocabularyChange]);
 
   return (
     <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')} onScroll={handleScroll}>
