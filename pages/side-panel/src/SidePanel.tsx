@@ -97,7 +97,7 @@ const SidePanel = () => {
   };
 
   return (
-    <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')}>
+    <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')} onScroll={handleScroll}>
       {/* 状态卡片区域 */}
       <div className="grid grid-cols-2 gap-4">
         <StatCard
@@ -129,9 +129,7 @@ const SidePanel = () => {
       {/* 单词列表区域 */}
       <div className="mt-6 flex min-h-0 flex-1 flex-col">
         <h2 className="mb-2 text-lg font-semibold">新单词</h2>
-        <div
-          className="flex min-h-0 flex-1 flex-col overflow-hidden overflow-y-auto rounded-lg bg-white shadow-sm"
-          onScroll={handleScroll}>
+        <div className="flex min-h-0 flex-1 flex-col rounded-lg bg-white shadow-sm">
           <div className="p-3">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
