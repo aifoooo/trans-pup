@@ -1,5 +1,13 @@
-import inlineCss from '../../../dist/all/index.css?inline';
-import { initAppWithShadow } from '@extension/shared';
 import App from '@src/matches/all/App';
+import { createRoot } from 'react-dom/client';
 
-initAppWithShadow({ id: 'CEB-extension-all', app: <App />, inlineCss });
+const init = () => {
+  const root = document.createElement('div');
+  root.id = 'CEB-extension-all';
+  root.style.display = 'none';
+  document.body.append(root);
+
+  createRoot(root).render(<App />);
+};
+
+init();
