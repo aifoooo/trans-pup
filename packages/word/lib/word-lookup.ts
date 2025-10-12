@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 import type { WordEntry, WordDictionary } from './types.js';
 
 /**
@@ -21,25 +20,11 @@ export class WordLookup {
   }
 
   /**
-   * 从文件加载词典数据
-   * @param filePath 词典文件路径
-   * @returns WordLookup 实例
-   */
-  static fromFile(filePath: string): WordLookup {
-    const data = readFileSync(filePath, 'utf8');
-    const dictionaryData: WordDictionary = JSON.parse(data);
-    return new WordLookup(dictionaryData);
-  }
-
-  /**
    * 获取单例实例
    * @param filePath 词典文件路径（仅在首次调用时需要）
    * @returns WordLookup 实例
    */
-  static getInstance(filePath?: string): WordLookup {
-    if (!WordLookup.instance && filePath) {
-      WordLookup.instance = WordLookup.fromFile(filePath);
-    }
+  static getInstance(): WordLookup {
     if (!WordLookup.instance) {
       throw new Error('WordLookup instance has not been initialized.');
     }
