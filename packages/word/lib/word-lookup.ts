@@ -8,6 +8,7 @@ import type { WordEntry, WordDictionary } from './types.js';
 export class WordLookup {
   private dictionary: WordDictionary;
   private wordMap: Map<string, WordEntry>;
+  private static instance: WordLookup | null = null;
 
   /**
    * 构造函数
@@ -28,6 +29,32 @@ export class WordLookup {
     const data = readFileSync(filePath, 'utf8');
     const dictionaryData: WordDictionary = JSON.parse(data);
     return new WordLookup(dictionaryData);
+  }
+
+  /**
+   * 获取单例实例
+   * @param filePath 词典文件路径（仅在首次调用时需要）
+   * @returns WordLookup 实例
+   */
+  static getInstance(filePath?: string): WordLookup {
+    if (!WordLookup.instance && filePath) {
+      WordLookup.instance = WordLookup.fromFile(filePath);
+    }
+    if (!WordLookup.instance) {
+      throw new Error('WordLookup instance has not been initialized.');
+    }
+    return WordLookup.instance;
+  }
+
+  /**
+   * 设置单例实例
+   * @param instance 要设置的 WordLookup 实例
+   */
+  static setInstance(instance: WordLookup): void {
+    if (WordLookup.instance) {
+      console.warn('WordLookup instance already exists. Overwriting existing instance.');
+    }
+    WordLookup.instance = instance;
   }
 
   /**

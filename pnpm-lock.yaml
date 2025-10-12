@@ -387,6 +387,9 @@ importers:
       '@extension/storage':
         specifier: workspace:*
         version: link:../../packages/storage
+      '@extension/word':
+        specifier: workspace:*
+        version: link:../../packages/word
     devDependencies:
       '@extension/hmr':
         specifier: workspace:*

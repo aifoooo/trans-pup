@@ -23,6 +23,7 @@
   "dependencies": {
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
+    "@extension/word": "workspace:*",
     "@extension/env": "workspace:*"
   },
   "devDependencies": {

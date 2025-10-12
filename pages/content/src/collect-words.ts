@@ -1,4 +1,7 @@
 import { vocabularyStorage } from '@extension/storage';
+import { WordLookup } from '@extension/word';
+
+const wordLookup = WordLookup.getInstance();
 
 const collectWords = function (): string[] {
   console.log('[collect-words] Starting word collection...');
@@ -12,8 +15,11 @@ const collectWords = function (): string[] {
   const uniqueWords = [...new Set(words)];
   console.log('[collect-words] Unique words array length:', uniqueWords.length);
 
+  const filteredWords = uniqueWords.filter(word => wordLookup.hasWord(word));
+  console.log('[collect-words] Filtered words array length:', filteredWords.length);
+
   vocabularyStorage
-    .addWords(uniqueWords)
+    .addWords(filteredWords)
     .then(() => {
       console.log('[collect-words] Words added to vocabulary storage');
     })
@@ -24,8 +30,9 @@ const collectWords = function (): string[] {
   // 仅在开发环境中输出详细信息
   if (process.env.CLI_CEB_DEV === 'true') {
     console.log('[collect-words] Extracted text content (first 100 chars):', text.substring(0, 100));
-    console.log('[collect-words] First 10 matched words:', words.slice(0, 30));
-    console.log('[collect-words] First 10 unique words:', uniqueWords.slice(0, 30));
+    console.log('[collect-words] First 30 matched words:', words.slice(0, 30));
+    console.log('[collect-words] First 30 unique words:', uniqueWords.slice(0, 30));
+    console.log('[collect-words] First 30 filtered words:', uniqueWords.slice(0, 30));
   }
 
   console.log('[collect-words] Word collection completed');
