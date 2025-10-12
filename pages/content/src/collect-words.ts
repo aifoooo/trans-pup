@@ -31,7 +31,7 @@ const collectWords = function (): string[] {
     console.log('[collect-words] Extracted text content (first 100 chars):', text.substring(0, 100));
     console.log('[collect-words] First 30 matched words:', words.slice(0, 30));
     console.log('[collect-words] First 30 unique words:', uniqueWords.slice(0, 30));
-    console.log('[collect-words] First 30 filtered words:', uniqueWords.slice(0, 30));
+    console.log('[collect-words] First 30 filtered words:', filteredWords.slice(0, 30));
   }
 
   console.log('[collect-words] Word collection completed');
