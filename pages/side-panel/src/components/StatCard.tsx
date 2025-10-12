@@ -8,12 +8,12 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, colorClass, icon }) => (
-  <div className="flex flex-col rounded-lg bg-white p-2.5 shadow-sm">
-    <div className="flex items-center justify-between">
+  <div className="flex flex-col items-center space-y-2 rounded-lg border border-gray-200 bg-white p-2.5">
+    <span className="text-xl font-bold">{value}</span>
+    <div className="flex items-center">
       <div className={`flex h-6 w-6 items-center justify-center rounded-full ${colorClass}`}>{icon}</div>
-      <span className="text-xl font-bold">{value}</span>
+      <span className="ml-1 text-sm font-medium text-gray-400">{title}</span>
     </div>
-    <span className="mt-1 text-sm font-medium text-gray-400">{title}</span>
   </div>
 );
 

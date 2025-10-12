@@ -187,7 +187,7 @@ const Popup = () => {
               alert(`打开单词本失败: ${error instanceof Error ? error.message : '未知错误'}`);
             }
           }}
-          className="rounded-full border border-blue-500 px-1 text-blue-500 hover:bg-gray-100">
+          className="rounded-full border border-blue-500 px-1 text-blue-500 hover:bg-gray-200">
           单词本
         </button>
       </footer>

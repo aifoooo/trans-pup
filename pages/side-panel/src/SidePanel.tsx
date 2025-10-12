@@ -5,7 +5,6 @@ import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import StatCard from '@src/components/StatCard';
 import { useEffect, useState, useCallback } from 'react';
 import { AiFillRead } from 'react-icons/ai';
-import { FaRegStar } from 'react-icons/fa';
 import { IoBagHandleOutline, IoSearch } from 'react-icons/io5';
 import { MdOutlineNewLabel } from 'react-icons/md';
 
@@ -115,9 +114,9 @@ const SidePanel = () => {
   }, [handleVocabularyChange]);
 
   return (
-    <div className={cn('App', 'h-full overflow-y-auto bg-gray-100 px-5 py-6')} onScroll={handleScroll}>
+    <div className={cn('App', 'h-full overflow-y-auto px-5 py-6')} onScroll={handleScroll}>
       {/* 状态卡片区域 */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         <StatCard
           title="新单词"
           value={vocabularyCount}
@@ -133,21 +132,15 @@ const SidePanel = () => {
         <StatCard
           title="已掌握"
           value={0}
-          colorClass="bg-blue-500"
-          icon={<IoBagHandleOutline className="h-4 w-4 text-white" />}
-        />
-        <StatCard
-          title="已收藏"
-          value={0}
           colorClass="bg-yellow-500"
-          icon={<FaRegStar className="h-4 w-4 text-white" />}
+          icon={<IoBagHandleOutline className="h-4 w-4 text-white" />}
         />
       </div>
 
       {/* 单词列表区域 */}
-      <div className="mt-6 flex min-h-0 flex-1 flex-col">
+      <div className="mt-5 flex min-h-0 flex-1 flex-col">
         <h2 className="mb-2 text-lg font-semibold">新单词</h2>
-        <div className="flex min-h-0 flex-1 flex-col rounded-lg bg-white shadow-sm">
+        <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-gray-200">
           <div className="p-3">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
