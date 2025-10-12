@@ -9,9 +9,9 @@ chrome.runtime.sendMessage({ action: 'getDictionary' }, response => {
     console.log('Loaded dictionary:', response);
     const wordLookupInstance = new WordLookup(response);
     WordLookup.setInstance(wordLookupInstance);
+
+    collectWords();
   } else {
     console.error('Failed to load dictionary from background script.');
   }
 });
-
-void collectWords();

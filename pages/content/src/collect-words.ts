@@ -1,8 +1,6 @@
 import { vocabularyStorage } from '@extension/storage';
 import { WordLookup } from '@extension/word';
 
-const wordLookup = WordLookup.getInstance();
-
 const collectWords = function (): string[] {
   console.log('[collect-words] Starting word collection...');
 
@@ -15,6 +13,7 @@ const collectWords = function (): string[] {
   const uniqueWords = [...new Set(words)];
   console.log('[collect-words] Unique words array length:', uniqueWords.length);
 
+  const wordLookup = WordLookup.getInstance();
   const filteredWords = uniqueWords.filter(word => wordLookup.hasWord(word));
   console.log('[collect-words] Filtered words array length:', filteredWords.length);
 
