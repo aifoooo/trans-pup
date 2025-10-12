@@ -21,10 +21,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@extension/dictionary": "workspace:*",
+    "@extension/env": "workspace:*",
     "@extension/shared": "workspace:*",
-    "@extension/storage": "workspace:*",
-    "@extension/word": "workspace:*",
-    "@extension/env": "workspace:*"
+    "@extension/storage": "workspace:*"
   },
   "devDependencies": {
     "@extension/hmr": "workspace:*",

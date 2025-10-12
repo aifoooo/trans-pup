@@ -1,5 +1,5 @@
+import { WordLookup } from '@extension/dictionary';
 import { vocabularyStorage } from '@extension/storage';
-import { WordLookup } from '@extension/word';
 
 const collectWords = function (): string[] {
   console.log('[collect-words] Starting word collection...');

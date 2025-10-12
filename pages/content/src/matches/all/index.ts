@@ -1,4 +1,4 @@
-import { WordLookup } from '@extension/word';
+import { WordLookup } from '@extension/dictionary';
 import { collectWords } from '@src/collect-words';
 
 console.log('[CEB] All content script loaded');

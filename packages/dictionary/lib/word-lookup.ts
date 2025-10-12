@@ -20,18 +20,6 @@ export class WordLookup {
   }
 
   /**
-   * 获取单例实例
-   * @param filePath 词典文件路径（仅在首次调用时需要）
-   * @returns WordLookup 实例
-   */
-  static getInstance(): WordLookup {
-    if (!WordLookup.instance) {
-      throw new Error('WordLookup instance has not been initialized.');
-    }
-    return WordLookup.instance;
-  }
-
-  /**
    * 设置单例实例
    * @param instance 要设置的 WordLookup 实例
    */
@@ -40,6 +28,17 @@ export class WordLookup {
       console.warn('WordLookup instance already exists. Overwriting existing instance.');
     }
     WordLookup.instance = instance;
+  }
+
+  /**
+   * 获取单例实例
+   * @returns WordLookup 实例
+   */
+  static getInstance(): WordLookup {
+    if (!WordLookup.instance) {
+      throw new Error('WordLookup instance has not been initialized.');
+    }
+    return WordLookup.instance;
   }
 
   /**
@@ -111,29 +110,5 @@ export class WordLookup {
    */
   getAllWords(): string[] {
     return Array.from(this.wordMap.keys());
-  }
-
-  /**
-   * 模糊匹配单词（前缀匹配）
-   * @param prefix 前缀
-   * @param limit 返回结果数量限制，默认为10
-   * @returns 匹配的单词列表
-   */
-  searchByPrefix(prefix: string, limit: number = 10): string[] {
-    if (!prefix) return [];
-
-    const lowerPrefix = prefix.toLowerCase();
-    const matches: string[] = [];
-
-    const words = Array.from(this.wordMap.keys());
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      if (word.startsWith(lowerPrefix)) {
-        matches.push(word);
-        if (matches.length >= limit) break;
-      }
-    }
-
-    return matches;
   }
 }
