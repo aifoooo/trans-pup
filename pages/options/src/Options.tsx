@@ -160,7 +160,6 @@ const Options = () => {
           </button>
         )}
         <h1 className="mr-2 text-lg font-bold">TransPup</h1>
-        <span className="text-sm text-gray-500">v0.5.0</span>
       </header>
 
       <div className={cn('App-body', 'w-full', 'flex h-screen flex-col')}>
