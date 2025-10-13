@@ -3,19 +3,13 @@ import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import { useEffect, useState, useCallback } from 'react';
-import { IoSearch } from 'react-icons/io5';
-
-type WordItem = {
-  word: string;
-  translation: string;
-};
-
-const PAGE_SIZE = 20;
+import { IoSearch, IoArrowDown, IoArrowUp } from 'react-icons/io5';
+import type { WordEntry } from '@extension/dictionary';
 
 const SidePanel = () => {
   // 主要数据状态
   const [vocabularyCount, setVocabularyCount] = useState(0);
-  const [words, setWords] = useState<WordItem[]>([]);
+  const [words, setWords] = useState<WordEntry[]>([]);
 
   // 分页相关状态
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,6 +19,9 @@ const SidePanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [vocabularyUpdateCount, setVocabularyUpdateCount] = useState(0);
+
+  // 展开状态管理
+  const [expandedWord, setExpandedWord] = useState<string | null>(null);
 
   // 获取词汇表总数
   const fetchVocabularyCount = useCallback(async () => {
@@ -40,7 +37,7 @@ const SidePanel = () => {
   const fetchWords = useCallback(async (page: number, search: string) => {
     setLoading(true);
     try {
-      const result = await vocabularyStorage.getWords(page, PAGE_SIZE, search);
+      const result = await vocabularyStorage.getWords(page, 20, search);
 
       // 检查 result.words 是否存在且为数组
       if (!result.words || !Array.isArray(result.words)) {
@@ -55,14 +52,23 @@ const SidePanel = () => {
       );
 
       // 向后台脚本发送批量查询请求
-      const translatedWords = await new Promise<WordItem[]>((resolve, reject) => {
+      const translatedWords = await new Promise<WordEntry[]>((resolve, reject) => {
         chrome.runtime.sendMessage({ action: 'batchQueryWords', words: uniqueWords }, response => {
           console.log('[popup] Received response from background:', response);
           if (response && typeof response === 'object') {
             resolve(
               uniqueWords.map(word => ({
                 word,
+                phonetic: response[word]?.phonetic || '',
+                definition: response[word]?.definition || '',
                 translation: response[word]?.translation || '',
+                pos: response[word]?.pos || '',
+                collins: response[word]?.collins || '',
+                oxford: response[word]?.oxford || '',
+                tag: response[word]?.tag || '',
+                bnc: response[word]?.bnc || '',
+                frq: response[word]?.frq || '',
+                exchange: response[word]?.exchange || '',
               })),
             );
           } else {
@@ -75,7 +81,7 @@ const SidePanel = () => {
       setWords(page === 1 ? translatedWords : prevWords => [...prevWords, ...translatedWords]);
 
       // 检查是否还有更多数据
-      setHasMore(result.words.length === PAGE_SIZE);
+      setHasMore(result.words.length === 20);
     } catch (error) {
       console.error('Failed to fetch words:', error);
       setWords([]);
@@ -123,6 +129,11 @@ const SidePanel = () => {
     };
   }, [handleVocabularyChange]);
 
+  // 处理展开/收缩点击事件
+  const toggleExpand = (word: string) => {
+    setExpandedWord(expandedWord === word ? null : word);
+  };
+
   return (
     <div className={cn('App', 'h-full overflow-y-auto pb-6')} onScroll={handleScroll}>
       {/* 单词状态区域 */}
@@ -155,12 +166,51 @@ const SidePanel = () => {
           <ul className="flex-1 divide-y divide-gray-200 border-t border-gray-200">
             {words.length > 0 ? (
               words.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between space-x-2 px-4 py-2 transition-colors hover:bg-gray-50">
-                  <span className="text-sm font-bold text-gray-700">{item.word}</span>
-                  <span className="truncate whitespace-nowrap text-sm text-gray-400">{item.translation}</span>
-                </li>
+                <div key={index}>
+                  <div
+                    role="button"
+                    className="flex cursor-pointer items-center justify-between space-x-2 px-4 py-2 transition-colors hover:bg-gray-50"
+                    onClick={() => toggleExpand(item.word)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleExpand(item.word);
+                      }
+                    }}
+                    tabIndex={0}
+                    aria-expanded={expandedWord === item.word}
+                    aria-label={`Toggle details for word ${item.word}`}>
+                    <span className="text-sm font-bold text-gray-700">{item.word}</span>
+                    <span className="truncate whitespace-nowrap text-sm text-gray-400">{item.translation}</span>
+                    <span className="ml-2">
+                      {expandedWord === item.word ? (
+                        <IoArrowUp className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <IoArrowDown className="h-4 w-4 text-gray-500" />
+                      )}
+                    </span>
+                  </div>
+
+                  {/* 详细信息面板 */}
+                  {expandedWord === item.word && (
+                    <div className="border-t border-gray-200 bg-gray-50 p-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-700">音标:</span>
+                          <span className="text-sm text-gray-500">{item.phonetic || 'N/A'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-700">标签:</span>
+                          <span className="text-sm text-gray-500">{item.tag || 'N/A'}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-700">翻译:</span>
+                          <span className="text-sm text-gray-500">{item.translation || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
               <li className="flex items-center justify-center px-4 py-2 text-sm text-gray-500">暂无单词</li>
