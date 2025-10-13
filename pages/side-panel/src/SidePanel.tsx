@@ -140,14 +140,18 @@ const SidePanel = () => {
             </div>
           </div>
           <ul className="flex-1 divide-y divide-gray-200 border-t border-gray-200">
-            {words.map((item, index) => (
-              <li
-                key={index}
-                className="flex items-center justify-between space-x-2 px-4 py-2 transition-colors hover:bg-gray-50">
-                <span className="text-sm font-bold text-gray-700">{item.word}</span>
-                <span className="truncate whitespace-nowrap text-sm text-gray-400">{item.translation}</span>
-              </li>
-            ))}
+            {words.length > 0 ? (
+              words.map((item, index) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between space-x-2 px-4 py-2 transition-colors hover:bg-gray-50">
+                  <span className="text-sm font-bold text-gray-700">{item.word}</span>
+                  <span className="truncate whitespace-nowrap text-sm text-gray-400">{item.translation}</span>
+                </li>
+              ))
+            ) : (
+              <li className="flex items-center justify-center px-4 py-2 text-sm text-gray-500">暂无单词</li>
+            )}
             {loading && (
               <li className="flex justify-center py-4">
                 <LoadingSpinner />
