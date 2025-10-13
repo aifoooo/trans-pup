@@ -58,11 +58,11 @@ const vocabularyStorage: VocabularyStorageType = {
       return;
     }
 
-    // 转换为小写统一格式
-    const normalizedWord = word.toLowerCase();
-
     // 获取当前词汇列表
     const currentVocabulary = await storage.get();
+
+    // 转换为小写统一格式
+    const normalizedWord = word.toLowerCase();
 
     // 检查单词是否已存在
     const exists = currentVocabulary.includes(normalizedWord);
@@ -80,10 +80,6 @@ const vocabularyStorage: VocabularyStorageType = {
 
   // 批量添加单词，保持数组按字母顺序排序
   addWords: async (words: string[]) => {
-    if (!words || words.length === 0) {
-      return;
-    }
-
     // 获取当前词汇列表
     const currentVocabulary = await storage.get();
     const existingWords = new Set(currentVocabulary);

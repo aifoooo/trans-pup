@@ -10,7 +10,10 @@ const collectWords = function (): string[] {
   const words = text.match(/\b[a-zA-Z]+\b/g) || [];
   console.log('[collect-words] Matched words array length:', words.length);
 
-  const uniqueWords = [...new Set(words)];
+  const normalizedWords = words.map(word => word.toLowerCase());
+  console.log('[collect-words] Normalized words array length:', normalizedWords.length);
+
+  const uniqueWords = [...new Set(normalizedWords)];
   console.log('[collect-words] Unique words array length:', uniqueWords.length);
 
   const wordLookup = WordLookup.getInstance();
@@ -30,6 +33,7 @@ const collectWords = function (): string[] {
   if (process.env.CLI_CEB_DEV === 'true') {
     console.log('[collect-words] Extracted text content (first 100 chars):', text.substring(0, 100));
     console.log('[collect-words] First 30 matched words:', words.slice(0, 30));
+    console.log('[collect-words] First 30 normalized words:', normalizedWords.slice(0, 30));
     console.log('[collect-words] First 30 unique words:', uniqueWords.slice(0, 30));
     console.log('[collect-words] First 30 filtered words:', filteredWords.slice(0, 30));
   }
