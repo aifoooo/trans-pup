@@ -1,30 +1,99 @@
 import 'webextension-polyfill';
+import { WordLookup } from '@extension/dictionary';
 import { exampleThemeStorage } from '@extension/storage';
 
-let dictionaryCache: Record<string, unknown> | null = null;
+let wordLookupInstance: WordLookup | null = null;
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.action === 'getDictionary') {
-    if (!dictionaryCache) {
-      // 首次加载词典
-      fetch(chrome.runtime.getURL('core-words.json'))
-        .then(response => response.json())
-        .then(data => {
-          dictionaryCache = data; // 缓存词典数据
-          sendResponse(dictionaryCache);
-        })
-        .catch(error => {
-          console.error('Failed to load dictionary:', error);
-          sendResponse(null);
-        });
-      return true;
-    } else {
-      // 直接返回缓存的词典数据
-      sendResponse(dictionaryCache);
-      return true;
+const initWordLookup = async () => {
+  console.log('Initializing WordLookup...');
+  if (wordLookupInstance) {
+    return;
+  }
+
+  try {
+    const response = await fetch(chrome.runtime.getURL('core-words.json'));
+    const dictionaryData = await response.json();
+    console.log('Loaded dictionary data:', dictionaryData);
+    if (dictionaryData) {
+      console.log('Creating WordLookup instance with dictionaryData...');
+      wordLookupInstance = new WordLookup(dictionaryData);
+      console.log('WordLookup instance created successfully.');
+    }
+  } catch (error) {
+    console.error('Failed to load dictionary:', error);
+  }
+};
+
+let isInitialized = false;
+const messageQueue: Array<{ message: unknown; sendResponse: (response?: unknown) => void }> = [];
+
+const processMessageQueue = () => {
+  while (messageQueue.length > 0) {
+    const queuedItem = messageQueue.shift();
+    if (queuedItem) {
+      const { message, sendResponse } = queuedItem;
+      handleMessage(message, sendResponse);
     }
   }
-  return false;
+};
+
+const handleMessage = (message: unknown, sendResponse: (response?: unknown) => void) => {
+  const { action, word, words } = message as { action: string; word: string | undefined; words: string[] | undefined };
+
+  if (action === 'hasWord' && word) {
+    if (wordLookupInstance && wordLookupInstance.hasWord(word)) {
+      sendResponse({ exists: true });
+    } else {
+      sendResponse({ exists: false });
+    }
+  } else if (action === 'batchHasWords' && words) {
+    if (wordLookupInstance) {
+      const wordExistsMap = wordLookupInstance.hasWordsBatch(words);
+      sendResponse(wordExistsMap);
+    } else {
+      sendResponse(null);
+    }
+  } else if (action === 'queryWord' && word) {
+    if (wordLookupInstance) {
+      const wordEntry = wordLookupInstance.lookup(word);
+      sendResponse(wordEntry);
+    } else {
+      sendResponse(null);
+    }
+  } else if (action === 'batchQueryWord' && words) {
+    if (wordLookupInstance) {
+      const wordEntryMap = wordLookupInstance.lookupBatch(words);
+      sendResponse(wordEntryMap);
+    } else {
+      sendResponse(null);
+    }
+  } else {
+    console.warn('Unknown action:', action);
+    sendResponse({ error: 'Unknown action' });
+  }
+};
+
+initWordLookup().then(() => {
+  console.log('WordLookup initialized');
+  isInitialized = true;
+  processMessageQueue();
+});
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (!isInitialized) {
+    messageQueue.push({ message, sendResponse });
+    return true;
+  }
+
+  // 确保 message 包含 action 属性再处理
+  if (message && typeof message === 'object' && 'action' in message) {
+    handleMessage(message, sendResponse);
+  } else {
+    console.warn('Invalid message received:', message);
+    sendResponse({ error: 'Invalid message format' });
+  }
+
+  return true;
 });
 
 exampleThemeStorage.get().then(theme => {

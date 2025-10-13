@@ -1,7 +1,6 @@
-import { WordLookup } from '@extension/dictionary';
 import { vocabularyStorage } from '@extension/storage';
 
-const collectWords = function (): string[] {
+const collectWords = async function (): Promise<string[]> {
   console.log('[collect-words] Starting word collection...');
 
   const text = document.body.textContent || '';
@@ -16,8 +15,16 @@ const collectWords = function (): string[] {
   const uniqueWords = [...new Set(normalizedWords)];
   console.log('[collect-words] Unique words array length:', uniqueWords.length);
 
-  const wordLookup = WordLookup.getInstance();
-  const filteredWords = uniqueWords.filter(word => wordLookup.hasWord(word));
+  const filteredWords = await new Promise<string[]>((resolve, reject) => {
+    chrome.runtime.sendMessage({ action: 'batchHasWords', words: uniqueWords }, response => {
+      if (response) {
+        resolve(uniqueWords.filter(word => response[word]));
+      } else {
+        reject(new Error('Failed to query words from background script'));
+      }
+    });
+  });
+
   console.log('[collect-words] Filtered words array length:', filteredWords.length);
 
   vocabularyStorage

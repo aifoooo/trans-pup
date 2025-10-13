@@ -144,6 +144,9 @@ importers:
 
   chrome-extension:
     dependencies:
+      '@extension/dictionary':
+        specifier: workspace:*
+        version: link:../packages/dictionary
       '@extension/env':
         specifier: workspace:*
         version: link:../packages/env
@@ -378,9 +381,6 @@ importers:
 
   pages/content:
     dependencies:
-      '@extension/dictionary':
-        specifier: workspace:*
-        version: link:../../packages/dictionary
       '@extension/env':
         specifier: workspace:*
         version: link:../../packages/env
@@ -553,6 +553,9 @@ importers:
 
   pages/side-panel:
     dependencies:
+      '@extension/dictionary':
+        specifier: workspace:*
+        version: link:../../packages/dictionary
       '@extension/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

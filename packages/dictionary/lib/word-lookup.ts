@@ -20,28 +20,6 @@ export class WordLookup {
   }
 
   /**
-   * 设置单例实例
-   * @param instance 要设置的 WordLookup 实例
-   */
-  static setInstance(instance: WordLookup): void {
-    if (WordLookup.instance) {
-      console.warn('WordLookup instance already exists. Overwriting existing instance.');
-    }
-    WordLookup.instance = instance;
-  }
-
-  /**
-   * 获取单例实例
-   * @returns WordLookup 实例
-   */
-  static getInstance(): WordLookup {
-    if (!WordLookup.instance) {
-      throw new Error('WordLookup instance has not been initialized.');
-    }
-    return WordLookup.instance;
-  }
-
-  /**
    * 初始化单词映射表
    */
   private initWordMap(): void {
@@ -102,6 +80,21 @@ export class WordLookup {
   hasWord(word: string): boolean {
     if (!word) return false;
     return this.wordMap.has(word.toLowerCase());
+  }
+
+  /**
+   * 批量检查单词是否存在
+   * @param words 单词数组
+   * @returns 单词存在性映射
+   */
+  hasWordsBatch(words: string[]): Map<string, boolean> {
+    const results = new Map<string, boolean>();
+
+    words.forEach(word => {
+      results.set(word, this.hasWord(word));
+    });
+
+    return results;
   }
 
   /**
