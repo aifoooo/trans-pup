@@ -17,6 +17,7 @@ const collectWords = async function (): Promise<string[]> {
 
   const filteredWords = await new Promise<string[]>((resolve, reject) => {
     chrome.runtime.sendMessage({ action: 'batchHasWords', words: uniqueWords }, response => {
+      console.log('[collect-words] Received response from background:', response);
       if (response) {
         resolve(uniqueWords.filter(word => response[word]));
       } else {

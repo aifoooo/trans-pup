@@ -1,6 +1,5 @@
 import 'webextension-polyfill';
 import { WordLookup } from '@extension/dictionary';
-import { exampleThemeStorage } from '@extension/storage';
 
 let wordLookupInstance: WordLookup | null = null;
 
@@ -47,8 +46,10 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
       sendResponse({ exists: false });
     }
   } else if (action === 'batchHasWords' && words) {
+    console.log('[background] Received batchHasWords request:', words);
     if (wordLookupInstance) {
       const wordExistsMap = wordLookupInstance.hasWordsBatch(words);
+      console.log('[background] Sending batchHasWords response:', wordExistsMap);
       sendResponse(wordExistsMap);
     } else {
       sendResponse(null);
@@ -60,10 +61,13 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     } else {
       sendResponse(null);
     }
-  } else if (action === 'batchQueryWord' && words) {
+  } else if (action === 'batchQueryWords' && words) {
+    console.log('[background] Received batchQueryWords request:', words);
     if (wordLookupInstance) {
       const wordEntryMap = wordLookupInstance.lookupBatch(words);
-      sendResponse(wordEntryMap);
+      console.log('[background] Sending batchQueryWords response:', wordEntryMap);
+      const resultObject = Object.fromEntries(wordEntryMap);
+      sendResponse(resultObject);
     } else {
       sendResponse(null);
     }
@@ -95,10 +99,3 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   return true;
 });
-
-exampleThemeStorage.get().then(theme => {
-  console.log('theme', theme);
-});
-
-console.log('Background loaded');
-console.log("Edit 'chrome-extension/src/background/index.ts' and save to reload.");

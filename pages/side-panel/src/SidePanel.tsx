@@ -49,17 +49,30 @@ const SidePanel = () => {
         return;
       }
 
-      // 使用默认翻译，因为还没有实现查词功能
-      const wordsWithDefaultTranslation = result.words.map(wordItem => {
-        const wordValue = typeof wordItem === 'string' ? wordItem : JSON.stringify(wordItem);
-        return {
-          word: wordValue,
-          translation: '默认翻译',
-        };
+      // 提取单词列表
+      const uniqueWords = Array.from(
+        new Set(result.words.map(wordItem => (typeof wordItem === 'string' ? wordItem : JSON.stringify(wordItem)))),
+      );
+
+      // 向后台脚本发送批量查询请求
+      const translatedWords = await new Promise<WordItem[]>((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: 'batchQueryWords', words: uniqueWords }, response => {
+          console.log('[popup] Received response from background:', response);
+          if (response && typeof response === 'object') {
+            resolve(
+              uniqueWords.map(word => ({
+                word,
+                translation: response[word]?.translation || '',
+              })),
+            );
+          } else {
+            reject(new Error('Failed to query words from background script'));
+          }
+        });
       });
 
       // 如果是第一页，替换数据；否则追加数据
-      setWords(page === 1 ? wordsWithDefaultTranslation : prevWords => [...prevWords, ...wordsWithDefaultTranslation]);
+      setWords(page === 1 ? translatedWords : prevWords => [...prevWords, ...translatedWords]);
 
       // 检查是否还有更多数据
       setHasMore(result.words.length === PAGE_SIZE);
