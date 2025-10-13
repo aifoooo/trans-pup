@@ -23,41 +23,11 @@ const storage = createStorage<string[]>('vocabulary-storage-key', [], {
   liveUpdate: true,
 });
 
-// 单词验证函数 - 检查是否为合法英文单词
-const isValidWord = (word: string): boolean => {
-  // 基本验证规则:
-  // 1. 长度在1-50个字符之间
-  // 2. 只包含英文字母
-  // 3. 不是纯数字
-  // 4. 不是单个字母（除了常见的'a'和'I'）
-  if (!word || word.length > 50) {
-    return false;
-  }
-
-  // 检查是否只包含英文字母
-  if (!/^[a-zA-Z]+$/.test(word)) {
-    return false;
-  }
-
-  // 检查是否是单个字母但不是'a'或'I'
-  if (word.length === 1 && word !== 'a' && word !== 'I') {
-    return false;
-  }
-
-  return true;
-};
-
 const vocabularyStorage: VocabularyStorageType = {
   ...storage,
 
   // 添加单个单词，保持数组按字母顺序排序
   addWord: async (word: string) => {
-    // 验证单词是否合法
-    if (!isValidWord(word)) {
-      console.log(`[vocabulary-storage] Skipped invalid word: ${word}`);
-      return;
-    }
-
     // 获取当前词汇列表
     const currentVocabulary = await storage.get();
 
@@ -87,12 +57,6 @@ const vocabularyStorage: VocabularyStorageType = {
 
     // 验证并过滤单词
     for (const word of words) {
-      // 验证单词是否合法
-      if (!isValidWord(word)) {
-        console.log(`[vocabulary-storage] Skipped invalid word: ${word}`);
-        continue;
-      }
-
       // 转换为小写统一格式
       const normalizedWord = word.toLowerCase();
 

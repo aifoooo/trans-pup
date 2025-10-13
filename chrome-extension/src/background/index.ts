@@ -50,7 +50,8 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     if (wordLookupInstance) {
       const wordExistsMap = wordLookupInstance.hasWordsBatch(words);
       console.log('[background] Sending batchHasWords response:', wordExistsMap);
-      sendResponse(wordExistsMap);
+      const resultObject = Object.fromEntries(wordExistsMap);
+      sendResponse(resultObject);
     } else {
       sendResponse(null);
     }
