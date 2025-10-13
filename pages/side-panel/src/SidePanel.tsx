@@ -2,11 +2,8 @@ import '@src/SidePanel.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
-import StatCard from '@src/components/StatCard';
 import { useEffect, useState, useCallback } from 'react';
-import { AiFillRead } from 'react-icons/ai';
-import { IoBagHandleOutline, IoSearch } from 'react-icons/io5';
-import { MdOutlineNewLabel } from 'react-icons/md';
+import { IoSearch } from 'react-icons/io5';
 
 type WordItem = {
   word: string;
@@ -114,32 +111,19 @@ const SidePanel = () => {
   }, [handleVocabularyChange]);
 
   return (
-    <div className={cn('App', 'h-full overflow-y-auto px-5 py-6')} onScroll={handleScroll}>
-      {/* 状态卡片区域 */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard
-          title="新单词"
-          value={vocabularyCount}
-          colorClass="bg-green-500"
-          icon={<MdOutlineNewLabel className="h-4 w-4 text-white" />}
-        />
-        <StatCard
-          title="学习中"
-          value={0}
-          colorClass="bg-red-500"
-          icon={<AiFillRead className="h-4 w-4 text-white" />}
-        />
-        <StatCard
-          title="已掌握"
-          value={0}
-          colorClass="bg-yellow-500"
-          icon={<IoBagHandleOutline className="h-4 w-4 text-white" />}
-        />
+    <div className={cn('App', 'h-full overflow-y-auto pb-5')} onScroll={handleScroll}>
+      {/* 单词状态区域 */}
+      <div className="bg-gray-50 px-5 py-2 text-base font-semibold">
+        <span className="text-green-500">{vocabularyCount}</span>
+        <span> / </span>
+        <span className="text-red-500">0</span>
+        <span> / </span>
+        <span className="text-yellow-500">0</span>
       </div>
 
       {/* 单词列表区域 */}
-      <div className="mt-5 flex min-h-0 flex-1 flex-col">
-        <h2 className="mb-2 text-lg font-semibold">新单词</h2>
+      <div className="mx-5 mt-5 flex min-h-0 flex-1 flex-col">
+        <h2 className="mb-2 text-base font-semibold">新单词</h2>
         <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-gray-200">
           <div className="p-3">
             <div className="relative">
