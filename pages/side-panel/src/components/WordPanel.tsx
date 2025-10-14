@@ -13,7 +13,7 @@ const tagMap: Record<string, string> = {
   gre: 'GRE',
 };
 
-const WordDetailsPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
+const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
   <div className="border-t border-gray-200 p-4">
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-1">
@@ -49,4 +49,4 @@ const WordDetailsPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
   </div>
 );
 
-export default WordDetailsPanel;
+export default WordPanel;

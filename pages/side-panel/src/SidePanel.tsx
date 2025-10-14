@@ -3,7 +3,7 @@ import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import StatusBar from '@src/components/StatusBar';
-import WordDetailsPanel from '@src/components/WordDetailsPanel';
+import WordPanel from '@src/components/WordPanel';
 import { useEffect, useState, useCallback } from 'react';
 import { IoSearch } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';
@@ -179,7 +179,7 @@ const SidePanel = () => {
                   </div>
 
                   {/* 详细信息面板 */}
-                  {expandedWord === item.word && <WordDetailsPanel entry={item} />}
+                  {expandedWord === item.word && <WordPanel entry={item} />}
                 </div>
               ))
             ) : (
