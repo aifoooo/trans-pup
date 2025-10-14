@@ -2,14 +2,15 @@ import '@src/SidePanel.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import StatusBar from '@src/components/StatusBar';
 import WordDetailsPanel from '@src/components/WordDetailsPanel';
 import { useEffect, useState, useCallback } from 'react';
-import { IoSearch, IoArrowDown, IoArrowUp } from 'react-icons/io5';
+import { IoSearch } from 'react-icons/io5';
+import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';
 import type { WordEntry } from '@extension/dictionary';
 
 const SidePanel = () => {
   // 主要数据状态
-  const [vocabularyCount, setVocabularyCount] = useState(0);
   const [words, setWords] = useState<WordEntry[]>([]);
 
   // 分页相关状态
@@ -21,18 +22,8 @@ const SidePanel = () => {
   const [loading, setLoading] = useState(false);
   const [vocabularyUpdateCount, setVocabularyUpdateCount] = useState(0);
 
-  // 展开状态管理
+  // 展开单词详情状态
   const [expandedWord, setExpandedWord] = useState<string | null>(null);
-
-  // 获取词汇表总数
-  const fetchVocabularyCount = useCallback(async () => {
-    try {
-      const words = await vocabularyStorage.get();
-      setVocabularyCount(words.length);
-    } catch (error) {
-      console.error('Failed to fetch vocabulary count:', error);
-    }
-  }, []);
 
   // 获取单词列表
   const fetchWords = useCallback(async (page: number, search: string) => {
@@ -94,10 +85,9 @@ const SidePanel = () => {
 
   // 初始加载和搜索时重新加载
   useEffect(() => {
-    fetchVocabularyCount();
     setCurrentPage(1);
     fetchWords(1, searchTerm);
-  }, [fetchVocabularyCount, fetchWords, searchTerm, vocabularyUpdateCount]);
+  }, [fetchWords, searchTerm, vocabularyUpdateCount]);
 
   // 加载更多数据
   const loadMore = useCallback(() => {
@@ -138,19 +128,13 @@ const SidePanel = () => {
   return (
     <div className={cn('App', 'h-full overflow-y-auto pb-6')} onScroll={handleScroll}>
       {/* 单词状态区域 */}
-      <div className="fixed left-0 top-0 z-10 w-full bg-gray-50 px-5 py-2 text-base font-semibold">
-        <span className="text-green-500">{vocabularyCount}</span>
-        <span> / </span>
-        <span className="text-red-500">0</span>
-        <span> / </span>
-        <span className="text-yellow-500">0</span>
-      </div>
+      <StatusBar />
 
       {/* 单词列表区域 */}
       <div className="mx-5 mt-16 flex min-h-0 flex-1 flex-col">
         <h2 className="mb-2 text-base font-semibold">新单词</h2>
         <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-gray-200">
-          <div className="p-3">
+          <div className="px-4 py-3">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
                 <IoSearch className="h-4 w-4 text-gray-400" />
@@ -160,7 +144,7 @@ const SidePanel = () => {
                 placeholder="搜索单词"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg bg-gray-100 py-1.5 pl-8 pr-2 text-sm hover:bg-gray-200 focus:bg-gray-100"
+                className="w-full rounded-lg bg-gray-100 py-2 pl-8 pr-2 text-sm hover:bg-gray-200 focus:bg-gray-100"
               />
             </div>
           </div>
@@ -170,7 +154,7 @@ const SidePanel = () => {
                 <div key={index}>
                   <div
                     role="button"
-                    className="flex cursor-pointer items-center justify-between space-x-2 px-4 py-2 transition-colors hover:bg-gray-50"
+                    className="flex cursor-pointer items-center py-3 pl-4 pr-2 transition-colors hover:bg-gray-50"
                     onClick={() => toggleExpand(item.word)}
                     onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -181,13 +165,15 @@ const SidePanel = () => {
                     tabIndex={0}
                     aria-expanded={expandedWord === item.word}
                     aria-label={`Toggle details for word ${item.word}`}>
-                    <span className="text-sm font-bold text-gray-700">{item.word}</span>
-                    <span className="truncate whitespace-nowrap text-sm text-gray-400">{item.translation}</span>
-                    <span className="ml-2">
+                    <span className="pr-3 text-sm font-bold text-gray-700">{item.word}</span>
+                    <span className="flex-1 truncate whitespace-nowrap text-right text-sm text-gray-400">
+                      {item.translation}
+                    </span>
+                    <span>
                       {expandedWord === item.word ? (
-                        <IoArrowUp className="h-4 w-4 text-gray-500" />
+                        <MdKeyboardArrowDown className="h-4 w-4 text-gray-500" />
                       ) : (
-                        <IoArrowDown className="h-4 w-4 text-gray-500" />
+                        <MdKeyboardArrowRight className="h-4 w-4 text-gray-500" />
                       )}
                     </span>
                   </div>
