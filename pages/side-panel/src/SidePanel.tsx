@@ -2,6 +2,7 @@ import '@src/SidePanel.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import WordDetailsPanel from '@src/components/WordDetailsPanel';
 import { useEffect, useState, useCallback } from 'react';
 import { IoSearch, IoArrowDown, IoArrowUp } from 'react-icons/io5';
 import type { WordEntry } from '@extension/dictionary';
@@ -192,24 +193,7 @@ const SidePanel = () => {
                   </div>
 
                   {/* 详细信息面板 */}
-                  {expandedWord === item.word && (
-                    <div className="border-t border-gray-200 bg-gray-50 p-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-700">音标:</span>
-                          <span className="text-sm text-gray-500">{item.phonetic || 'N/A'}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-700">标签:</span>
-                          <span className="text-sm text-gray-500">{item.tag || 'N/A'}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-700">翻译:</span>
-                          <span className="text-sm text-gray-500">{item.translation || 'N/A'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  {expandedWord === item.word && <WordDetailsPanel entry={item} />}
                 </div>
               ))
             ) : (
