@@ -50,7 +50,7 @@ const SidePanel = () => {
           if (response && typeof response === 'object') {
             resolve(
               uniqueWords.map(word => ({
-                word,
+                word: response[word]?.word || '',
                 phonetic: response[word]?.phonetic || '',
                 definition: response[word]?.definition || '',
                 translation: response[word]?.translation || '',
