@@ -17,9 +17,9 @@ const exchangeMap: Record<string, string> = {
   d: '过去分词',
   i: '现在分词',
   '3': '第三人称单数',
-  r: '形容词比较级',
-  t: '形容词最高级',
-  s: '名词复数形式',
+  r: '比较级',
+  t: '最高级',
+  s: '复数',
 };
 
 const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
