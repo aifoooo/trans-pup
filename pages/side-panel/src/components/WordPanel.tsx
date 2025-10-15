@@ -1,7 +1,6 @@
 import type { WordEntry } from '@extension/dictionary';
 import type React from 'react';
 
-// 创建一个映射对象，将英文tag转换为中文
 const tagMap: Record<string, string> = {
   zk: '中考',
   gk: '高考',
@@ -11,6 +10,16 @@ const tagMap: Record<string, string> = {
   toefl: '托福',
   ielts: '雅思',
   gre: 'GRE',
+};
+
+const exchangeMap: Record<string, string> = {
+  p: '过去式',
+  d: '过去分词',
+  i: '现在分词',
+  '3': '第三人称单数',
+  r: '形容词比较级',
+  t: '形容词最高级',
+  s: '名词复数形式',
 };
 
 const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
@@ -42,9 +51,24 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
         <span className="text-base font-bold">{entry.word}</span>
         <span className="text-sm text-gray-500">{entry.phonetic ? `[${entry.phonetic}]` : ''}</span>
       </div>
-      <div className="flex items-center">
+      <div>
         <pre className="whitespace-pre-wrap text-sm text-gray-500">{entry.translation || ''}</pre>
       </div>
+      {entry.exchange && (
+        <div className="flex flex-wrap items-center gap-1">
+          {entry.exchange.split('/').map((item, index) => {
+            const [prefix, content] = item.split(':');
+            if (prefix === '0' || prefix === '1' || !exchangeMap[prefix]) {
+              return null;
+            }
+            return (
+              <span key={index} className="rounded-md border border-gray-300 px-1 text-xs text-gray-400">
+                {`${exchangeMap[prefix]}: ${content}`}
+              </span>
+            );
+          })}
+        </div>
+      )}
     </div>
   </div>
 );
