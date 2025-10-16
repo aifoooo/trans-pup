@@ -56,30 +56,74 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
           </span>
         )}
       </div>
-      <div className="flex items-center space-x-1">
-        <span className="text-base font-bold">{entry.word}</span>
+      <div className="flex flex-col">
+        <span className="text-lg font-bold">{entry.word}</span>
         <span className="text-sm italic text-gray-500">{entry.phonetic ? `[${entry.phonetic}]` : ''}</span>
       </div>
-      <div>
-        <pre className="whitespace-pre-wrap text-sm text-gray-700">{entry.translation || ''}</pre>
+      <div className="text-sm text-gray-700">
+        {entry.translation &&
+          entry.translation
+            .split('\n')
+            .filter(part => part.trim() !== '')
+            .map((part, index) => {
+              // 匹配词性或专业前缀，如 n. [计] 等
+              const prefixRegex = /(\[[^\]]+\]|(?:^|\s)([a-zA-Z]+\.)(?:\s|$))/g;
+              const parts = [];
+              let lastIndex = 0;
+              let match;
+
+              // 查找所有前缀
+              while ((match = prefixRegex.exec(part)) !== null) {
+                // 添加前缀前的文本（如果有）
+                if (match.index > lastIndex) {
+                  parts.push(part.substring(lastIndex, match.index));
+                }
+                // 添加前缀本身
+                parts.push(match[0]);
+                lastIndex = match.index + match[0].length;
+              }
+
+              // 添加剩余的文本
+              if (lastIndex < part.length) {
+                parts.push(part.substring(lastIndex));
+              }
+
+              return (
+                <div key={index} className="mb-1 last:mb-0">
+                  {parts.map((text, i) => (
+                    <span key={i}>
+                      {text.match(/^(\[[^\]]+\]|(?:^|\s)([a-zA-Z]+\.)(?:\s|$))$/) ? (
+                        <span className="font-semibold text-indigo-500">{text.trim()} </span>
+                      ) : (
+                        text.trim()
+                      )}
+                    </span>
+                  ))}
+                </div>
+              );
+            })}
       </div>
-      {entry.exchange && (
-        <div className="grid grid-cols-2 gap-2">
-          {entry.exchange.split('/').map((item, index) => {
-            const [prefix, content] = item.split(':');
-            if (prefix === '0' || prefix === '1' || !exchangeMap[prefix]) {
-              return null;
-            }
-            return (
-              <span
-                key={index}
-                className="scrollbar-hide h-[3.625rem] cursor-default overflow-auto rounded-md border border-gray-200 px-2 py-2 text-sm text-gray-700">
-                {`${exchangeMap[prefix]}: ${content}`}
-              </span>
-            );
-          })}
-        </div>
-      )}
+      {entry.exchange &&
+        entry.exchange.split('/').some(item => {
+          const [prefix] = item.split(':');
+          return exchangeMap[prefix];
+        }) && (
+          <div className="grid grid-cols-2 gap-2 pt-2">
+            {entry.exchange.split('/').map((item, index) => {
+              const [prefix, content] = item.split(':');
+              if (prefix === '0' || prefix === '1' || !exchangeMap[prefix]) {
+                return null;
+              }
+              return (
+                <span
+                  key={index}
+                  className="scrollbar-hide h-[3.625rem] cursor-default overflow-auto rounded-md border border-gray-200 px-2 py-2 text-sm text-gray-700">
+                  {`${exchangeMap[prefix]}: ${content}`}
+                </span>
+              );
+            })}
+          </div>
+        )}
     </div>
   </div>
 );

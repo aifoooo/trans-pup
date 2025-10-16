@@ -9,6 +9,8 @@ import { IoSettingsOutline } from 'react-icons/io5';
 import { MdOutlineTranslate } from 'react-icons/md';
 
 const Popup = () => {
+  const logo = chrome.runtime.getURL('icon-34.png');
+
   // 状态变量
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
@@ -110,6 +112,7 @@ const Popup = () => {
       <div className="flex-grow">
         <header className="flex items-center justify-between bg-gray-50 px-4 py-2">
           <div className="flex items-center space-x-2">
+            <img src={logo} className="h-5 w-5" alt="Logo" />
             <h1 className="text-base font-medium">TransPup</h1>
           </div>
           <button
@@ -187,7 +190,7 @@ const Popup = () => {
               alert(`打开单词本失败: ${error instanceof Error ? error.message : '未知错误'}`);
             }
           }}
-          className="rounded-full border border-blue-500 px-1 text-blue-500 hover:bg-gray-100">
+          className="rounded-full border border-blue-500 px-1.5 py-0.5 font-semibold text-blue-500 hover:bg-gray-100">
           单词本
         </button>
       </footer>
