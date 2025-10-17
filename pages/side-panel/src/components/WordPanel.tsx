@@ -1,5 +1,6 @@
 import '@src/components/WordPanel.css';
-import { FaVolumeUp } from 'react-icons/fa';
+import { useState } from 'react';
+import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
 import type React from 'react';
 
@@ -25,15 +26,20 @@ const exchangeMap: Record<string, string> = {
 };
 
 const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
-  const speakWord = (word: string, lang: string) => {
+  const [playing, setPlaying] = useState<'en-GB' | 'en-US' | null>(null);
+
+  const speakWord = (word: string, lang: 'en-GB' | 'en-US') => {
+    if (playing) return; // 防止重复点击
+    setPlaying(lang);
     const synth = window.speechSynthesis;
     const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = lang; // 设置语言，例如 'en-US' 或 'zh-CN'
+    utterance.lang = lang;
+    utterance.onend = () => setPlaying(null); // 播放结束时重置状态
     synth.speak(utterance);
   };
 
   return (
-    <div className="border-t border-gray-200 p-4">
+    <div className="border-t border-gray-200 px-4 pb-5 pt-4">
       <div className="space-y-4">
         <div className="scrollbar-hide flex cursor-default items-center gap-1 overflow-auto">
           {entry.tag &&
@@ -69,27 +75,33 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
           <span className="text-lg font-bold">{entry.word}</span>
           {entry.phonetic && (
             <div className="flex items-center gap-3">
-              <div className="text-sm italic text-gray-500">[{entry.phonetic}]</div>
+              <div className="text-xs italic text-gray-500">[{entry.phonetic}]</div>
               {/* 英式发音 */}
-              <button
-                onClick={() => speakWord(entry.word, 'en-GB')}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') speakWord(entry.word, 'en-GB');
-                }}
-                className="flex cursor-pointer items-center gap-1 text-sm italic text-gray-500"
-                tabIndex={0}>
-                英<FaVolumeUp title="英式发音" />
-              </button>
+              <div className="flex items-center gap-1 text-xs italic text-blue-500">
+                <span className="cursor-default">BrE</span>
+                <button
+                  onClick={() => speakWord(entry.word, 'en-GB')}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') speakWord(entry.word, 'en-GB');
+                  }}
+                  className="cursor-pointer"
+                  tabIndex={0}>
+                  <RxSpeakerLoud title="英式发音" />
+                </button>
+              </div>
               {/* 美式发音 */}
-              <button
-                onClick={() => speakWord(entry.word, 'en-US')}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') speakWord(entry.word, 'en-US');
-                }}
-                className="flex cursor-pointer items-center gap-1 text-sm italic text-gray-500"
-                tabIndex={0}>
-                美<FaVolumeUp title="美式发音" />
-              </button>
+              <div className="flex items-center gap-1 text-xs italic text-red-500">
+                <span className="cursor-default">AmE</span>
+                <button
+                  onClick={() => speakWord(entry.word, 'en-US')}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') speakWord(entry.word, 'en-US');
+                  }}
+                  className="cursor-pointer"
+                  tabIndex={0}>
+                  <RxSpeakerLoud title="美式发音" />
+                </button>
+              </div>
             </div>
           )}
         </div>
