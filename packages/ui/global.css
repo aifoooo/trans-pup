@@ -18,3 +18,24 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+/* 自定义动画关键帧 */
+@keyframes fadeModerate {
+  0%, 45% { opacity: 1; }   /* 前45%时间显示 */
+  50%, 100% { opacity: 0; } /* 后55%时间隐藏 */
+}
+
+@keyframes fadeLoud {
+  0%, 45% { opacity: 0; }   /* 前45%时间隐藏 */
+  50%, 100% { opacity: 1; } /* 后55%时间显示 */
+}
+
+/* 绑定到 Tailwind 工具类（方便组件中使用） */
+@layer utilities {
+  .animate-moderate {
+    animation: fadeModerate 1.5s infinite ease-in-out; /* 1.5秒循环，无限重复 */
+  }
+  .animate-loud {
+    animation: fadeLoud 1.5s infinite ease-in-out; /* 与中等音量图标同步循环 */
+  }
+}

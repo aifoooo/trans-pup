@@ -1,4 +1,5 @@
 import '@src/components/WordPanel.css';
+import { SpeakerLoop } from '@extension/ui';
 import { useState } from 'react';
 import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
@@ -84,9 +85,9 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
                   onKeyDown={e => {
                     if (e.key === 'Enter') speakWord(entry.word, 'en-GB');
                   }}
-                  className="cursor-pointer"
+                  className="flex cursor-pointer items-center"
                   tabIndex={0}>
-                  <RxSpeakerLoud title="英式发音" />
+                  {playing === 'en-GB' ? <SpeakerLoop /> : <RxSpeakerLoud title="英式发音" />}
                 </button>
               </div>
               {/* 美式发音 */}
@@ -97,9 +98,9 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
                   onKeyDown={e => {
                     if (e.key === 'Enter') speakWord(entry.word, 'en-US');
                   }}
-                  className="cursor-pointer"
+                  className="flex cursor-pointer items-center"
                   tabIndex={0}>
-                  <RxSpeakerLoud title="美式发音" />
+                  {playing === 'en-US' ? <SpeakerLoop /> : <RxSpeakerLoud title="美式发音" />}
                 </button>
               </div>
             </div>
