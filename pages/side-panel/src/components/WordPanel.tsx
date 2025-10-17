@@ -1,4 +1,5 @@
 import '@src/components/WordPanel.css';
+import { FaVolumeUp } from 'react-icons/fa';
 import type { WordEntry } from '@extension/dictionary';
 import type React from 'react';
 
@@ -56,9 +57,19 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => (
           </span>
         )}
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-1">
         <span className="text-lg font-bold">{entry.word}</span>
-        <span className="text-sm italic text-gray-500">{entry.phonetic ? `[${entry.phonetic}]` : ''}</span>
+        {entry.phonetic && (
+          <div className="flex items-center gap-3">
+            <div className="text-sm italic text-gray-500">[{entry.phonetic}]</div>
+            <span className="inline-flex items-center gap-0.5 text-xs text-blue-500">
+              英<FaVolumeUp className="h-3 w-3" title="英式发音" />
+            </span>
+            <span className="inline-flex items-center gap-0.5 text-xs text-red-500">
+              美<FaVolumeUp className="h-3 w-3" title="美式发音" />
+            </span>
+          </div>
+        )}
       </div>
       <div className="text-sm text-gray-700">
         {entry.translation &&
