@@ -1,9 +1,8 @@
 import '@src/SidePanel.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
-import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import { cn, ErrorDisplay, LoadingSpinner, WordPanel } from '@extension/ui';
 import StatusBar from '@src/components/StatusBar';
-import WordPanel from '@src/components/WordPanel';
 import { useEffect, useState, useCallback } from 'react';
 import { IoSearch } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';

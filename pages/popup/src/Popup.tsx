@@ -6,7 +6,6 @@ import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner } from
 import TranslationStatusCard from '@src/components/TranslationStatusCard';
 import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
-import { MdOutlineTranslate } from 'react-icons/md';
 
 const Popup = () => {
   const logo = chrome.runtime.getURL('icon-34.png');
@@ -124,11 +123,9 @@ const Popup = () => {
             <IoSettingsOutline size={18} className="text-gray-500" />
           </button>
         </header>
-        <div className="space-y-5 p-5">
+
+        <div className="space-y-4 px-5 py-6">
           <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
-              <MdOutlineTranslate className="h-4 w-4 text-gray-400" />
-            </div>
             <textarea
               ref={textareaRef}
               value={inputText}
@@ -138,9 +135,9 @@ const Popup = () => {
                 setError('');
               }}
               onKeyDown={handleTranslate}
-              className="w-full resize-none rounded-lg bg-gray-100 py-2 pl-8 pr-2 align-middle text-sm hover:bg-gray-200 focus:bg-gray-100"
+              className="w-full resize-none rounded-lg border border-gray-200 px-4 py-3 text-sm"
               placeholder="翻译文本"
-              rows={1}
+              rows={2}
             />
             {isLoading && <InlineLoadingSpinner />}
           </div>

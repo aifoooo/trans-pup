@@ -19,6 +19,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* 自定义动画关键帧 */
 @keyframes fadeModerate {
   0%, 45% { opacity: 1; }   /* 前45%时间显示 */

@@ -1,5 +1,4 @@
-import '@src/components/WordPanel.css';
-import { SpeakerLoop } from '@extension/ui';
+import SpeakerLoop from '@/lib/components/SpeakerLoop';
 import { useState } from 'react';
 import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
@@ -26,7 +25,7 @@ const exchangeMap: Record<string, string> = {
   s: '复数',
 };
 
-const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExchanges?: boolean }> = ({
+export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExchanges?: boolean }> = ({
   entry,
   showTags = true,
   showExchanges = true,
@@ -39,6 +38,7 @@ const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExchanges?
     const synth = window.speechSynthesis;
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = lang;
+    // console.log('[speakWord] Playing word:', word, 'lang:', lang, 'voices', synth.getVoices());
     utterance.onend = () => setPlaying(null); // 播放结束时重置状态
     synth.speak(utterance);
   };
@@ -186,5 +186,3 @@ const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExchanges?
     </div>
   );
 };
-
-export default WordPanel;

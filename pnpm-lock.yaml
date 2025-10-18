@@ -319,6 +319,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@extension/dictionary':
+        specifier: workspace:*
+        version: link:../dictionary
       '@extension/i18n':
         specifier: workspace:*
         version: link:../i18n
