@@ -136,10 +136,14 @@ const Popup = () => {
               }}
               onKeyDown={handleTranslate}
               className="w-full resize-none rounded-lg border border-gray-200 px-4 py-3 text-sm"
-              placeholder="翻译文本"
+              placeholder="按下 Enter 翻译文本"
               rows={2}
             />
-            {isLoading && <InlineLoadingSpinner />}
+            {isLoading && (
+              <div className="mb-1">
+                <InlineLoadingSpinner />
+              </div>
+            )}
           </div>
           {!translatedText && !error && (
             <div className="space-y-3 rounded-lg border border-gray-200 p-4">
