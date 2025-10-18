@@ -124,8 +124,8 @@ const Popup = () => {
           </button>
         </header>
 
-        <div className="space-y-4 px-5 py-6">
-          <div className="relative">
+        <div className="space-y-5 px-5 py-6">
+          <div className="relative -mb-1">
             <textarea
               ref={textareaRef}
               value={inputText}

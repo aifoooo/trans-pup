@@ -13,7 +13,7 @@ export const InlineLoadingSpinner = ({ size = 'md', color = 'text-blue-500' }: I
   };
 
   return (
-    <div className="absolute bottom-1 right-1">
+    <div className="absolute bottom-2 right-1">
       <div className="flex items-center justify-center">
         <IoReloadCircle className={`${sizeClasses[size]} ${color} animate-spin`} />
       </div>
