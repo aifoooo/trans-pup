@@ -45,7 +45,7 @@ const SidePanel = () => {
       // 向后台脚本发送批量查询请求
       const translatedWords = await new Promise<WordEntry[]>((resolve, reject) => {
         chrome.runtime.sendMessage({ action: 'batchQueryWords', words: uniqueWords }, response => {
-          console.log('[popup] Received response from background:', response);
+          console.log('[side-panel] Received response from background:', response);
           if (response && typeof response === 'object') {
             resolve(
               uniqueWords.map(word => ({
@@ -74,7 +74,7 @@ const SidePanel = () => {
       // 检查是否还有更多数据
       setHasMore(result.words.length === 20);
     } catch (error) {
-      console.error('Failed to fetch words:', error);
+      console.error('[side-panel] Failed to fetch words:', error);
       setWords([]);
       setHasMore(false);
     } finally {
@@ -178,7 +178,11 @@ const SidePanel = () => {
                   </div>
 
                   {/* 详细信息面板 */}
-                  {expandedWord === item.word && <WordPanel entry={item} />}
+                  {expandedWord === item.word && (
+                    <div className="border-t border-gray-200">
+                      <WordPanel entry={item} />
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

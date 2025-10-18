@@ -522,6 +522,9 @@ importers:
 
   pages/popup:
     dependencies:
+      '@extension/dictionary':
+        specifier: workspace:*
+        version: link:../../packages/dictionary
       '@extension/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

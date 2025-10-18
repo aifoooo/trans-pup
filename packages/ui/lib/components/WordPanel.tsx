@@ -44,14 +44,14 @@ export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExc
   };
 
   return (
-    <div className="border-t border-gray-200 px-4 pb-5 pt-4">
+    <div className="px-4 pb-5 pt-4">
       <div className="space-y-4">
         {showTags &&
           (entry.tag ||
-            (entry.collins && entry.collins > 0) ||
-            (entry.oxford && entry.oxford > 0) ||
-            (entry.bnc && entry.bnc > 0) ||
-            (entry.frq && entry.frq > 0)) && (
+            (entry.collins && Number(entry.collins) > 0) ||
+            (entry.oxford && Number(entry.oxford) > 0) ||
+            (entry.bnc && Number(entry.bnc) > 0) ||
+            (entry.frq && Number(entry.frq) > 0)) && (
             <div className="scrollbar-hide flex cursor-default items-center gap-1 overflow-auto">
               {entry.tag &&
                 entry.tag.split(' ').map((part, index) => (
@@ -61,22 +61,22 @@ export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExc
                     {tagMap[part] || part}
                   </span>
                 ))}
-              {entry.collins && entry.collins > 0 && (
+              {entry.collins && Number(entry.collins) > 0 && (
                 <span className="whitespace-nowrap rounded-md bg-violet-500 px-1.5 py-0.5 text-xs font-semibold text-white">
                   柯林斯:{entry.collins}
                 </span>
               )}
-              {entry.oxford && entry.oxford > 0 && (
+              {entry.oxford && Number(entry.oxford) > 0 && (
                 <span className="whitespace-nowrap rounded-md bg-orange-500 px-1.5 py-0.5 text-xs font-semibold text-white">
                   牛津3000
                 </span>
               )}
-              {entry.bnc && entry.bnc > 0 && (
+              {entry.bnc && Number(entry.bnc) > 0 && (
                 <span className="whitespace-nowrap rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-500">
                   BNC:{entry.bnc}
                 </span>
               )}
-              {entry.frq && entry.frq > 0 && (
+              {entry.frq && Number(entry.frq) > 0 && (
                 <span className="whitespace-nowrap rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-500">
                   FRQ:{entry.frq}
                 </span>

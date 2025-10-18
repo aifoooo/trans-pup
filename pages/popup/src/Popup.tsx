@@ -2,16 +2,18 @@ import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
 import { createTranslator, translator } from '@extension/translator';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner } from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, WordPanel } from '@extension/ui';
 import TranslationStatusCard from '@src/components/TranslationStatusCard';
 import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
+import type { WordEntry } from '@extension/dictionary';
 
 const Popup = () => {
   const logo = chrome.runtime.getURL('icon-34.png');
 
   // 状态变量
   const [inputText, setInputText] = useState('');
+  const [localWordEntry, setLocalWordEntry] = useState<WordEntry | null>(null);
   const [translatedText, setTranslatedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -64,11 +66,53 @@ const Popup = () => {
       e.preventDefault();
 
       // 清除之前的翻译信息
+      setLocalWordEntry(null);
       setTranslatedText('');
       setError('');
 
       // 检查输入文本是否为空
       if (!inputText.trim()) {
+        return;
+      }
+
+      // 判断输入是否为单词
+      const isWord = /^[a-zA-Z]+$/.test(inputText);
+      console.log('[popup] Input is word:', isWord);
+
+      let hasLocalWord = false;
+      if (isWord) {
+        // 查询本地词库
+        try {
+          const response = await new Promise<WordEntry>(resolve => {
+            chrome.runtime.sendMessage({ action: 'queryWord', word: inputText }, resolve);
+          });
+
+          console.log('[popup] Received response from background:', response);
+          if (response) {
+            const responseWordEntry = {
+              word: response.word || '',
+              phonetic: response.phonetic || '',
+              definition: response.definition || '',
+              translation: response.translation || '',
+              pos: response.pos || '',
+              collins: response.collins || '',
+              oxford: response.oxford || '',
+              tag: response.tag || '',
+              bnc: response.bnc || '',
+              frq: response.frq || '',
+              exchange: response.exchange || '',
+            };
+            hasLocalWord = true;
+            console.log('[popup] Local word entry:', responseWordEntry);
+            setLocalWordEntry(responseWordEntry);
+          }
+        } catch (error) {
+          console.error('[popup] Local dictionary query failed:', error);
+        }
+      }
+
+      if (hasLocalWord) {
+        console.log('[popup] Using local dictionary');
         return;
       }
 
@@ -98,7 +142,7 @@ const Popup = () => {
 
         setTranslatedText(result);
       } catch (err) {
-        console.error('Translation error:', err);
+        console.error('[popup] Translation error:', err);
         setError(err instanceof Error ? err.message : '翻译失败');
       } finally {
         setIsLoading(false);
@@ -131,6 +175,7 @@ const Popup = () => {
               value={inputText}
               onChange={e => {
                 setInputText(e.target.value);
+                setLocalWordEntry(null);
                 setTranslatedText('');
                 setError('');
               }}
@@ -145,7 +190,7 @@ const Popup = () => {
               </div>
             )}
           </div>
-          {!translatedText && !error && (
+          {!localWordEntry && !translatedText && !error && (
             <div className="space-y-3 rounded-lg border border-gray-200 p-4">
               <ToggleSwitch
                 label="自动收集"
@@ -165,8 +210,13 @@ const Popup = () => {
             </div>
           )}
         </div>
-        {error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
+        {localWordEntry && (
+          <div className="border-t border-gray-200 p-1">
+            <WordPanel entry={localWordEntry} />
+          </div>
+        )}
         {translatedText && <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />}
+        {error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
       </div>
 
       <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-5 py-3 text-xs text-gray-500">
@@ -187,7 +237,7 @@ const Popup = () => {
               // 打开侧边栏
               await chrome.sidePanel.open({ tabId: tab.id });
             } catch (error) {
-              console.error('打开单词本失败:', error);
+              console.error('[popup] 打开单词本失败:', error);
               alert(`打开单词本失败: ${error instanceof Error ? error.message : '未知错误'}`);
             }
           }}

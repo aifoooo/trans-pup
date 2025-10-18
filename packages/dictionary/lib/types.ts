@@ -4,11 +4,11 @@ export interface WordEntry {
   definition: string;
   translation: string;
   pos: string;
-  collins: number;
-  oxford: number;
+  collins: string | number;
+  oxford: string | number;
   tag: string;
-  bnc: number;
-  frq: number;
+  bnc: string | number;
+  frq: string | number;
   exchange: string;
 }
 
