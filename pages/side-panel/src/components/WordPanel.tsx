@@ -26,7 +26,11 @@ const exchangeMap: Record<string, string> = {
   s: '复数',
 };
 
-const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
+const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExchanges?: boolean }> = ({
+  entry,
+  showTags = true,
+  showExchanges = true,
+}) => {
   const [playing, setPlaying] = useState<'en-GB' | 'en-US' | null>(null);
 
   const speakWord = (word: string, lang: 'en-GB' | 'en-US') => {
@@ -42,36 +46,43 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
   return (
     <div className="border-t border-gray-200 px-4 pb-5 pt-4">
       <div className="space-y-4">
-        <div className="scrollbar-hide flex cursor-default items-center gap-1 overflow-auto">
-          {entry.tag &&
-            entry.tag.split(' ').map((part, index) => (
-              <span
-                key={index}
-                className="whitespace-nowrap rounded-md bg-rose-500 px-1.5 py-0.5 text-xs font-semibold text-white">
-                {tagMap[part] || part}
-              </span>
-            ))}
-          {entry.collins && entry.collins > 0 && (
-            <span className="whitespace-nowrap rounded-md bg-violet-500 px-1.5 py-0.5 text-xs font-semibold text-white">
-              柯林斯:{entry.collins}
-            </span>
+        {showTags &&
+          (entry.tag ||
+            (entry.collins && entry.collins > 0) ||
+            (entry.oxford && entry.oxford > 0) ||
+            (entry.bnc && entry.bnc > 0) ||
+            (entry.frq && entry.frq > 0)) && (
+            <div className="scrollbar-hide flex cursor-default items-center gap-1 overflow-auto">
+              {entry.tag &&
+                entry.tag.split(' ').map((part, index) => (
+                  <span
+                    key={index}
+                    className="whitespace-nowrap rounded-md bg-rose-500 px-1.5 py-0.5 text-xs font-semibold text-white">
+                    {tagMap[part] || part}
+                  </span>
+                ))}
+              {entry.collins && entry.collins > 0 && (
+                <span className="whitespace-nowrap rounded-md bg-violet-500 px-1.5 py-0.5 text-xs font-semibold text-white">
+                  柯林斯:{entry.collins}
+                </span>
+              )}
+              {entry.oxford && entry.oxford > 0 && (
+                <span className="whitespace-nowrap rounded-md bg-orange-500 px-1.5 py-0.5 text-xs font-semibold text-white">
+                  牛津3000
+                </span>
+              )}
+              {entry.bnc && entry.bnc > 0 && (
+                <span className="whitespace-nowrap rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-500">
+                  BNC:{entry.bnc}
+                </span>
+              )}
+              {entry.frq && entry.frq > 0 && (
+                <span className="whitespace-nowrap rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-500">
+                  FRQ:{entry.frq}
+                </span>
+              )}
+            </div>
           )}
-          {entry.oxford && entry.oxford > 0 && (
-            <span className="whitespace-nowrap rounded-md bg-orange-500 px-1.5 py-0.5 text-xs font-semibold text-white">
-              牛津3000
-            </span>
-          )}
-          {entry.bnc && entry.bnc > 0 && (
-            <span className="whitespace-nowrap rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-500">
-              BNC:{entry.bnc}
-            </span>
-          )}
-          {entry.frq && entry.frq > 0 && (
-            <span className="whitespace-nowrap rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-semibold text-blue-500">
-              FRQ:{entry.frq}
-            </span>
-          )}
-        </div>
         <div className="flex flex-col gap-1">
           <span className="text-lg font-bold">{entry.word}</span>
           {entry.phonetic && (
@@ -149,7 +160,8 @@ const WordPanel: React.FC<{ entry: WordEntry }> = ({ entry }) => {
                 );
               })}
         </div>
-        {entry.exchange &&
+        {showExchanges &&
+          entry.exchange &&
           entry.exchange.split('/').some(item => {
             const [prefix] = item.split(':');
             return exchangeMap[prefix];
