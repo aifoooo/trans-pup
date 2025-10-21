@@ -4,6 +4,7 @@ import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner, WordPanel } from '@extension/ui';
 import StatusBar from '@src/components/StatusBar';
 import { useEffect, useState, useCallback } from 'react';
+import { IoIosArrowDropdown } from 'react-icons/io';
 import { IoSearch } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';
 import type { WordEntry } from '@extension/dictionary';
@@ -131,7 +132,16 @@ const SidePanel = () => {
 
       {/* 单词列表区域 */}
       <div className="mx-5 mt-16 flex min-h-0 flex-1 flex-col">
-        <h2 className="mb-2 text-base font-semibold">新单词</h2>
+        <div
+          className={cn(
+            'mb-3 flex cursor-pointer items-center justify-between',
+            'rounded-lg border border-dashed border-gray-200 p-2',
+          )}>
+          <h2 className="text-base font-semibold">新单词</h2>
+          <span>
+            <IoIosArrowDropdown className="h-5 w-5 font-semibold text-gray-500" />
+          </span>
+        </div>
         <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-gray-200">
           <div className="px-4 py-3">
             <div className="relative">

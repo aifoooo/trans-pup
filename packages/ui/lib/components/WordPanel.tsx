@@ -1,5 +1,6 @@
 import SpeakerLoop from '@/lib/components/SpeakerLoop';
 import { useState } from 'react';
+import { FaBookmark } from 'react-icons/fa6';
 import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
 import type React from 'react';
@@ -84,7 +85,12 @@ export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExc
             </div>
           )}
         <div className="flex flex-col gap-1">
-          <span className="text-lg font-bold">{entry.word}</span>
+          <div className="flex w-full items-center justify-between">
+            <span className="text-lg font-bold">{entry.word}</span>
+            <span>
+              <FaBookmark className="h-[0.875rem] w-[0.875rem] cursor-pointer text-green-500" />
+            </span>
+          </div>
           {entry.phonetic && (
             <div className="flex items-center gap-3">
               <div className="text-xs italic text-gray-500">[{entry.phonetic}]</div>
