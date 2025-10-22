@@ -38,10 +38,8 @@ const SidePanel = () => {
         return;
       }
 
-      // 提取单词列表
-      const uniqueWords = Array.from(
-        new Set(result.words.map(wordItem => (typeof wordItem === 'string' ? wordItem : JSON.stringify(wordItem)))),
-      );
+      // 提取单词列表（适配新的 CollectedWord 结构）
+      const uniqueWords = result.words.map(wordItem => (typeof wordItem === 'string' ? wordItem : wordItem.word));
 
       // 向后台脚本发送批量查询请求
       const translatedWords = await new Promise<WordEntry[]>((resolve, reject) => {
@@ -50,7 +48,7 @@ const SidePanel = () => {
           if (response && typeof response === 'object') {
             resolve(
               uniqueWords.map(word => ({
-                word: response[word]?.word || '',
+                word: response[word]?.word || word,
                 phonetic: response[word]?.phonetic || '',
                 definition: response[word]?.definition || '',
                 translation: response[word]?.translation || '',
