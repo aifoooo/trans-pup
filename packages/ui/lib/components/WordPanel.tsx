@@ -1,8 +1,10 @@
 import SpeakerLoop from '@/lib/components/SpeakerLoop';
-import { useState } from 'react';
+import { WordActionMenu } from '@/lib/components/WordActionMenu';
+import { useState, useRef } from 'react';
 import { FaBookmark } from 'react-icons/fa6';
 import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
+import type { WordStatus } from '@extension/storage';
 import type React from 'react';
 
 const tagMap: Record<string, string> = {
@@ -26,12 +28,15 @@ const exchangeMap: Record<string, string> = {
   s: '复数',
 };
 
-export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExchanges?: boolean }> = ({
-  entry,
-  showTags = true,
-  showExchanges = true,
-}) => {
+export const WordPanel: React.FC<{
+  entry: WordEntry;
+  showTags?: boolean;
+  showExchanges?: boolean;
+  currentStatus?: WordStatus | null; // 当前单词所在的列表状态
+}> = ({ entry, showTags = true, showExchanges = true, currentStatus = null }) => {
   const [playing, setPlaying] = useState<'en-GB' | 'en-US' | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const bookmarkRef = useRef<HTMLButtonElement>(null);
 
   const speakWord = (word: string, lang: 'en-GB' | 'en-US') => {
     if (playing) return; // 防止重复点击
@@ -42,6 +47,31 @@ export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExc
     // console.log('[speakWord] Playing word:', word, 'lang:', lang, 'voices', synth.getVoices());
     utterance.onend = () => setPlaying(null); // 播放结束时重置状态
     synth.speak(utterance);
+  };
+
+  // 菜单操作处理函数（目前仅UI，功能待实现）
+  const handleRemove = () => {
+    console.log('[WordPanel] Remove word:', entry.word);
+    setIsMenuOpen(false);
+    // TODO: 实现删除功能
+  };
+
+  const handleMoveToNew = () => {
+    console.log('[WordPanel] Move to new:', entry.word);
+    setIsMenuOpen(false);
+    // TODO: 实现移动到新单词功能
+  };
+
+  const handleMoveToLearning = () => {
+    console.log('[WordPanel] Move to learning:', entry.word);
+    setIsMenuOpen(false);
+    // TODO: 实现移动到学习中功能
+  };
+
+  const handleMoveToMastered = () => {
+    console.log('[WordPanel] Move to mastered:', entry.word);
+    setIsMenuOpen(false);
+    // TODO: 实现移动到已掌握功能
   };
 
   return (
@@ -87,9 +117,21 @@ export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExc
         <div className="flex flex-col gap-1">
           <div className="flex w-full items-center justify-between">
             <span className="text-lg font-bold">{entry.word}</span>
-            <span>
-              <FaBookmark className="h-[0.875rem] w-[0.875rem] cursor-pointer text-green-500" />
-            </span>
+            <button
+              ref={bookmarkRef}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setIsMenuOpen(!isMenuOpen);
+                }
+              }}
+              className="flex cursor-pointer items-center"
+              aria-label="单词操作菜单"
+              aria-expanded={isMenuOpen}
+              tabIndex={0}>
+              <FaBookmark className="h-[0.875rem] w-[0.875rem] text-green-500" />
+            </button>
           </div>
           {entry.phonetic && (
             <div className="flex items-center gap-3">
@@ -189,6 +231,18 @@ export const WordPanel: React.FC<{ entry: WordEntry; showTags?: boolean; showExc
             </div>
           )}
       </div>
+
+      {/* 单词操作菜单 */}
+      <WordActionMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        currentStatus={currentStatus}
+        onRemove={handleRemove}
+        onMoveToNew={handleMoveToNew}
+        onMoveToLearning={handleMoveToLearning}
+        onMoveToMastered={handleMoveToMastered}
+        anchorEl={bookmarkRef.current}
+      />
     </div>
   );
 };
