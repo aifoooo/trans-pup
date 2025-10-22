@@ -8,10 +8,12 @@ import { IoIosArrowDropdown } from 'react-icons/io';
 import { IoSearch } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';
 import type { WordEntry } from '@extension/dictionary';
+import type { CollectedWord } from '@extension/storage';
 
 const SidePanel = () => {
   // 主要数据状态
   const [words, setWords] = useState<WordEntry[]>([]);
+  const [collectedWords, setCollectedWords] = useState<CollectedWord[]>([]); // 保存原始数据以获取状态
 
   // 分页相关状态
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,9 +36,13 @@ const SidePanel = () => {
       // 检查 result.words 是否存在且为数组
       if (!result.words || !Array.isArray(result.words)) {
         setWords([]);
+        setCollectedWords([]);
         setHasMore(false);
         return;
       }
+
+      // 保存 CollectedWord 数组（包含状态信息）
+      setCollectedWords(page === 1 ? result.words : prevWords => [...prevWords, ...result.words]);
 
       // 提取单词列表（适配新的 CollectedWord 结构）
       const uniqueWords = result.words.map(wordItem => (typeof wordItem === 'string' ? wordItem : wordItem.word));
@@ -75,6 +81,7 @@ const SidePanel = () => {
     } catch (error) {
       console.error('[side-panel] Failed to fetch words:', error);
       setWords([]);
+      setCollectedWords([]);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -157,42 +164,48 @@ const SidePanel = () => {
           </div>
           <ul className="flex-1 divide-y divide-gray-200 border-t border-gray-200">
             {words.length > 0 ? (
-              words.map((item, index) => (
-                <div key={index}>
-                  <div
-                    role="button"
-                    className="flex cursor-pointer items-center py-3 pl-4 pr-2 transition-colors hover:bg-gray-50"
-                    onClick={() => toggleExpand(item.word)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleExpand(item.word);
-                      }
-                    }}
-                    tabIndex={0}
-                    aria-expanded={expandedWord === item.word}
-                    aria-label={`Toggle details for word ${item.word}`}>
-                    <span className="pr-3 text-sm font-bold text-gray-700">{item.word}</span>
-                    <span className="flex-1 truncate whitespace-nowrap text-right text-sm text-gray-400">
-                      {item.translation}
-                    </span>
-                    <span>
-                      {expandedWord === item.word ? (
-                        <MdKeyboardArrowDown className="h-4 w-4 text-gray-500" />
-                      ) : (
-                        <MdKeyboardArrowRight className="h-4 w-4 text-gray-500" />
-                      )}
-                    </span>
-                  </div>
+              words.map((item, index) => {
+                // 从 collectedWords 中获取对应的状态信息
+                const collectedWord = collectedWords[index];
+                const currentStatus = collectedWord?.status || null;
 
-                  {/* 详细信息面板 */}
-                  {expandedWord === item.word && (
-                    <div className="border-t border-gray-200">
-                      <WordPanel entry={item} />
+                return (
+                  <div key={index}>
+                    <div
+                      role="button"
+                      className="flex cursor-pointer items-center py-3 pl-4 pr-2 transition-colors hover:bg-gray-50"
+                      onClick={() => toggleExpand(item.word)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleExpand(item.word);
+                        }
+                      }}
+                      tabIndex={0}
+                      aria-expanded={expandedWord === item.word}
+                      aria-label={`Toggle details for word ${item.word}`}>
+                      <span className="pr-3 text-sm font-bold text-gray-700">{item.word}</span>
+                      <span className="flex-1 truncate whitespace-nowrap text-right text-sm text-gray-400">
+                        {item.translation}
+                      </span>
+                      <span>
+                        {expandedWord === item.word ? (
+                          <MdKeyboardArrowDown className="h-4 w-4 text-gray-500" />
+                        ) : (
+                          <MdKeyboardArrowRight className="h-4 w-4 text-gray-500" />
+                        )}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))
+
+                    {/* 详细信息面板 */}
+                    {expandedWord === item.word && (
+                      <div className="border-t border-gray-200">
+                        <WordPanel entry={item} currentStatus={currentStatus} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             ) : (
               <li className="flex items-center justify-center px-4 py-2 text-sm text-gray-500">暂无单词</li>
             )}

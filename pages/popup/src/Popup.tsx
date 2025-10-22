@@ -1,12 +1,13 @@
 import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
+import { globalConfigStorage, tencentTranslatorConfigStorage, vocabularyStorage } from '@extension/storage';
 import { createTranslator, translator } from '@extension/translator';
 import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, WordPanel } from '@extension/ui';
 import TranslationStatusCard from '@src/components/TranslationStatusCard';
 import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 import type { WordEntry } from '@extension/dictionary';
+import type { WordStatus } from '@extension/storage';
 
 const Popup = () => {
   const logo = chrome.runtime.getURL('icon-34.png');
@@ -14,6 +15,7 @@ const Popup = () => {
   // 状态变量
   const [inputText, setInputText] = useState('');
   const [localWordEntry, setLocalWordEntry] = useState<WordEntry | null>(null);
+  const [currentWordStatus, setCurrentWordStatus] = useState<WordStatus | null>(null); // 当前单词的状态
   const [translatedText, setTranslatedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -67,6 +69,7 @@ const Popup = () => {
 
       // 清除之前的翻译信息
       setLocalWordEntry(null);
+      setCurrentWordStatus(null);
       setTranslatedText('');
       setError('');
 
@@ -105,6 +108,15 @@ const Popup = () => {
             hasLocalWord = true;
             console.log('[popup] Local word entry:', responseWordEntry);
             setLocalWordEntry(responseWordEntry);
+
+            // 查询单词状态
+            try {
+              const wordData = await vocabularyStorage.hasWord(inputText);
+              setCurrentWordStatus(wordData?.status || null);
+            } catch (err) {
+              console.error('[popup] Failed to query word status:', err);
+              setCurrentWordStatus(null);
+            }
           }
         } catch (error) {
           console.error('[popup] Local dictionary query failed:', error);
@@ -176,6 +188,7 @@ const Popup = () => {
               onChange={e => {
                 setInputText(e.target.value);
                 setLocalWordEntry(null);
+                setCurrentWordStatus(null);
                 setTranslatedText('');
                 setError('');
               }}
@@ -208,7 +221,7 @@ const Popup = () => {
         </div>
         {localWordEntry && (
           <div className="border-t border-gray-200 p-1">
-            <WordPanel entry={localWordEntry} />
+            <WordPanel entry={localWordEntry} currentStatus={currentWordStatus} />
           </div>
         )}
         {translatedText && <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />}
