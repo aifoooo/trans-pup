@@ -65,9 +65,11 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
     if (!anchorEl) return { top: 0, left: 0 };
 
     const rect = anchorEl.getBoundingClientRect();
-    const menuWidth = 160; // w-40 = 160px
-    const menuHeight = 200; // 估算的菜单高度
-    const spacing = 4; // 间距
+    const spacing = 4; // 间距 (单位: px)
+
+    // 动态计算菜单尺寸（使用实际 DOM 尺寸或备用值）
+    const menuWidth = menuRef.current?.offsetWidth || 160; // w-40 = 10rem = 160px
+    const menuHeight = menuRef.current?.offsetHeight || 160; // 动态计算，备用 160px
 
     let top = rect.bottom + spacing;
     let left = rect.left;
