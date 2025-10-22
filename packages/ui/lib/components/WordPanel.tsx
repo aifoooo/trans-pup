@@ -1,7 +1,7 @@
 import SpeakerLoop from '@/lib/components/SpeakerLoop';
 import { WordActionMenu } from '@/lib/components/WordActionMenu';
 import { useState, useRef } from 'react';
-import { FaBookmark } from 'react-icons/fa6';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa6';
 import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
 import type { WordStatus } from '@extension/storage';
@@ -74,6 +74,20 @@ export const WordPanel: React.FC<{
     // TODO: 实现移动到已掌握功能
   };
 
+  // 根据单词状态获取书签图标颜色类名
+  const getBookmarkColor = () => {
+    switch (currentStatus) {
+      case 'new':
+        return 'text-green-500'; // 新单词 - 绿色
+      case 'learning':
+        return 'text-red-500'; // 学习中 - 红色
+      case 'mastered':
+        return 'text-yellow-500'; // 已掌握 - 黄色
+      default:
+        return 'text-white stroke-gray-500 stroke-[24]'; // 不在列表中 - 白底灰边
+    }
+  };
+
   return (
     <div className="px-4 pb-5 pt-4">
       <div className="space-y-4">
@@ -130,7 +144,11 @@ export const WordPanel: React.FC<{
               aria-label="单词操作菜单"
               aria-expanded={isMenuOpen}
               tabIndex={0}>
-              <FaBookmark className="h-[0.875rem] w-[0.875rem] text-green-500" />
+              {currentStatus === null ? (
+                <FaRegBookmark className={`h-[0.875rem] w-[0.875rem] ${getBookmarkColor()}`} />
+              ) : (
+                <FaBookmark className={`h-[0.875rem] w-[0.875rem] ${getBookmarkColor()}`} />
+              )}
             </button>
           </div>
           {entry.phonetic && (
