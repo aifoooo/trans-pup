@@ -4,7 +4,7 @@ import { globalConfigStorage, tencentTranslatorConfigStorage, vocabularyStorage 
 import { createTranslator, translator } from '@extension/translator';
 import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, WordPanel } from '@extension/ui';
 import TranslationStatusCard from '@src/components/TranslationStatusCard';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 import type { WordEntry } from '@extension/dictionary';
 import type { WordStatus } from '@extension/storage';
@@ -61,6 +61,30 @@ const Popup = () => {
     };
 
     checkTranslator();
+  }, []);
+
+  // 处理单词删除
+  const handleRemoveWord = useCallback(async (word: string) => {
+    try {
+      await vocabularyStorage.removeWord(word);
+      console.log('[Popup] Word removed:', word);
+      // 更新状态显示
+      setCurrentWordStatus(null);
+    } catch (error) {
+      console.error('[Popup] Failed to remove word:', error);
+    }
+  }, []);
+
+  // 处理单词状态改变
+  const handleStatusChange = useCallback(async (word: string, newStatus: WordStatus) => {
+    try {
+      await vocabularyStorage.updateWordStatus(word, newStatus);
+      console.log('[Popup] Word status updated:', word, '->', newStatus);
+      // 更新状态显示
+      setCurrentWordStatus(newStatus);
+    } catch (error) {
+      console.error('[Popup] Failed to update word status:', error);
+    }
   }, []);
 
   const handleTranslate = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -221,7 +245,12 @@ const Popup = () => {
         </div>
         {localWordEntry && (
           <div className="border-t border-gray-200 p-1">
-            <WordPanel entry={localWordEntry} currentStatus={currentWordStatus} />
+            <WordPanel
+              entry={localWordEntry}
+              currentStatus={currentWordStatus}
+              onRemove={() => handleRemoveWord(localWordEntry.word)}
+              onStatusChange={newStatus => handleStatusChange(localWordEntry.word, newStatus)}
+            />
           </div>
         )}
         {translatedText && <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />}

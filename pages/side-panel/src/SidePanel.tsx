@@ -8,7 +8,7 @@ import { IoIosArrowDropdown } from 'react-icons/io';
 import { IoSearch } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';
 import type { WordEntry } from '@extension/dictionary';
-import type { CollectedWord } from '@extension/storage';
+import type { CollectedWord, WordStatus } from '@extension/storage';
 
 const SidePanel = () => {
   // 主要数据状态
@@ -130,6 +130,30 @@ const SidePanel = () => {
     setExpandedWord(expandedWord === word ? null : word);
   };
 
+  // 处理单词删除
+  const handleRemoveWord = useCallback(async (word: string) => {
+    try {
+      await vocabularyStorage.removeWord(word);
+      console.log('[SidePanel] Word removed:', word);
+      // 刷新列表
+      setVocabularyUpdateCount(prev => prev + 1);
+    } catch (error) {
+      console.error('[SidePanel] Failed to remove word:', error);
+    }
+  }, []);
+
+  // 处理单词状态改变
+  const handleStatusChange = useCallback(async (word: string, newStatus: WordStatus) => {
+    try {
+      await vocabularyStorage.updateWordStatus(word, newStatus);
+      console.log('[SidePanel] Word status updated:', word, '->', newStatus);
+      // 刷新列表
+      setVocabularyUpdateCount(prev => prev + 1);
+    } catch (error) {
+      console.error('[SidePanel] Failed to update word status:', error);
+    }
+  }, []);
+
   return (
     <div className={cn('App', 'h-full overflow-y-auto pb-6')} onScroll={handleScroll}>
       {/* 单词状态区域 */}
@@ -200,7 +224,12 @@ const SidePanel = () => {
                     {/* 详细信息面板 */}
                     {expandedWord === item.word && (
                       <div className="border-t border-gray-200">
-                        <WordPanel entry={item} currentStatus={currentStatus} />
+                        <WordPanel
+                          entry={item}
+                          currentStatus={currentStatus}
+                          onRemove={() => handleRemoveWord(item.word)}
+                          onStatusChange={newStatus => handleStatusChange(item.word, newStatus)}
+                        />
                       </div>
                     )}
                   </div>

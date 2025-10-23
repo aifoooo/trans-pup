@@ -33,7 +33,9 @@ export const WordPanel: React.FC<{
   showTags?: boolean;
   showExchanges?: boolean;
   currentStatus?: WordStatus | null; // 当前单词所在的列表状态
-}> = ({ entry, showTags = true, showExchanges = true, currentStatus = null }) => {
+  onRemove?: () => void; // 删除单词的回调
+  onStatusChange?: (newStatus: WordStatus) => void; // 改变单词状态的回调
+}> = ({ entry, showTags = true, showExchanges = true, currentStatus = null, onRemove, onStatusChange }) => {
   const [playing, setPlaying] = useState<'en-GB' | 'en-US' | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const bookmarkRef = useRef<HTMLButtonElement>(null);
@@ -49,29 +51,29 @@ export const WordPanel: React.FC<{
     synth.speak(utterance);
   };
 
-  // 菜单操作处理函数（目前仅UI，功能待实现）
+  // 菜单操作处理函数
   const handleRemove = () => {
     console.log('[WordPanel] Remove word:', entry.word);
     setIsMenuOpen(false);
-    // TODO: 实现删除功能
+    onRemove?.();
   };
 
   const handleMoveToNew = () => {
     console.log('[WordPanel] Move to new:', entry.word);
     setIsMenuOpen(false);
-    // TODO: 实现移动到新单词功能
+    onStatusChange?.('new');
   };
 
   const handleMoveToLearning = () => {
     console.log('[WordPanel] Move to learning:', entry.word);
     setIsMenuOpen(false);
-    // TODO: 实现移动到学习中功能
+    onStatusChange?.('learning');
   };
 
   const handleMoveToMastered = () => {
     console.log('[WordPanel] Move to mastered:', entry.word);
     setIsMenuOpen(false);
-    // TODO: 实现移动到已掌握功能
+    onStatusChange?.('mastered');
   };
 
   // 根据单词状态获取书签图标颜色类名
