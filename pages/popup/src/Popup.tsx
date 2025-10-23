@@ -76,16 +76,27 @@ const Popup = () => {
   }, []);
 
   // 处理单词状态改变
-  const handleStatusChange = useCallback(async (word: string, newStatus: WordStatus) => {
-    try {
-      await vocabularyStorage.updateWordStatus(word, newStatus);
-      console.log('[Popup] Word status updated:', word, '->', newStatus);
-      // 更新状态显示
-      setCurrentWordStatus(newStatus);
-    } catch (error) {
-      console.error('[Popup] Failed to update word status:', error);
-    }
-  }, []);
+  const handleStatusChange = useCallback(
+    async (word: string, newStatus: WordStatus) => {
+      try {
+        // 如果单词不在列表中，需要先添加单词
+        if (currentWordStatus === null) {
+          await vocabularyStorage.addWord(word);
+          console.log('[Popup] Word added:', word);
+        }
+
+        // 更新单词状态
+        await vocabularyStorage.updateWordStatus(word, newStatus);
+        console.log('[Popup] Word status updated:', word, '->', newStatus);
+
+        // 更新状态显示
+        setCurrentWordStatus(newStatus);
+      } catch (error) {
+        console.error('[Popup] Failed to update word status:', error);
+      }
+    },
+    [currentWordStatus],
+  );
 
   const handleTranslate = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

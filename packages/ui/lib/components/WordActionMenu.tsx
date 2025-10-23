@@ -133,9 +133,12 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           {/* 从单词列表移除 */}
           <button
             onClick={onRemove}
-            className="flex w-full items-center gap-2 px-4 py-1 text-left text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200"
+            disabled={currentStatus === null}
+            className={`flex w-full items-center gap-2 px-4 py-1 text-left text-sm font-normal transition-colors ${
+              currentStatus === null ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            }`}
             role="menuitem">
-            <MdDeleteOutline className="h-4 w-4 text-red-500" />
+            <MdDeleteOutline className={`h-4 w-4 ${currentStatus === null ? 'text-gray-400' : 'text-red-500'}`} />
             <span>从列表移除</span>
           </button>
 
@@ -148,7 +151,10 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           {/* 新单词 */}
           <button
             onClick={onMoveToNew}
-            className="flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200"
+            disabled={currentStatus === 'new'}
+            className={`flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal transition-colors ${
+              currentStatus === 'new' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            }`}
             role="menuitem">
             <span>新单词</span>
             {currentStatus === 'new' && <FaCheck className="h-3 w-3 text-green-500" />}
@@ -157,7 +163,10 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           {/* 学习中 */}
           <button
             onClick={onMoveToLearning}
-            className="flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200"
+            disabled={currentStatus === 'learning'}
+            className={`flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal transition-colors ${
+              currentStatus === 'learning' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            }`}
             role="menuitem">
             <span>学习中</span>
             {currentStatus === 'learning' && <FaCheck className="h-3 w-3 text-red-500" />}
@@ -166,7 +175,10 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           {/* 已掌握 */}
           <button
             onClick={onMoveToMastered}
-            className="flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal text-gray-700 transition-colors hover:bg-gray-200"
+            disabled={currentStatus === 'mastered'}
+            className={`flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal transition-colors ${
+              currentStatus === 'mastered' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            }`}
             role="menuitem">
             <span>已掌握</span>
             {currentStatus === 'mastered' && <FaCheck className="h-3 w-3 text-yellow-500" />}

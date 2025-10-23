@@ -145,8 +145,19 @@ const SidePanel = () => {
   // 处理单词状态改变
   const handleStatusChange = useCallback(async (word: string, newStatus: WordStatus) => {
     try {
+      // 检查单词是否在列表中
+      const wordData = await vocabularyStorage.hasWord(word);
+
+      // 如果单词不在列表中，需要先添加单词
+      if (!wordData) {
+        await vocabularyStorage.addWord(word);
+        console.log('[SidePanel] Word added:', word);
+      }
+
+      // 更新单词状态
       await vocabularyStorage.updateWordStatus(word, newStatus);
       console.log('[SidePanel] Word status updated:', word, '->', newStatus);
+
       // 刷新列表
       setVocabularyUpdateCount(prev => prev + 1);
     } catch (error) {
