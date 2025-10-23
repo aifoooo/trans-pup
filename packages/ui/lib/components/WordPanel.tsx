@@ -84,7 +84,7 @@ export const WordPanel: React.FC<{
       case 'mastered':
         return 'text-yellow-500'; // 已掌握 - 黄色
       default:
-        return 'text-white stroke-gray-500 stroke-[24]'; // 不在列表中 - 白底灰边
+        return 'text-gray-500'; // 不在列表中 - 白底灰边
     }
   };
 
