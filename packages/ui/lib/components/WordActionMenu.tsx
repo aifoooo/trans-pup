@@ -68,8 +68,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
     const spacing = 4; // 间距 (单位: px)
 
     // 动态计算菜单尺寸（使用实际 DOM 尺寸或备用值）
-    const menuWidth = menuRef.current?.offsetWidth || 130; // 动态计算，备用 130px
-    const menuHeight = menuRef.current?.offsetHeight || 160; // 动态计算，备用 160px
+    const menuWidth = menuRef.current?.offsetWidth || 160;
+    const menuHeight = menuRef.current?.offsetHeight || 187;
 
     let top = rect.bottom + spacing;
     let left = rect.left;
@@ -122,7 +122,7 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
       {/* 菜单 */}
       <div
         ref={menuRef}
-        className="fixed z-50 rounded-lg border border-gray-200 bg-white shadow-lg"
+        className="fixed z-50 w-40 rounded-lg border border-gray-200 bg-white shadow-lg"
         role="menu"
         aria-label="单词操作菜单"
         style={{
@@ -134,8 +134,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           <button
             onClick={onRemove}
             disabled={currentStatus === null}
-            className={`flex w-full items-center gap-2 px-4 py-1 text-left text-sm font-normal transition-colors ${
-              currentStatus === null ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-normal transition-colors ${
+              currentStatus === null ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-100'
             }`}
             role="menuitem">
             <MdDeleteOutline className={`h-4 w-4 ${currentStatus === null ? 'text-gray-400' : 'text-red-500'}`} />
@@ -152,8 +152,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           <button
             onClick={onMoveToNew}
             disabled={currentStatus === 'new'}
-            className={`flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal transition-colors ${
-              currentStatus === 'new' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-normal transition-colors ${
+              currentStatus === 'new' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-100'
             }`}
             role="menuitem">
             <span>新单词</span>
@@ -164,8 +164,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           <button
             onClick={onMoveToLearning}
             disabled={currentStatus === 'learning'}
-            className={`flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal transition-colors ${
-              currentStatus === 'learning' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-normal transition-colors ${
+              currentStatus === 'learning' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-100'
             }`}
             role="menuitem">
             <span>学习中</span>
@@ -176,8 +176,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
           <button
             onClick={onMoveToMastered}
             disabled={currentStatus === 'mastered'}
-            className={`flex w-full items-center justify-between px-4 py-1 text-left text-sm font-normal transition-colors ${
-              currentStatus === 'mastered' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-200'
+            className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-normal transition-colors ${
+              currentStatus === 'mastered' ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 hover:bg-gray-100'
             }`}
             role="menuitem">
             <span>已掌握</span>

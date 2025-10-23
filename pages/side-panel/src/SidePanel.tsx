@@ -3,8 +3,8 @@ import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { vocabularyStorage } from '@extension/storage';
 import { cn, ErrorDisplay, LoadingSpinner, WordPanel } from '@extension/ui';
 import StatusBar from '@src/components/StatusBar';
+import WordListDropdown from '@src/components/WordListDropdown';
 import { useEffect, useState, useCallback } from 'react';
-import { IoIosArrowDropdown } from 'react-icons/io';
 import { IoSearch } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md';
 import type { WordEntry } from '@extension/dictionary';
@@ -14,6 +14,9 @@ const SidePanel = () => {
   // 主要数据状态
   const [words, setWords] = useState<WordEntry[]>([]);
   const [collectedWords, setCollectedWords] = useState<CollectedWord[]>([]); // 保存原始数据以获取状态
+
+  // 选中的列表
+  const [selectedList, setSelectedList] = useState<'all' | WordStatus>('all');
 
   // 分页相关状态
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,10 +31,14 @@ const SidePanel = () => {
   const [expandedWord, setExpandedWord] = useState<string | null>(null);
 
   // 获取单词列表
-  const fetchWords = useCallback(async (page: number, search: string) => {
+  const fetchWords = useCallback(async (page: number, search: string, listFilter: 'all' | WordStatus) => {
     setLoading(true);
     try {
-      const result = await vocabularyStorage.getWords(page, 20, search);
+      // 根据选择的列表类型获取单词
+      const result =
+        listFilter === 'all'
+          ? await vocabularyStorage.getWords(page, 20, search)
+          : await vocabularyStorage.getWordsByStatus(listFilter, page, 20, search);
 
       // 检查 result.words 是否存在且为数组
       if (!result.words || !Array.isArray(result.words)) {
@@ -91,17 +98,17 @@ const SidePanel = () => {
   // 初始加载和搜索时重新加载
   useEffect(() => {
     setCurrentPage(1);
-    fetchWords(1, searchTerm);
-  }, [fetchWords, searchTerm, vocabularyUpdateCount]);
+    fetchWords(1, searchTerm, selectedList);
+  }, [fetchWords, searchTerm, vocabularyUpdateCount, selectedList]);
 
   // 加载更多数据
   const loadMore = useCallback(() => {
     if (hasMore && !loading) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
-      fetchWords(nextPage, searchTerm);
+      fetchWords(nextPage, searchTerm, selectedList);
     }
-  }, [currentPage, fetchWords, hasMore, loading, searchTerm]);
+  }, [currentPage, fetchWords, hasMore, loading, searchTerm, selectedList]);
 
   // 处理滚动到底部的事件
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -165,6 +172,12 @@ const SidePanel = () => {
     }
   }, []);
 
+  // 处理列表选择
+  const handleSelectList = useCallback((list: 'all' | WordStatus) => {
+    setSelectedList(list);
+    setExpandedWord(null); // 关闭展开的单词详情
+  }, []);
+
   return (
     <div className={cn('App', 'h-full overflow-y-auto pb-6')} onScroll={handleScroll}>
       {/* 单词状态区域 */}
@@ -172,16 +185,9 @@ const SidePanel = () => {
 
       {/* 单词列表区域 */}
       <div className="mx-5 mt-16 flex min-h-0 flex-1 flex-col">
-        <div
-          className={cn(
-            'mb-3 flex cursor-pointer items-center justify-between',
-            'rounded-lg border border-dashed border-gray-200 p-2',
-          )}>
-          <h2 className="text-base font-semibold">新单词</h2>
-          <span>
-            <IoIosArrowDropdown className="h-5 w-5 font-semibold text-gray-500" />
-          </span>
-        </div>
+        {/* 列表选择下拉菜单 */}
+        <WordListDropdown selectedList={selectedList} onSelectList={handleSelectList} />
+
         <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-gray-200">
           <div className="px-4 py-3">
             <div className="relative">
