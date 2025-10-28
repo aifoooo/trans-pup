@@ -1,5 +1,7 @@
 import 'webextension-polyfill';
 import { WordLookup } from '@extension/dictionary';
+import { vocabularyStorage } from '@extension/storage';
+import type { WordStatus } from '@extension/storage';
 
 let wordLookupInstance: WordLookup | null = null;
 
@@ -37,7 +39,12 @@ const processMessageQueue = () => {
 };
 
 const handleMessage = (message: unknown, sendResponse: (response?: unknown) => void) => {
-  const { action, word, words } = message as { action: string; word: string | undefined; words: string[] | undefined };
+  const { action, word, words, status } = message as {
+    action: string;
+    word: string | undefined;
+    words: string[] | undefined;
+    status: WordStatus | undefined;
+  };
 
   if (action === 'hasWord' && word) {
     if (wordLookupInstance && wordLookupInstance.hasWord(word)) {
@@ -72,6 +79,30 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     } else {
       sendResponse(null);
     }
+  } else if (action === 'getWordStatus' && word) {
+    // 获取单词状态
+    vocabularyStorage.hasWord(word).then(wordData => {
+      sendResponse({ status: wordData?.status || null });
+    });
+  } else if (action === 'removeWord' && word) {
+    // 删除单词
+    vocabularyStorage.removeWord(word).then(() => {
+      sendResponse({ success: true });
+    });
+  } else if (action === 'updateWordStatus' && word && status) {
+    // 更新单词状态（如果单词不在列表，先添加）
+    vocabularyStorage
+      .hasWord(word)
+      .then(wordData => {
+        if (!wordData) {
+          return vocabularyStorage.addWord(word);
+        }
+        return undefined;
+      })
+      .then(() => vocabularyStorage.updateWordStatus(word, status))
+      .then(() => {
+        sendResponse({ success: true });
+      });
   } else {
     console.warn('Unknown action:', action);
     sendResponse({ error: 'Unknown action' });

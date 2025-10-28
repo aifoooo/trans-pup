@@ -1,13 +1,14 @@
+import '@src/matches/all/index.css';
+import { initAppWithShadow } from '@extension/shared';
 import App from '@src/matches/all/App';
-import { createRoot } from 'react-dom/client';
+import cssText from '@src/matches/all/index.css?inline';
 
 const init = () => {
-  const root = document.createElement('div');
-  root.id = 'CEB-extension-all';
-  root.style.display = 'none';
-  document.body.append(root);
-
-  createRoot(root).render(<App />);
+  initAppWithShadow({
+    id: 'CEB-extension-all',
+    app: <App />,
+    inlineCss: cssText,
+  });
 };
 
 init();
