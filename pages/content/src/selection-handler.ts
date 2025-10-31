@@ -8,7 +8,7 @@ type SelectionHandler = {
 
 /**
  * 创建选词处理器
- * 监听双击事件，当用户双击选中文本时，显示翻译图标
+ * 监听鼠标事件，当用户选中文本时，显示翻译图标
  */
 const createSelectionHandler = (): SelectionHandler => {
   let selectionTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -44,29 +44,23 @@ const createSelectionHandler = (): SelectionHandler => {
         return;
       }
 
-      const selectedText = selection.toString().trim();
-
       // 文本太长不处理（超过2000个字符）
+      const selectedText = selection.toString().trim();
       if (selectedText.length === 0 || selectedText.length > 2000) {
         console.log('[selection-handler] Selected text is empty or too long');
         return;
       }
 
-      // 获取选中文本的位置
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-
       // 发送消息显示翻译图标
       const selectionInfo: SelectionInfo = {
         text: selectedText,
         position: {
-          x: rect.left + window.scrollX + rect.width / 2, // 图标居中显示
-          y: rect.top + window.scrollY - 40, // 图标显示在选中文本上方
-          width: rect.width,
-          height: rect.height,
+          x: event.clientX + window.scrollX,
+          y: event.clientY + window.scrollY,
+          width: 0,
+          height: 0,
         },
       };
-
       window.postMessage(
         {
           type: 'TRANS_PUP_SHOW_ICON',
@@ -74,6 +68,7 @@ const createSelectionHandler = (): SelectionHandler => {
         },
         '*',
       );
+
       console.log('[selection-handler] Sent TRANS_PUP_SHOW_ICON message with data:', selectionInfo);
     }, 100); // 100ms 延迟
   };
