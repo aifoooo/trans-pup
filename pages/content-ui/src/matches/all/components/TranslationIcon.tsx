@@ -33,11 +33,11 @@ export const TranslationIcon: React.FC<TranslationIconProps> = ({ position, onTr
 
   return (
     <div
-      className="fixed z-[10000] cursor-pointer transition-all duration-200 hover:scale-110"
+      className="absolute z-[10000] cursor-pointer"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        transform: 'translate(-50%, 1rem)',
+        transform: 'translate(0.75rem, 0.75rem)',
       }}
       onClick={e => {
         e.stopPropagation();
