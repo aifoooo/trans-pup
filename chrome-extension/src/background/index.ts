@@ -47,12 +47,14 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
   };
 
   if (action === 'hasWord' && word) {
+    // 检查单词是否存在
     if (wordLookupInstance && wordLookupInstance.hasWord(word)) {
       sendResponse({ exists: true });
     } else {
       sendResponse({ exists: false });
     }
   } else if (action === 'batchHasWords' && words) {
+    // 批量检查单词是否存在
     console.log('[background] Received batchHasWords request:', words);
     if (wordLookupInstance) {
       const wordExistsMap = wordLookupInstance.hasWordsBatch(words);
@@ -63,6 +65,7 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
       sendResponse(null);
     }
   } else if (action === 'queryWord' && word) {
+    // 查询单个单词
     if (wordLookupInstance) {
       const wordEntry = wordLookupInstance.lookup(word);
       sendResponse(wordEntry);
@@ -70,6 +73,7 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
       sendResponse(null);
     }
   } else if (action === 'batchQueryWords' && words) {
+    // 批量查询单词
     console.log('[background] Received batchQueryWords request:', words);
     if (wordLookupInstance) {
       const wordEntryMap = wordLookupInstance.lookupBatch(words);
@@ -79,18 +83,18 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     } else {
       sendResponse(null);
     }
-  } else if (action === 'getWordStatus' && word) {
-    // 获取单词状态
-    vocabularyStorage.hasWord(word).then(wordData => {
-      sendResponse({ status: wordData?.status || null });
-    });
   } else if (action === 'removeWord' && word) {
     // 删除单词
     vocabularyStorage.removeWord(word).then(() => {
       sendResponse({ success: true });
     });
+  } else if (action === 'getWordStatus' && word) {
+    // 获取单词状态
+    vocabularyStorage.hasWord(word).then(wordData => {
+      sendResponse({ status: wordData?.status || null });
+    });
   } else if (action === 'updateWordStatus' && word && status) {
-    // 更新单词状态（如果单词不在列表，先添加）
+    // 更新单词状态
     vocabularyStorage
       .hasWord(word)
       .then(wordData => {
