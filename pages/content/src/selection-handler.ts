@@ -15,7 +15,6 @@ const createSelectionHandler = (): SelectionHandler => {
 
   const handleMouseUp = async (event: MouseEvent) => {
     console.log('[selection-handler] Mouse up event triggered', event);
-    console.log('[selection-handler] Current selection:', window.getSelection()?.toString());
 
     // 清除之前的定时器
     if (selectionTimeout) {
@@ -27,8 +26,6 @@ const createSelectionHandler = (): SelectionHandler => {
     selectionTimeout = setTimeout(async () => {
       // 检查划词翻译是否启用
       const config = globalConfigStorage.getSnapshot();
-      console.log('[selection-handler] Config snapshot:', config);
-
       if (!config || !config.wordTranslation) {
         console.log('[selection-handler] Word translation disabled or config not available');
         return;
@@ -48,7 +45,6 @@ const createSelectionHandler = (): SelectionHandler => {
       }
 
       const selectedText = selection.toString().trim();
-      console.log('[selection-handler] Selected text:', selectedText);
 
       // 文本太长不处理（超过2000个字符）
       if (selectedText.length === 0 || selectedText.length > 2000) {
@@ -59,7 +55,6 @@ const createSelectionHandler = (): SelectionHandler => {
       // 获取选中文本的位置
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      console.log('[selection-handler] Selection rect:', rect);
 
       // 发送消息显示翻译图标
       const selectionInfo: SelectionInfo = {
