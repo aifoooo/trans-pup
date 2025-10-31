@@ -19,6 +19,8 @@ interface TranslationPopupProps {
  * 2. 如果不是单词或查不到，使用翻译API
  */
 export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, position, onClose }) => {
+  console.log('[TranslationPopup] Rendering...');
+
   const [loading, setLoading] = useState(true);
   const [wordEntry, setWordEntry] = useState<WordEntry | null>(null);
   const [translatedText, setTranslatedText] = useState('');
@@ -52,7 +54,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
             // 找到单词，显示单词卡片
             setWordEntry(response);
 
-            // 查询单词状态 - 通过消息传递
+            // 查询单词状态
             try {
               const wordStatus = await new Promise<WordStatus | null>((resolve, reject) => {
                 chrome.runtime.sendMessage({ action: 'getWordStatus', word: text }, response => {

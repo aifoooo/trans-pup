@@ -54,7 +54,7 @@ export const TranslationIcon: React.FC<TranslationIconProps> = ({ position, onTr
       aria-label="翻译">
       {/* 翻译图标 */}
       <div>
-        <img src={logo} className="h-6 w-6" alt="Logo" />
+        <img src={logo} className="h-5 w-5" alt="Logo" />
       </div>
     </div>
   );
