@@ -335,7 +335,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       }}>
       {/* 拖拽标题栏 */}
       <div
-        className={`flex w-full items-center justify-between rounded-t-lg bg-gray-50 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
+        className={`flex h-8 w-full items-center justify-between rounded-t-lg bg-gray-50 p-1 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
         onMouseDown={e => {
           handleDragStart(e);
           e.stopPropagation();
@@ -359,7 +359,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           onMouseDown={e => e.stopPropagation()}
           onMouseUp={e => e.stopPropagation()}
           onClick={onClose}
-          className="flex h-6 w-6 items-center justify-center text-gray-400 transition-colors hover:text-gray-600"
+          className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
           aria-label="关闭">
           <IoClose className="h-4 w-4" />
         </button>
