@@ -29,6 +29,11 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   const [currentWordStatus, setCurrentWordStatus] = useState<WordStatus | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
+  // 拖拽相关状态
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+
   // 查询单词或翻译
   useEffect(() => {
     const queryOrTranslate = async () => {
@@ -178,8 +183,46 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     };
   }, [onClose]);
 
+  // 拖拽相关事件处理
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging && popupRef.current) {
+        // 计算新位置
+        const newX = e.clientX - dragOffset.x;
+        const newY = e.clientY - dragOffset.y;
+
+        // 确保弹窗不会被拖出视口
+        const maxX = window.innerWidth - popupRef.current.offsetWidth;
+        const maxY = window.innerHeight - popupRef.current.offsetHeight;
+
+        const boundedX = Math.max(0, Math.min(newX, maxX));
+        const boundedY = Math.max(0, Math.min(newY, maxY));
+
+        setDragPosition({ x: boundedX, y: boundedY });
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isDragging, dragOffset]);
+
   // 计算弹窗位置，确保不超出视口
   const getPopupPosition = () => {
+    // 如果正在拖拽，使用拖拽位置
+    if (dragPosition) {
+      return {
+        left: dragPosition.x,
+        top: dragPosition.y,
+        right: undefined,
+        bottom: undefined,
+      };
+    }
+
     const popupWidth = 400;
     const popupHeight = 400;
     const padding = 10;
@@ -228,13 +271,41 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     return { left, top, right, bottom };
   };
 
+  // 处理拖拽开始
+  const handleDragStart = (e: React.MouseEvent) => {
+    if (!popupRef.current) return;
+
+    const rect = popupRef.current.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+
+    setDragOffset({ x: offsetX, y: offsetY });
+    setIsDragging(true);
+
+    // 开始拖拽时，如果还没有拖拽位置，则初始化为当前显示位置
+    if (!dragPosition) {
+      setDragPosition({
+        x: getPopupPosition().left || window.innerWidth - 400 - (getPopupPosition().right || 0),
+        y: getPopupPosition().top || window.innerHeight - 400 - (getPopupPosition().bottom || 0),
+      });
+    }
+  };
+
+  // 处理拖拽结束
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   const popupPosition = getPopupPosition();
 
   return (
     <div
       ref={popupRef}
       onMouseDown={e => e.stopPropagation()}
-      onMouseUp={e => e.stopPropagation()}
+      onMouseUp={e => {
+        handleDragEnd();
+        e.stopPropagation();
+      }}
       role="presentation"
       aria-label="翻译弹窗"
       tabIndex={-1}
@@ -245,13 +316,28 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         right: popupPosition.right !== undefined ? `${popupPosition.right}px` : undefined,
         bottom: popupPosition.bottom !== undefined ? `${popupPosition.bottom}px` : undefined,
       }}>
-      {/* 关闭按钮 */}
-      <button
-        onClick={onClose}
-        className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-        aria-label="关闭">
-        <IoClose className="h-4 w-4" />
-      </button>
+      {/* 拖拽标题栏 */}
+      <div
+        className="flex h-8 w-full cursor-move items-center justify-between bg-gray-200 pr-2"
+        onMouseDown={handleDragStart}
+        role="toolbar"
+        aria-label="拖拽工具栏"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            setIsDragging(!isDragging);
+          }
+        }}>
+        <div className="h-full flex-1 cursor-move" />
+        {/* 关闭按钮 */}
+        <button
+          onClick={onClose}
+          className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
+          aria-label="关闭">
+          <IoClose className="h-4 w-4" />
+        </button>
+      </div>
 
       {/* 内容区域 */}
       <div className="max-h-[400px] overflow-y-auto">
