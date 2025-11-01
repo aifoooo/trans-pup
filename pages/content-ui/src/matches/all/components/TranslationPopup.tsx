@@ -301,7 +301,10 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   return (
     <div
       ref={popupRef}
-      onMouseDown={e => e.stopPropagation()}
+      onMouseDown={e => {
+        handleDragStart(e);
+        e.stopPropagation();
+      }}
       onMouseUp={e => {
         handleDragEnd();
         e.stopPropagation();
@@ -319,7 +322,14 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       {/* 拖拽标题栏 */}
       <div
         className={`flex w-full items-center justify-between rounded-t-lg bg-gray-50 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
-        onMouseDown={handleDragStart}
+        onMouseDown={e => {
+          handleDragStart(e);
+          e.stopPropagation();
+        }}
+        onMouseUp={e => {
+          handleDragEnd();
+          e.stopPropagation();
+        }}
         role="toolbar"
         aria-label="拖拽工具栏"
         tabIndex={0}
@@ -332,6 +342,8 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         <div className="h-full flex-1" />
         {/* 关闭按钮 */}
         <button
+          onMouseDown={e => e.stopPropagation()}
+          onMouseUp={e => e.stopPropagation()}
           onClick={onClose}
           className="flex h-6 w-6 items-center justify-center text-gray-400 transition-colors hover:text-gray-600"
           aria-label="关闭">
