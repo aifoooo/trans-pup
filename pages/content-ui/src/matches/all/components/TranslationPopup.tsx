@@ -184,15 +184,19 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     const popupHeight = 400;
     const padding = 10;
 
-    let left: number | undefined = position.x - popupWidth / 2;
-    let top: number | undefined = position.y + 10;
+    // 将文档坐标转换为视口坐标
+    const viewportX = position.x - (window.scrollX || window.pageXOffset);
+    const viewportY = position.y - (window.scrollY || window.pageYOffset);
+
+    let left: number | undefined = viewportX - popupWidth / 2;
+    let top: number | undefined = viewportY + 10;
     let right: number | undefined;
     let bottom: number | undefined;
 
     // 检查右边界
     if (left + popupWidth > window.innerWidth - padding) {
       // 右侧超出，使用 right 定位
-      right = window.innerWidth - position.x - popupWidth / 2;
+      right = window.innerWidth - viewportX - popupWidth / 2;
       // 确保right不会导致弹窗超出左边界
       if (right < padding) {
         right = padding;
@@ -208,7 +212,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     // 检查底部边界
     if (top + popupHeight > window.innerHeight - padding) {
       // 底部超出，使用 bottom 定位
-      bottom = window.innerHeight - position.y - 10;
+      bottom = window.innerHeight - viewportY - 10;
       // 确保bottom不会导致弹窗超出顶部边界
       if (bottom < padding) {
         bottom = padding;
