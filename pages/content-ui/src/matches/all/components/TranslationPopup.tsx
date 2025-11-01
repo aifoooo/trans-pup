@@ -284,10 +284,24 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
 
     // 开始拖拽时，如果还没有拖拽位置，则初始化为当前显示位置
     if (!dragPosition) {
-      setDragPosition({
-        x: getPopupPosition().left || window.innerWidth - 400 - (getPopupPosition().right || 0),
-        y: getPopupPosition().top || window.innerHeight - 400 - (getPopupPosition().bottom || 0),
-      });
+      // 获取当前弹窗的实际位置
+      const computedStyle = window.getComputedStyle(popupRef.current);
+      const currentLeft = parseInt(computedStyle.left, 10);
+      const currentTop = parseInt(computedStyle.top, 10);
+
+      // 如果能获取到有效的绝对定位值，则使用这些值
+      if (!isNaN(currentLeft) && !isNaN(currentTop)) {
+        setDragPosition({
+          x: currentLeft,
+          y: currentTop,
+        });
+      } else {
+        // 否则使用 getPopupPosition 计算的位置
+        setDragPosition({
+          x: getPopupPosition().left || window.innerWidth - 400 - (getPopupPosition().right || 0),
+          y: getPopupPosition().top || window.innerHeight - 400 - (getPopupPosition().bottom || 0),
+        });
+      }
     }
   };
 
