@@ -181,33 +181,47 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   // 计算弹窗位置，确保不超出视口
   const getPopupPosition = () => {
     const popupWidth = 400;
-    const popupHeight = 300;
+    const popupHeight = 400;
     const padding = 10;
 
-    let left = position.x - popupWidth / 2;
-    let top = position.y + 10;
+    let left: number | undefined = position.x - popupWidth / 2;
+    let top: number | undefined = position.y + 10;
+    let right: number | undefined;
+    let bottom: number | undefined;
 
     // 检查右边界
     if (left + popupWidth > window.innerWidth - padding) {
-      left = window.innerWidth - popupWidth - padding;
+      // 右侧超出，使用 right 定位
+      right = window.innerWidth - position.x - popupWidth / 2;
+      // 确保right不会导致弹窗超出左边界
+      if (right < padding) {
+        right = padding;
+      }
+      left = undefined;
     }
 
-    // 检查左边界
-    if (left < padding) {
+    // 检查左边界（仅在使用left定位时）
+    if (left !== undefined && left < padding) {
       left = padding;
     }
 
     // 检查底部边界
     if (top + popupHeight > window.innerHeight - padding) {
-      top = position.y - popupHeight - 10;
+      // 底部超出，使用 bottom 定位
+      bottom = window.innerHeight - position.y - 10;
+      // 确保bottom不会导致弹窗超出顶部边界
+      if (bottom < padding) {
+        bottom = padding;
+      }
+      top = undefined;
     }
 
-    // 检查顶部边界
-    if (top < padding) {
+    // 检查顶部边界（仅在使用top定位时）
+    if (top !== undefined && top < padding) {
       top = padding;
     }
 
-    return { left, top };
+    return { left, top, right, bottom };
   };
 
   const popupPosition = getPopupPosition();
@@ -222,8 +236,10 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       tabIndex={-1}
       className="fixed z-[10000] w-[400px] rounded-lg border border-gray-200 bg-white shadow-2xl"
       style={{
-        left: `${popupPosition.left}px`,
-        top: `${popupPosition.top}px`,
+        left: popupPosition.left !== undefined ? `${popupPosition.left}px` : undefined,
+        top: popupPosition.top !== undefined ? `${popupPosition.top}px` : undefined,
+        right: popupPosition.right !== undefined ? `${popupPosition.right}px` : undefined,
+        bottom: popupPosition.bottom !== undefined ? `${popupPosition.bottom}px` : undefined,
       }}>
       {/* 关闭按钮 */}
       <button
