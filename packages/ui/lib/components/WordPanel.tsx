@@ -135,6 +135,8 @@ export const WordPanel: React.FC<{
             <span className="text-lg font-bold">{entry.word}</span>
             <button
               ref={bookmarkRef}
+              onMouseDown={e => e.stopPropagation()}
+              onMouseUp={e => e.stopPropagation()}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {

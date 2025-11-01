@@ -108,6 +108,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
       {/* 遮罩层 */}
       <div
         className="fixed inset-0 z-40"
+        onMouseDown={e => e.stopPropagation()}
+        onMouseUp={e => e.stopPropagation()}
         onClick={onClose}
         onKeyDown={e => {
           if (e.key === 'Escape') {
@@ -132,6 +134,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
         <div className="py-1">
           {/* 从单词列表移除 */}
           <button
+            onMouseDown={e => e.stopPropagation()}
+            onMouseUp={e => e.stopPropagation()}
             onClick={onRemove}
             disabled={currentStatus === null}
             className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-normal transition-colors ${
@@ -150,6 +154,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
 
           {/* 新单词 */}
           <button
+            onMouseDown={e => e.stopPropagation()}
+            onMouseUp={e => e.stopPropagation()}
             onClick={onMoveToNew}
             disabled={currentStatus === 'new'}
             className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-normal transition-colors ${
@@ -162,6 +168,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
 
           {/* 学习中 */}
           <button
+            onMouseDown={e => e.stopPropagation()}
+            onMouseUp={e => e.stopPropagation()}
             onClick={onMoveToLearning}
             disabled={currentStatus === 'learning'}
             className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-normal transition-colors ${
@@ -174,6 +182,8 @@ export const WordActionMenu: React.FC<WordActionMenuProps> = ({
 
           {/* 已掌握 */}
           <button
+            onMouseDown={e => e.stopPropagation()}
+            onMouseUp={e => e.stopPropagation()}
             onClick={onMoveToMastered}
             disabled={currentStatus === 'mastered'}
             className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-normal transition-colors ${

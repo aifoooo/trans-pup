@@ -1,5 +1,6 @@
 import { WordPanel, InlineLoadingSpinner } from '@extension/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { IoClose } from 'react-icons/io5';
 import type { WordEntry } from '@extension/dictionary';
 import type { WordStatus } from '@extension/storage';
 import type React from 'react';
@@ -37,6 +38,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       try {
         // 判断是否为单个英文单词
         const isWord = /^[a-zA-Z]+$/.test(text);
+        console.log('[TranslationPopup] Is word:', isWord);
 
         if (isWord) {
           // 查询本地词典
@@ -50,6 +52,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
             });
           });
 
+          console.log('[TranslationPopup] Query response:', response);
           if (response && response.word) {
             // 找到单词，显示单词卡片
             setWordEntry(response);
@@ -65,6 +68,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
                   }
                 });
               });
+              console.log('[TranslationPopup] Word status:', wordStatus);
               setCurrentWordStatus(wordStatus);
             } catch (err) {
               console.error('[TranslationPopup] Failed to query word status:', err);
@@ -211,6 +215,11 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   return (
     <div
       ref={popupRef}
+      onMouseDown={e => e.stopPropagation()}
+      onMouseUp={e => e.stopPropagation()}
+      role="presentation"
+      aria-label="翻译弹窗"
+      tabIndex={-1}
       className="fixed z-[10000] w-[400px] rounded-lg border border-gray-200 bg-white shadow-2xl"
       style={{
         left: `${popupPosition.left}px`,
@@ -221,18 +230,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         onClick={onClose}
         className="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
         aria-label="关闭">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-4 w-4">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+        <IoClose className="h-4 w-4" />
       </button>
 
       {/* 内容区域 */}

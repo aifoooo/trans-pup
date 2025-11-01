@@ -39,6 +39,8 @@ export const TranslationIcon: React.FC<TranslationIconProps> = ({ position, onTr
         top: `${position.y}px`,
         transform: 'translate(0.75rem, 0.75rem)',
       }}
+      onMouseDown={e => e.stopPropagation()}
+      onMouseUp={e => e.stopPropagation()}
       onClick={e => {
         e.stopPropagation();
         onTranslate();
