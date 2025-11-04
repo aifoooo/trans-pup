@@ -3,5 +3,6 @@ export * from './InlineLoadingSpinner';
 export * from './LoadingSpinner';
 export * from './ToggleButton';
 export * from './ToggleSwitch';
+export * from './TranslationStatusCard';
 export * from './WordActionMenu';
 export * from './WordPanel';

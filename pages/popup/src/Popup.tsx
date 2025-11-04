@@ -2,8 +2,14 @@ import '@src/Popup.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage, vocabularyStorage } from '@extension/storage';
 import { createTranslator, translator } from '@extension/translator';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, WordPanel } from '@extension/ui';
-import TranslationStatusCard from '@src/components/TranslationStatusCard';
+import {
+  ErrorDisplay,
+  ToggleSwitch,
+  LoadingSpinner,
+  InlineLoadingSpinner,
+  TranslationStatusCard,
+  WordPanel,
+} from '@extension/ui';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 import type { WordEntry } from '@extension/dictionary';
@@ -264,8 +270,16 @@ const Popup = () => {
             />
           </div>
         )}
-        {translatedText && <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />}
-        {error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
+        {translatedText && (
+          <div className="border-t border-gray-200 p-1">
+            <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
+          </div>
+        )}
+        {error && (
+          <div className="border-t border-gray-200 p-1">
+            <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
+          </div>
+        )}
       </div>
 
       <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-5 py-3 text-xs text-gray-500">
