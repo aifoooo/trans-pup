@@ -9,41 +9,54 @@ const rootDir = resolve(import.meta.dirname);
 const srcDir = resolve(rootDir, 'src');
 const matchesDir = resolve(srcDir, 'matches');
 
-const configs = Object.entries(getContentScriptEntries(matchesDir)).map(([name, entry]) => ({
+const configs = Object.entries(getContentScriptEntries(matchesDir)).map(([name, entry], index) => ({
   name,
-  config: withPageConfig({
-    mode: IS_DEV ? 'development' : undefined,
-    resolve: {
-      alias: {
-        '@src': srcDir,
+  config: withPageConfig(
+    {
+      mode: IS_DEV ? 'development' : undefined,
+      resolve: {
+        alias: {
+          '@src': srcDir,
+        },
+      },
+      publicDir: resolve(rootDir, 'public'),
+      plugins: [IS_DEV && makeEntryPointPlugin()],
+      build: {
+        lib: {
+          name: name,
+          formats: ['iife'],
+          entry,
+          fileName: name,
+        },
+        outDir: resolve(rootDir, '..', '..', 'dist', 'content-runtime'),
       },
     },
-    publicDir: resolve(rootDir, 'public'),
-    plugins: [IS_DEV && makeEntryPointPlugin()],
-    build: {
-      lib: {
-        name: name,
-        formats: ['iife'],
-        entry,
-        fileName: name,
-      },
-      outDir: resolve(rootDir, '..', '..', 'dist', 'content-runtime'),
-    },
-  }),
+    index,
+  ),
 }));
 
-const builds = configs.map(async ({ name, config }) => {
-  const folder = resolve(matchesDir, name);
-  const args = {
-    ['--input']: resolve(folder, 'index.css'),
-    ['--output']: resolve(rootDir, 'dist', name, 'index.css'),
-    ['--config']: resolve(rootDir, 'tailwind.config.ts'),
-    ['--watch']: IS_DEV,
+const builds = configs.map(({ name, config }) => {
+  return async () => {
+    try {
+      const folder = resolve(matchesDir, name);
+      const args = {
+        ['--input']: resolve(folder, 'index.css'),
+        ['--output']: resolve(rootDir, 'dist', name, 'index.css'),
+        ['--config']: resolve(rootDir, 'tailwind.config.ts'),
+        ['--watch']: IS_DEV,
+      };
+      await buildTW(args);
+      //@ts-expect-error This is hidden property into vite's resolveConfig()
+      config.configFile = false;
+      await build(config);
+    } catch (error) {
+      console.error(`构建 ${name} 失败:`, error);
+      throw error;
+    }
   };
-  await buildTW(args);
-  //@ts-expect-error This is hidden property into vite's resolveConfig()
-  config.configFile = false;
-  await build(config);
 });
 
-await Promise.all(builds);
+// 将并行任务改为串行执行，避免并行执行时部分文件被意外清空
+for (const buildTask of builds) {
+  await buildTask();
+}

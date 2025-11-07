@@ -14,29 +14,26 @@ export const watchOption = IS_DEV
     }
   : undefined;
 
-export const withPageConfig = (config: UserConfig, index: number = 0) => {
-  console.log('[withPageConfig] index:', index);
-  const mergedConfig = deepmerge(
-    {
-      define: {
-        'process.env': env,
-      },
-      base: '',
-      plugins: [react(), IS_DEV && watchRebuildPlugin({ refresh: true }), nodePolyfills()],
-      build: {
-        sourcemap: IS_DEV,
-        minify: IS_PROD,
-        reportCompressedSize: IS_PROD,
-        emptyOutDir: IS_PROD && index === 0,
-        watch: watchOption,
-        rollupOptions: {
-          external: ['chrome'],
+export const withPageConfig = (config: UserConfig, index: number = 0) =>
+  defineConfig(
+    deepmerge(
+      {
+        define: {
+          'process.env': env,
+        },
+        base: '',
+        plugins: [react(), IS_DEV && watchRebuildPlugin({ refresh: true }), nodePolyfills()],
+        build: {
+          sourcemap: IS_DEV,
+          minify: IS_PROD,
+          reportCompressedSize: IS_PROD,
+          emptyOutDir: IS_PROD && index === 0,
+          watch: watchOption,
+          rollupOptions: {
+            external: ['chrome'],
+          },
         },
       },
-    },
-    config,
+      config,
+    ),
   );
-
-  console.log('[withPageConfig] mergedConfig.build.emptyOutDir:', mergedConfig.build.emptyOutDir);
-  return defineConfig(mergedConfig);
-};

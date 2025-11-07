@@ -37,11 +37,12 @@ const builds = configs.map(config => {
   const name = typeof config.build?.lib === 'object' && config.build.lib !== null ? config.build.lib.name : undefined;
   return async () => {
     try {
-      console.log(`[${new Date().toISOString()}] 开始构建: ${name}`);
+      //@ts-expect-error This is hidden property into vite's resolveConfig()
+      config.configFile = false;
       await build(config);
-      console.log(`[${new Date().toISOString()}] 完成构建: ${name}`);
     } catch (error) {
       console.error(`构建 ${name} 失败:`, error);
+      throw error;
     }
   };
 });
