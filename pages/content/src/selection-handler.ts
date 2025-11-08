@@ -57,8 +57,6 @@ const createSelectionHandler = (): SelectionHandler => {
         position: {
           x: event.clientX + window.scrollX,
           y: event.clientY + window.scrollY,
-          width: 0,
-          height: 0,
         },
       };
       window.postMessage(

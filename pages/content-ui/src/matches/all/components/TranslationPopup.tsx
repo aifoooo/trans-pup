@@ -2,15 +2,13 @@ import { WordPanel, InlineLoadingSpinner } from '@extension/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoClose } from 'react-icons/io5';
 import type { WordEntry } from '@extension/dictionary';
+import type { Position } from '@extension/shared';
 import type { WordStatus } from '@extension/storage';
 import type React from 'react';
 
 interface TranslationPopupProps {
   text: string;
-  position: {
-    x: number;
-    y: number;
-  };
+  position: Position;
   onClose: () => void;
 }
 

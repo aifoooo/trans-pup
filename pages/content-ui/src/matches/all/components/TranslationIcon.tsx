@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
+import type { Position } from '@extension/shared';
 import type React from 'react';
 
 interface TranslationIconProps {
-  position: {
-    x: number;
-    y: number;
-  };
+  position: Position;
   onTranslate: () => void;
 }
 
