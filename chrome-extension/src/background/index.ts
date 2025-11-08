@@ -1,6 +1,7 @@
 import 'webextension-polyfill';
 import { WordLookup } from '@extension/dictionary';
 import { vocabularyStorage } from '@extension/storage';
+import { createTranslator } from '@extension/translator';
 import type { WordStatus } from '@extension/storage';
 
 let wordLookupInstance: WordLookup | null = null;
@@ -39,11 +40,12 @@ const processMessageQueue = () => {
 };
 
 const handleMessage = (message: unknown, sendResponse: (response?: unknown) => void) => {
-  const { action, word, words, status } = message as {
+  const { action, word, words, status, text } = message as {
     action: string;
     word: string | undefined;
     words: string[] | undefined;
     status: WordStatus | undefined;
+    text: string | undefined;
   };
 
   if (action === 'hasWord' && word) {
@@ -106,6 +108,30 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
       .then(() => vocabularyStorage.updateWordStatus(word, status))
       .then(() => {
         sendResponse({ success: true });
+      });
+  } else if (action === 'translate' && text) {
+    // 翻译文本（通过 background script 代理，避免 CORS 问题）
+    const translatorInstance = createTranslator();
+    if (!translatorInstance) {
+      sendResponse({ error: '请先配置腾讯云翻译服务的 SecretId 和 SecretKey' });
+      return;
+    }
+
+    translatorInstance
+      .detect(text)
+      .then(sourceLanguage => {
+        // 源语言是中文时翻译成英文，源语言不是中文时翻译成中文
+        const targetLanguage = sourceLanguage === 'zh' ? 'en' : 'zh';
+        return translatorInstance.translate(text, sourceLanguage, targetLanguage);
+      })
+      .then(result => {
+        sendResponse({ result });
+      })
+      .catch(error => {
+        console.error('[background] Translation error:', error);
+        sendResponse({
+          error: error instanceof Error ? error.message : '翻译失败，请稍后重试',
+        });
       });
   } else {
     console.warn('Unknown action:', action);

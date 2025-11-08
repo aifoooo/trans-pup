@@ -1,7 +1,6 @@
 import '@src/Popup.css';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
+import { useStorage, useTranslation, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage, vocabularyStorage } from '@extension/storage';
-import { createTranslator, translator } from '@extension/translator';
 import {
   ErrorDisplay,
   ToggleSwitch,
@@ -12,7 +11,6 @@ import {
 } from '@extension/ui';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
-import type { WordEntry } from '@extension/dictionary';
 import type { WordStatus } from '@extension/storage';
 
 const Popup = () => {
@@ -20,11 +18,6 @@ const Popup = () => {
 
   // 状态变量
   const [inputText, setInputText] = useState('');
-  const [localWordEntry, setLocalWordEntry] = useState<WordEntry | null>(null);
-  const [currentWordStatus, setCurrentWordStatus] = useState<WordStatus | null>(null); // 当前单词的状态
-  const [translatedText, setTranslatedText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [, setHasTranslator] = useState(false);
 
   // 引用变量
@@ -33,25 +26,26 @@ const Popup = () => {
   // 配置状态
   const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
 
+  // 使用翻译 hook（popup 环境，直接使用 vocabularyStorage）
+  const {
+    loading: isLoading,
+    wordEntry: localWordEntry,
+    translatedText,
+    error,
+    wordStatus: currentWordStatus,
+    translate: translateText,
+    clear: clearTranslation,
+  } = useTranslation({
+    useMessageForWordStatus: false,
+    vocabularyStorage,
+  });
+
   // 检查是否存在有效的翻译器配置
   // 该副作用用于在组件挂载时检查翻译服务的可用性
-  // 主要检查两个方面：
-  // 1. 全局 translator 实例是否已创建
-  // 2. 用户是否配置了腾讯云翻译服务的凭证
-  // 如果任一条件满足，则设置 hasTranslator 状态为 true，表示翻译功能可用
   useEffect(() => {
     const checkTranslator = async () => {
-      // 检查全局 translator 实例是否已存在
-      // 这个实例在应用启动时可能已经创建好了
-      if (translator) {
-        setHasTranslator(true);
-        return;
-      }
-
-      // 如果全局 translator 实例不存在，则检查用户配置
-      // 获取存储中的腾讯云翻译配置
+      // 检查用户配置
       const config = tencentTranslatorConfigStorage.getSnapshot();
-      // 检查配置中是否包含有效的密钥信息
       const hasValidConfig =
         config &&
         config.secretId &&
@@ -70,16 +64,19 @@ const Popup = () => {
   }, []);
 
   // 处理单词删除
-  const handleRemoveWord = useCallback(async (word: string) => {
-    try {
-      await vocabularyStorage.removeWord(word);
-      console.log('[Popup] Word removed:', word);
-      // 更新状态显示
-      setCurrentWordStatus(null);
-    } catch (error) {
-      console.error('[Popup] Failed to remove word:', error);
-    }
-  }, []);
+  const handleRemoveWord = useCallback(
+    async (word: string) => {
+      try {
+        await vocabularyStorage.removeWord(word);
+        console.log('[Popup] Word removed:', word);
+        // 重新翻译以更新状态
+        await translateText(word);
+      } catch (error) {
+        console.error('[Popup] Failed to remove word:', error);
+      }
+    },
+    [translateText],
+  );
 
   // 处理单词状态改变
   const handleStatusChange = useCallback(
@@ -95,111 +92,19 @@ const Popup = () => {
         await vocabularyStorage.updateWordStatus(word, newStatus);
         console.log('[Popup] Word status updated:', word, '->', newStatus);
 
-        // 更新状态显示
-        setCurrentWordStatus(newStatus);
+        // 重新翻译以更新状态
+        await translateText(word);
       } catch (error) {
         console.error('[Popup] Failed to update word status:', error);
       }
     },
-    [currentWordStatus],
+    [currentWordStatus, translateText],
   );
 
   const handleTranslate = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-
-      // 清除之前的翻译信息
-      setLocalWordEntry(null);
-      setCurrentWordStatus(null);
-      setTranslatedText('');
-      setError('');
-
-      // 检查输入文本是否为空
-      if (!inputText.trim()) {
-        return;
-      }
-
-      // 判断输入是否为单词
-      const isWord = /^[a-zA-Z]+$/.test(inputText);
-      console.log('[popup] Input is word:', isWord);
-
-      let hasLocalWord = false;
-      if (isWord) {
-        // 查询本地词库
-        try {
-          const response = await new Promise<WordEntry>(resolve => {
-            chrome.runtime.sendMessage({ action: 'queryWord', word: inputText }, resolve);
-          });
-
-          console.log('[popup] Received response from background:', response);
-          if (response) {
-            const responseWordEntry = {
-              word: response.word || '',
-              phonetic: response.phonetic || '',
-              definition: response.definition || '',
-              translation: response.translation || '',
-              pos: response.pos || '',
-              collins: response.collins || '',
-              oxford: response.oxford || '',
-              tag: response.tag || '',
-              bnc: response.bnc || '',
-              frq: response.frq || '',
-              exchange: response.exchange || '',
-            };
-            hasLocalWord = true;
-            console.log('[popup] Local word entry:', responseWordEntry);
-            setLocalWordEntry(responseWordEntry);
-
-            // 查询单词状态
-            try {
-              const wordData = await vocabularyStorage.hasWord(inputText);
-              setCurrentWordStatus(wordData?.status || null);
-            } catch (err) {
-              console.error('[popup] Failed to query word status:', err);
-              setCurrentWordStatus(null);
-            }
-          }
-        } catch (error) {
-          console.error('[popup] Local dictionary query failed:', error);
-        }
-      }
-
-      if (hasLocalWord) {
-        console.log('[popup] Using local dictionary');
-        return;
-      }
-
-      // 确定要使用的翻译器实例
-      let translatorToUse = translator;
-      if (!translatorToUse) {
-        // 再次尝试创建翻译器实例
-        translatorToUse = createTranslator();
-        if (!translatorToUse) {
-          setError('请先配置腾讯云翻译服务的 SecretId 和 SecretKey');
-          return;
-        }
-      }
-
-      try {
-        setIsLoading(true);
-
-        // 检测源语言
-        const sourceLanguage = await translatorToUse.detect(inputText);
-
-        // 翻译文本（源语言是中文时翻译成英文，源语言不是中文时翻译成中文）
-        const result = await translatorToUse.translate(
-          inputText,
-          sourceLanguage,
-          sourceLanguage === 'zh' ? 'en' : 'zh',
-        );
-
-        setTranslatedText(result);
-      } catch (err) {
-        console.error('[popup] Translation error:', err);
-        setError(err instanceof Error ? err.message : '翻译失败');
-      } finally {
-        setIsLoading(false);
-      }
+      await translateText(inputText);
     }
   };
 
@@ -228,10 +133,7 @@ const Popup = () => {
               value={inputText}
               onChange={e => {
                 setInputText(e.target.value);
-                setLocalWordEntry(null);
-                setCurrentWordStatus(null);
-                setTranslatedText('');
-                setError('');
+                clearTranslation();
               }}
               onKeyDown={handleTranslate}
               className="w-full resize-none rounded-lg border border-gray-200 px-4 py-3 text-sm"
