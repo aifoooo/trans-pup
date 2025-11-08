@@ -257,7 +257,6 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     <div
       ref={popupRef}
       onMouseDown={e => {
-        handleDragStart(e);
         e.stopPropagation();
       }}
       onMouseUp={e => {
