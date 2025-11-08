@@ -35,6 +35,7 @@ const Popup = () => {
     wordStatus: currentWordStatus,
     translate: translateText,
     clear: clearTranslation,
+    updateWordStatus,
   } = useTranslation({
     useMessageForWordStatus: false,
     vocabularyStorage,
@@ -69,13 +70,13 @@ const Popup = () => {
       try {
         await vocabularyStorage.removeWord(word);
         console.log('[Popup] Word removed:', word);
-        // 重新翻译以更新状态
-        await translateText(word);
+        // 只更新状态，不重新翻译
+        await updateWordStatus(word);
       } catch (error) {
         console.error('[Popup] Failed to remove word:', error);
       }
     },
-    [translateText],
+    [updateWordStatus],
   );
 
   // 处理单词状态改变
@@ -92,13 +93,13 @@ const Popup = () => {
         await vocabularyStorage.updateWordStatus(word, newStatus);
         console.log('[Popup] Word status updated:', word, '->', newStatus);
 
-        // 重新翻译以更新状态
-        await translateText(word);
+        // 只更新状态，不重新翻译
+        await updateWordStatus(word);
       } catch (error) {
         console.error('[Popup] Failed to update word status:', error);
       }
     },
-    [currentWordStatus, translateText],
+    [currentWordStatus, updateWordStatus],
   );
 
   const handleTranslate = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

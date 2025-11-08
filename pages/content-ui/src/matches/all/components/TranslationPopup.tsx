@@ -38,6 +38,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     error,
     wordStatus: currentWordStatus,
     translate,
+    updateWordStatus,
   } = useTranslation({
     useMessageForWordStatus: true,
   });
@@ -74,15 +75,15 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           });
         });
         console.log('[TranslationPopup] Word removed:', word);
-        // 重新翻译以更新状态（仅在组件仍挂载时）
+        // 只更新状态，不重新翻译（仅在组件仍挂载时）
         if (isMounted.current) {
-          translate(text);
+          await updateWordStatus(word);
         }
       } catch (error) {
         console.error('[TranslationPopup] Failed to remove word:', error);
       }
     },
-    [text, translate],
+    [updateWordStatus],
   );
 
   // 处理单词状态改变
@@ -101,15 +102,15 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           });
         });
         console.log('[TranslationPopup] Word status updated:', word, '->', newStatus);
-        // 重新翻译以更新状态（仅在组件仍挂载时）
+        // 只更新状态，不重新翻译（仅在组件仍挂载时）
         if (isMounted.current) {
-          translate(text);
+          await updateWordStatus(word);
         }
       } catch (error) {
         console.error('[TranslationPopup] Failed to update word status:', error);
       }
     },
-    [text, translate],
+    [updateWordStatus],
   );
 
   // 点击外部关闭

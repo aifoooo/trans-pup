@@ -1,5 +1,5 @@
 import { createTranslator, translator } from '@extension/translator';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import type { WordEntry } from '@extension/dictionary';
 import type { WordStatus } from '@extension/storage';
 
@@ -159,6 +159,12 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
   const [error, setError] = useState('');
   const [wordStatus, setWordStatus] = useState<WordStatus | null>(null);
 
+  // 使用 ref 存储 wordEntry，避免 updateWordStatus 函数引用变化
+  const wordEntryRef = useRef<WordEntry | null>(null);
+  useEffect(() => {
+    wordEntryRef.current = wordEntry;
+  }, [wordEntry]);
+
   // 使用 useMemo 稳定 options，避免 translate 函数频繁变化
   const stableOptions = useMemo(() => options, [options.useMessageForWordStatus, options.vocabularyStorage]);
 
@@ -224,6 +230,22 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
     setLoading(false);
   }, []);
 
+  /**
+   * 只更新单词状态，不重新执行翻译
+   * 用于在单词状态改变后快速更新 UI，避免重新执行整个翻译流程
+   */
+  const updateWordStatus = useCallback(
+    async (word: string) => {
+      // 只在当前显示的是单词时才更新状态
+      // 使用 ref 来获取最新的 wordEntry，避免函数引用变化
+      if (wordEntryRef.current && wordEntryRef.current.word === word) {
+        const status = await queryWordStatus(word, stableOptions);
+        setWordStatus(status);
+      }
+    },
+    [stableOptions],
+  );
+
   return {
     loading,
     wordEntry,
@@ -232,5 +254,6 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
     wordStatus,
     translate,
     clear,
+    updateWordStatus,
   };
 };
