@@ -32,7 +32,6 @@ const SidePanel = () => {
 
   // 获取单词列表
   const fetchWords = useCallback(async (page: number, search: string, listFilter: 'all' | WordStatus) => {
-    console.log(`[SidePanel] fetchWords called: page=${page}, search=${search}, listFilter=${listFilter}`);
     setLoading(true);
     try {
       // 根据选择的列表类型获取单词
@@ -40,8 +39,6 @@ const SidePanel = () => {
         listFilter === 'all'
           ? await vocabularyStorage.getWords(page, 20, search)
           : await vocabularyStorage.getWordsByStatus(listFilter, page, 20, search);
-
-      console.log(`[SidePanel] Fetched ${result.words?.length || 0} words from storage`);
 
       // 检查 result.words 是否存在且为数组
       if (!result.words || !Array.isArray(result.words)) {
@@ -52,7 +49,6 @@ const SidePanel = () => {
       }
 
       // 保存 CollectedWord 数组（包含状态信息）
-      console.log(`[SidePanel] Setting collectedWords with ${result.words.length} words`);
       setCollectedWords(page === 1 ? result.words : prevWords => [...prevWords, ...result.words]);
 
       // 提取单词列表（适配新的 CollectedWord 结构）
@@ -61,7 +57,6 @@ const SidePanel = () => {
       // 向后台脚本发送批量查询请求
       const translatedWords = await new Promise<WordEntry[]>((resolve, reject) => {
         chrome.runtime.sendMessage({ action: 'batchQueryWords', words: uniqueWords }, response => {
-          console.log('[side-panel] Received response from background:', response);
           if (response && typeof response === 'object') {
             resolve(
               uniqueWords.map(word => ({
@@ -125,7 +120,6 @@ const SidePanel = () => {
 
   // 监听词汇存储变化以刷新数据
   const handleVocabularyChange = useCallback(() => {
-    console.log('[SidePanel] Vocabulary storage changed, refreshing...');
     setVocabularyUpdateCount(prev => prev + 1);
   }, []);
 
@@ -146,7 +140,6 @@ const SidePanel = () => {
   const handleRemoveWord = useCallback(async (word: string) => {
     try {
       await vocabularyStorage.removeWord(word);
-      console.log('[SidePanel] Word removed:', word);
       // 刷新列表
       setVocabularyUpdateCount(prev => prev + 1);
     } catch (error) {
@@ -163,12 +156,10 @@ const SidePanel = () => {
       // 如果单词不在列表中，需要先添加单词
       if (!wordData) {
         await vocabularyStorage.addWord(word);
-        console.log('[SidePanel] Word added:', word);
       }
 
       // 更新单词状态
       await vocabularyStorage.updateWordStatus(word, newStatus);
-      console.log('[SidePanel] Word status updated:', word, '->', newStatus);
 
       // 刷新列表
       setVocabularyUpdateCount(prev => prev + 1);

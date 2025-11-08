@@ -188,13 +188,11 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
 
       // 检查是否是 vocabulary-storage-key 的变化
       if (changes['vocabulary-storage-key']) {
-        console.log('[useTranslation] Vocabulary storage changed, updating word status for:', currentWord);
         // 重新查询单词状态
         queryWordStatus(currentWord, stableOptions)
           .then(newStatus => {
             // 检查单词是否仍然是当前显示的单词（可能在 storage 变化期间已经切换了）
             if (wordEntryRef.current && wordEntryRef.current.word === currentWord) {
-              console.log('[useTranslation] Word status updated:', currentWord, '->', newStatus);
               setWordStatus(newStatus);
             }
           })
@@ -234,7 +232,6 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
       try {
         // 判断是否为单词
         const isWordText = isWord(text);
-        console.log('[useTranslation] Is word:', isWordText);
 
         if (isWordText) {
           // 查询本地词典

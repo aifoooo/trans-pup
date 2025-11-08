@@ -9,14 +9,9 @@ export default function App() {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    console.log('[content-ui] Runtime content view loaded');
-
     // 监听来自 content script 的消息
     const handleMessage = (event: MessageEvent) => {
-      console.log('[content-ui] Message event received:', event);
-
       if (event.source !== window) {
-        console.log('[content-ui] Message source is not window, ignoring');
         return;
       }
 
@@ -34,8 +29,6 @@ export default function App() {
         setShowIcon(false);
         setShowPopup(false);
         setSelectionInfo(null);
-      } else {
-        console.log('[content-ui] Unknown message type:', type);
       }
     };
 
@@ -47,19 +40,16 @@ export default function App() {
   }, []);
 
   const handleTranslate = () => {
-    console.log('[content-ui] Translate button clicked');
     setShowIcon(false);
     setShowPopup(true);
   };
 
   const handleClosePopup = () => {
-    console.log('[content-ui] Popup closed');
     setShowPopup(false);
     setSelectionInfo(null);
   };
 
   // 添加渲染日志以便调试
-  console.log('[content-ui] Render triggered with state:', { showIcon, showPopup, selectionInfo });
 
   return (
     <>

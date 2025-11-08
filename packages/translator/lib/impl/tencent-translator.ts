@@ -33,8 +33,6 @@ export class TencentTranslator implements TranslatorInterface {
    * @returns 语种
    */
   async detect(text: string): Promise<string> {
-    console.log('TencentTranslator.detect called with text:', text);
-
     // 处理空文本
     if (!text.trim()) {
       throw new Error('Text to detect cannot be empty');
@@ -68,8 +66,6 @@ export class TencentTranslator implements TranslatorInterface {
    * @returns 翻译结果
    */
   async translate(text: string, source: string, target: string): Promise<string> {
-    console.log('TencentTranslator.translate called with:', { text, source, target });
-
     // 处理空文本
     if (!text.trim()) {
       return text;
@@ -109,14 +105,11 @@ export class TencentTranslator implements TranslatorInterface {
    * @returns 响应结果
    */
   private async callTencentAPI(action: string, params: Record<string, unknown>): Promise<TencentAPIResponse> {
-    console.log('TencentTranslator.callTencentAPI called with:', { action, params });
-
     const endpoint = 'tmt.tencentcloudapi.com';
     const service = 'tmt';
     const version = '2018-03-21';
 
     const timestamp = Math.floor(Date.now() / 1000);
-    console.log('Timestamp:', timestamp);
 
     // 构造请求参数
     const payload = JSON.stringify(params);
@@ -129,8 +122,6 @@ export class TencentTranslator implements TranslatorInterface {
       'X-TC-Region': this.region,
     };
 
-    console.log('Headers:', headers);
-
     // ************* 步骤 1：拼接规范请求串 *************
     const signedHeaders = 'content-type;host';
     const hashedRequestPayload = CryptoJS.SHA256(payload).toString(CryptoJS.enc.Hex);
@@ -139,9 +130,6 @@ export class TencentTranslator implements TranslatorInterface {
     const canonicalQueryString = '';
     const canonicalHeaders =
       'content-type:' + headers['Content-Type'].trim() + '\n' + 'host:' + headers['Host'].trim() + '\n';
-
-    console.log('Signed headers:', signedHeaders);
-    console.log('Canonical headers:', canonicalHeaders);
 
     const canonicalRequest =
       httpRequestMethod +
@@ -156,8 +144,6 @@ export class TencentTranslator implements TranslatorInterface {
       '\n' +
       hashedRequestPayload;
 
-    console.log('Canonical request:', canonicalRequest);
-
     // ************* 步骤 2：拼接待签名字符串 *************
     const algorithm = 'TC3-HMAC-SHA256';
 
@@ -171,17 +157,11 @@ export class TencentTranslator implements TranslatorInterface {
     const credentialScope = dateStr + '/' + service + '/' + 'tc3_request';
     const stringToSign = algorithm + '\n' + timestamp + '\n' + credentialScope + '\n' + hashedCanonicalRequest;
 
-    console.log('Date string (for credential):', dateStr);
-    console.log('Credential scope:', credentialScope);
-    console.log('String to sign:', stringToSign);
-
     // ************* 步骤 3：计算签名 *************
     const kDate = CryptoJS.HmacSHA256(dateStr, 'TC3' + this.secretKey);
     const kService = CryptoJS.HmacSHA256(service, kDate);
     const kSigning = CryptoJS.HmacSHA256('tc3_request', kService);
     const signature = CryptoJS.HmacSHA256(stringToSign, kSigning).toString(CryptoJS.enc.Hex);
-
-    console.log('Signature:', signature);
 
     // ************* 步骤 4：拼接 Authorization *************
     const authorization =
@@ -199,7 +179,6 @@ export class TencentTranslator implements TranslatorInterface {
       signature;
 
     headers['Authorization'] = authorization;
-    console.log('Authorization header:', authorization);
 
     // ************* 步骤 5：构造并发起请求 *************
     // 发送请求

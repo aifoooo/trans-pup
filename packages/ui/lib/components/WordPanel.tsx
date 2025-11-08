@@ -83,7 +83,6 @@ export const WordPanel: React.FC<{
           const voices = synth.getVoices();
           // 尝试找到匹配语言的语音
           const englishVoice = voices.find(voice => voice.lang === lang);
-          console.log('[WordPanel] English voice:', englishVoice);
           if (englishVoice) {
             utterance.voice = englishVoice;
           }
@@ -125,25 +124,21 @@ export const WordPanel: React.FC<{
 
   // 菜单操作处理函数
   const handleRemove = () => {
-    console.log('[WordPanel] Remove word:', entry.word);
     setIsMenuOpen(false);
     onRemove?.();
   };
 
   const handleMoveToNew = () => {
-    console.log('[WordPanel] Move to new:', entry.word);
     setIsMenuOpen(false);
     onStatusChange?.('new');
   };
 
   const handleMoveToLearning = () => {
-    console.log('[WordPanel] Move to learning:', entry.word);
     setIsMenuOpen(false);
     onStatusChange?.('learning');
   };
 
   const handleMoveToMastered = () => {
-    console.log('[WordPanel] Move to mastered:', entry.word);
     setIsMenuOpen(false);
     onStatusChange?.('mastered');
   };

@@ -7,7 +7,6 @@ import type { WordStatus } from '@extension/storage';
 let wordLookupInstance: WordLookup | null = null;
 
 const initWordLookup = async () => {
-  console.log('Initializing WordLookup...');
   if (wordLookupInstance) {
     return;
   }
@@ -15,11 +14,8 @@ const initWordLookup = async () => {
   try {
     const response = await fetch(chrome.runtime.getURL('core-words.json'));
     const dictionaryData = await response.json();
-    console.log('Loaded dictionary data:', dictionaryData);
     if (dictionaryData) {
-      console.log('Creating WordLookup instance with dictionaryData...');
       wordLookupInstance = new WordLookup(dictionaryData);
-      console.log('WordLookup instance created successfully.');
     }
   } catch (error) {
     console.error('Failed to load dictionary:', error);
@@ -57,10 +53,8 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     }
   } else if (action === 'batchHasWords' && words) {
     // 批量检查单词是否存在
-    console.log('[background] Received batchHasWords request:', words);
     if (wordLookupInstance) {
       const wordExistsMap = wordLookupInstance.hasWordsBatch(words);
-      console.log('[background] Sending batchHasWords response:', wordExistsMap);
       const resultObject = Object.fromEntries(wordExistsMap);
       sendResponse(resultObject);
     } else {
@@ -76,10 +70,8 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     }
   } else if (action === 'batchQueryWords' && words) {
     // 批量查询单词
-    console.log('[background] Received batchQueryWords request:', words);
     if (wordLookupInstance) {
       const wordEntryMap = wordLookupInstance.lookupBatch(words);
-      console.log('[background] Sending batchQueryWords response:', wordEntryMap);
       const resultObject = Object.fromEntries(wordEntryMap);
       sendResponse(resultObject);
     } else {
@@ -140,7 +132,6 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
 };
 
 initWordLookup().then(() => {
-  console.log('WordLookup initialized');
   isInitialized = true;
   processMessageQueue();
 });

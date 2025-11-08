@@ -86,12 +86,10 @@ const Popup = () => {
         // 如果单词不在列表中，需要先添加单词
         if (currentWordStatus === null) {
           await vocabularyStorage.addWord(word);
-          console.log('[Popup] Word added:', word);
         }
 
         // 更新单词状态
         await vocabularyStorage.updateWordStatus(word, newStatus);
-        console.log('[Popup] Word status updated:', word, '->', newStatus);
 
         // 只更新状态，不重新翻译
         await updateWordStatus(word);

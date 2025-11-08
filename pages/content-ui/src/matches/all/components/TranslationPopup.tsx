@@ -18,8 +18,6 @@ interface TranslationPopupProps {
  * 2. 如果不是单词或查不到，使用翻译API
  */
 export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, position, onClose }) => {
-  console.log('[TranslationPopup] Rendering...');
-
   const popupRef = useRef<HTMLDivElement>(null);
   const isMounted = useRef(true);
   const isDraggingRef = useRef(false);
@@ -74,7 +72,6 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
             }
           });
         });
-        console.log('[TranslationPopup] Word removed:', word);
         // 只更新状态，不重新翻译（仅在组件仍挂载时）
         if (isMounted.current) {
           await updateWordStatus(word);
@@ -101,7 +98,6 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
             }
           });
         });
-        console.log('[TranslationPopup] Word status updated:', word, '->', newStatus);
         // 只更新状态，不重新翻译（仅在组件仍挂载时）
         if (isMounted.current) {
           await updateWordStatus(word);

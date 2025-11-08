@@ -1,8 +1,6 @@
 import { createWordCollector } from '@src/collect-words';
 import { createSelectionHandler } from '@src/selection-handler';
 
-console.log('[CEB] All content script loaded');
-
 // 收集单词
 const wordCollector = createWordCollector();
 void wordCollector.execute();

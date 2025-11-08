@@ -14,7 +14,6 @@ const createWordCollector = (): WordCollector => {
    */
   const extractText = (): string => {
     const text = document.body.textContent || '';
-    console.log('[collect-words] Extracted text content length:', text.length);
     return text;
   };
 
@@ -23,7 +22,6 @@ const createWordCollector = (): WordCollector => {
    */
   const extractWords = (text: string): string[] => {
     const words = text.match(/\b[a-zA-Z]+\b/g) || [];
-    console.log('[collect-words] Matched words array length:', words.length);
     return words;
   };
 
@@ -32,7 +30,6 @@ const createWordCollector = (): WordCollector => {
    */
   const normalizeWords = (words: string[]): string[] => {
     const normalizedWords = words.map(word => word.toLowerCase());
-    console.log('[collect-words] Normalized words array length:', normalizedWords.length);
     return normalizedWords;
   };
 
@@ -41,7 +38,6 @@ const createWordCollector = (): WordCollector => {
    */
   const deduplicateWords = (words: string[]): string[] => {
     const uniqueWords = [...new Set(words)];
-    console.log('[collect-words] Unique words array length:', uniqueWords.length);
     return uniqueWords;
   };
 
@@ -51,7 +47,6 @@ const createWordCollector = (): WordCollector => {
   const filterExistingWords = async (words: string[]): Promise<string[]> => {
     const filteredWords = await new Promise<string[]>((resolve, reject) => {
       chrome.runtime.sendMessage({ action: 'batchHasWords', words }, response => {
-        console.log('[collect-words] Received response from background:', response);
         if (response) {
           resolve(words.filter(word => response[word]));
         } else {
@@ -60,7 +55,6 @@ const createWordCollector = (): WordCollector => {
       });
     });
 
-    console.log('[collect-words] Filtered words array length:', filteredWords.length);
     return filteredWords;
   };
 
@@ -70,7 +64,6 @@ const createWordCollector = (): WordCollector => {
   const addWordsToStorage = async (words: string[]): Promise<void> => {
     try {
       await vocabularyStorage.addWords(words);
-      console.log('[collect-words] Words added to vocabulary storage');
     } catch (error) {
       console.error('[collect-words] Error adding words to vocabulary storage:', error);
     }
@@ -97,12 +90,9 @@ const createWordCollector = (): WordCollector => {
 
   return {
     async execute(): Promise<string[]> {
-      console.log('[collect-words] Starting word collection...');
-
       // 检查自动收集是否启用
       const config = await globalConfigStorage.get();
       if (!config || !config.autoCollection) {
-        console.log('[collect-words] Auto collection disabled or config not available');
         return [];
       }
 
@@ -118,7 +108,6 @@ const createWordCollector = (): WordCollector => {
 
       logDebugInfo(text, words, normalizedWords, uniqueWords, filteredWords);
 
-      console.log('[collect-words] Word collection completed');
       return uniqueWords;
     },
   };

@@ -57,7 +57,6 @@ const vocabularyStorage: VocabularyStorageType = {
     const newVocabulary = [...currentVocabulary, newWord].sort((a, b) => a.word.localeCompare(b.word));
 
     await storage.set(newVocabulary);
-    console.log(`[vocabulary-storage] Added new word: ${normalizedWord}`);
   },
 
   // 批量添加单词，默认状态为 'new'，返回新增单词数量
@@ -91,7 +90,6 @@ const vocabularyStorage: VocabularyStorageType = {
     if (newWords.length > 0) {
       const sortedVocabulary = [...currentVocabulary, ...newWords].sort((a, b) => a.word.localeCompare(b.word));
       await storage.set(sortedVocabulary);
-      console.log(`[vocabulary-storage] Added ${newWords.length} new words`);
     }
 
     return newWords.length;
@@ -113,16 +111,12 @@ const vocabularyStorage: VocabularyStorageType = {
 
     if (filteredVocabulary.length !== currentVocabulary.length) {
       await storage.set(filteredVocabulary);
-      console.log(`[vocabulary-storage] Removed word: ${normalizedWord}`);
-    } else {
-      console.log(`[vocabulary-storage] Word not found: ${normalizedWord}`);
     }
   },
 
   // 清空词汇本
   clear: async () => {
     await storage.set([]);
-    console.log('[vocabulary-storage] Cleared all words');
   },
 
   // 分页获取单词（全量查询，不区分状态）
@@ -182,7 +176,6 @@ const vocabularyStorage: VocabularyStorageType = {
       targetWord.status = newStatus;
       targetWord.lastModified = Date.now();
       await storage.set(words);
-      console.log(`[vocabulary-storage] Updated word status: ${normalizedWord} -> ${newStatus}`);
     } else {
       console.warn(`[vocabulary-storage] Word not found for status update: ${normalizedWord}`);
     }
