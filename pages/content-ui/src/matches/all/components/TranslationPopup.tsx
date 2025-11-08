@@ -375,7 +375,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       role="presentation"
       aria-label="翻译弹窗"
       tabIndex={-1}
-      className="fixed z-[10000] w-[360px] rounded-lg border border-gray-200 bg-white shadow-2xl"
+      className="fixed z-[10000] w-[360px] rounded-xl border border-gray-200 bg-white shadow-2xl"
       style={{
         left: popupPosition.left !== undefined ? `${popupPosition.left}px` : undefined,
         top: popupPosition.top !== undefined ? `${popupPosition.top}px` : undefined,
@@ -384,7 +384,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       }}>
       {/* 拖拽标题栏 */}
       <div
-        className={`flex h-8 w-full items-center justify-between rounded-t-lg bg-gray-50 p-1 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
+        className={`flex h-8 w-full items-center justify-between rounded-t-xl bg-gray-50 p-1 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
         onMouseDown={e => {
           handleDragStart(e);
           e.stopPropagation();

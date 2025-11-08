@@ -164,7 +164,7 @@ const Popup = () => {
           )}
         </div>
         {localWordEntry && (
-          <div className="border-t border-gray-200 p-1">
+          <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <WordPanel
               entry={localWordEntry}
               showTags={false}
@@ -176,12 +176,12 @@ const Popup = () => {
           </div>
         )}
         {translatedText && (
-          <div className="border-t border-gray-200 p-1">
+          <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
           </div>
         )}
         {error && (
-          <div className="border-t border-gray-200 p-1">
+          <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
           </div>
         )}
