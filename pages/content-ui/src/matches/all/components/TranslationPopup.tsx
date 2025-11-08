@@ -21,6 +21,9 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   console.log('[TranslationPopup] Rendering...');
 
   const popupRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(true);
+  const isDraggingRef = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
 
   // 拖拽相关状态
   const [isDragging, setIsDragging] = useState(false);
@@ -39,15 +42,27 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     useMessageForWordStatus: true,
   });
 
+  // 组件卸载时标记
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
   // 在文本变化时执行翻译
   useEffect(() => {
-    translate(text);
+    if (isMounted.current) {
+      translate(text);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
   // 处理单词删除
   const handleRemoveWord = useCallback(
     async (word: string) => {
+      if (!isMounted.current) return;
+
       try {
         await new Promise<void>((resolve, reject) => {
           chrome.runtime.sendMessage({ action: 'removeWord', word }, () => {
@@ -59,8 +74,10 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           });
         });
         console.log('[TranslationPopup] Word removed:', word);
-        // 重新翻译以更新状态
-        translate(text);
+        // 重新翻译以更新状态（仅在组件仍挂载时）
+        if (isMounted.current) {
+          translate(text);
+        }
       } catch (error) {
         console.error('[TranslationPopup] Failed to remove word:', error);
       }
@@ -71,6 +88,8 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   // 处理单词状态改变
   const handleStatusChange = useCallback(
     async (word: string, newStatus: WordStatus) => {
+      if (!isMounted.current) return;
+
       try {
         await new Promise<void>((resolve, reject) => {
           chrome.runtime.sendMessage({ action: 'updateWordStatus', word, status: newStatus }, () => {
@@ -82,8 +101,10 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           });
         });
         console.log('[TranslationPopup] Word status updated:', word, '->', newStatus);
-        // 重新翻译以更新状态
-        translate(text);
+        // 重新翻译以更新状态（仅在组件仍挂载时）
+        if (isMounted.current) {
+          translate(text);
+        }
       } catch (error) {
         console.error('[TranslationPopup] Failed to update word status:', error);
       }
@@ -94,25 +115,37 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   // 点击外部关闭
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (!isMounted.current) return;
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
         onClose();
       }
     };
 
     // 延迟添加事件监听，避免立即触发
-    const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
+    let timer: NodeJS.Timeout | null = null;
+    let isListenerAdded = false;
+
+    timer = setTimeout(() => {
+      if (isMounted.current) {
+        document.addEventListener('mousedown', handleClickOutside);
+        isListenerAdded = true;
+      }
     }, 100);
 
     return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
+      if (timer) {
+        clearTimeout(timer);
+      }
+      if (isListenerAdded) {
+        document.removeEventListener('mousedown', handleClickOutside);
+      }
     };
   }, [onClose]);
 
   // ESC键关闭
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
+      if (!isMounted.current) return;
       if (event.key === 'Escape') {
         onClose();
       }
@@ -126,29 +159,47 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
 
   // 拖拽相关事件处理
   useEffect(() => {
+    // 同步 ref 值
+    isDraggingRef.current = isDragging;
+    dragOffsetRef.current = dragOffset;
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && popupRef.current) {
-        // 计算新位置
-        const newX = e.clientX - dragOffset.x;
-        const newY = e.clientY - dragOffset.y;
+      if (!isMounted.current || !isDraggingRef.current || !popupRef.current) return;
 
-        // 确保弹窗不会被拖出视口
-        const maxX = window.innerWidth - popupRef.current.offsetWidth;
-        const maxY = window.innerHeight - popupRef.current.offsetHeight;
+      // 使用 ref 中的最新值，避免闭包问题
+      const currentOffset = dragOffsetRef.current;
 
-        const boundedX = Math.max(0, Math.min(newX, maxX));
-        const boundedY = Math.max(0, Math.min(newY, maxY));
+      // 计算新位置
+      const newX = e.clientX - currentOffset.x;
+      const newY = e.clientY - currentOffset.y;
 
+      // 确保弹窗不会被拖出视口
+      const maxX = window.innerWidth - popupRef.current.offsetWidth;
+      const maxY = window.innerHeight - popupRef.current.offsetHeight;
+
+      const boundedX = Math.max(0, Math.min(newX, maxX));
+      const boundedY = Math.max(0, Math.min(newY, maxY));
+
+      if (isMounted.current) {
         setDragPosition({ x: boundedX, y: boundedY });
       }
     };
 
+    const handleMouseUp = () => {
+      if (isMounted.current && isDraggingRef.current) {
+        setIsDragging(false);
+        isDraggingRef.current = false;
+      }
+    };
+
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mousemove', handleMouseMove, { passive: true });
+      document.addEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, dragOffset]);
 
@@ -213,43 +264,97 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   };
 
   // 处理拖拽开始
-  const handleDragStart = (e: React.MouseEvent) => {
-    if (!popupRef.current) return;
+  const handleDragStart = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isMounted.current || !popupRef.current) return;
 
-    const rect = popupRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
+      const rect = popupRef.current.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
 
-    setDragOffset({ x: offsetX, y: offsetY });
-    setIsDragging(true);
+      const newOffset = { x: offsetX, y: offsetY };
+      setDragOffset(newOffset);
+      dragOffsetRef.current = newOffset;
+      setIsDragging(true);
+      isDraggingRef.current = true;
 
-    // 开始拖拽时，如果还没有拖拽位置，则初始化为当前显示位置
-    if (!dragPosition) {
-      // 获取当前弹窗的实际位置
-      const computedStyle = window.getComputedStyle(popupRef.current);
-      const currentLeft = parseInt(computedStyle.left, 10);
-      const currentTop = parseInt(computedStyle.top, 10);
+      // 开始拖拽时，如果还没有拖拽位置，则初始化为当前显示位置
+      setDragPosition(prevPosition => {
+        if (prevPosition) return prevPosition;
 
-      // 如果能获取到有效的绝对定位值，则使用这些值
-      if (!isNaN(currentLeft) && !isNaN(currentTop)) {
-        setDragPosition({
-          x: currentLeft,
-          y: currentTop,
-        });
-      } else {
-        // 否则使用 getPopupPosition 计算的位置
-        setDragPosition({
-          x: getPopupPosition().left || window.innerWidth - 400 - (getPopupPosition().right || 0),
-          y: getPopupPosition().top || window.innerHeight - 400 - (getPopupPosition().bottom || 0),
-        });
-      }
-    }
-  };
+        if (!popupRef.current) return null;
+
+        // 获取当前弹窗的实际位置
+        const computedStyle = window.getComputedStyle(popupRef.current);
+        const currentLeft = parseInt(computedStyle.left, 10);
+        const currentTop = parseInt(computedStyle.top, 10);
+
+        // 如果能获取到有效的绝对定位值，则使用这些值
+        if (!isNaN(currentLeft) && !isNaN(currentTop)) {
+          return {
+            x: currentLeft,
+            y: currentTop,
+          };
+        }
+
+        // 否则使用 getPopupPosition 计算的位置（使用最新的 position）
+        const popupWidth = 400;
+        const popupHeight = 434;
+        const padding = 10;
+
+        // 将文档坐标转换为视口坐标
+        const viewportX = position.x - (window.scrollX || window.pageXOffset);
+        const viewportY = position.y - (window.scrollY || window.pageYOffset);
+
+        let left: number | undefined = viewportX - popupWidth / 2;
+        let top: number | undefined = viewportY + 10;
+        let right: number | undefined;
+        let bottom: number | undefined;
+
+        // 检查右边界
+        if (left + popupWidth > window.innerWidth - padding) {
+          right = window.innerWidth - viewportX - popupWidth / 2;
+          if (right < padding) {
+            right = padding;
+          }
+          left = undefined;
+        }
+
+        // 检查左边界
+        if (left !== undefined && left < padding) {
+          left = padding;
+        }
+
+        // 检查底部边界
+        if (top + popupHeight > window.innerHeight - padding) {
+          bottom = window.innerHeight - viewportY - 10;
+          if (bottom < padding) {
+            bottom = padding;
+          }
+          top = undefined;
+        }
+
+        // 检查顶部边界
+        if (top !== undefined && top < padding) {
+          top = padding;
+        }
+
+        return {
+          x: left ?? window.innerWidth - popupWidth - (right ?? 0),
+          y: top ?? window.innerHeight - popupHeight - (bottom ?? 0),
+        };
+      });
+    },
+    [position],
+  );
 
   // 处理拖拽结束
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
+  const handleDragEnd = useCallback(() => {
+    if (isMounted.current) {
+      setIsDragging(false);
+      isDraggingRef.current = false;
+    }
+  }, []);
 
   const popupPosition = getPopupPosition();
 
@@ -260,7 +365,10 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         e.stopPropagation();
       }}
       onMouseUp={e => {
-        handleDragEnd();
+        // 只在拖拽时处理，避免与标题栏的 onMouseUp 冲突
+        if (isDragging) {
+          handleDragEnd();
+        }
         e.stopPropagation();
       }}
       role="presentation"
@@ -281,7 +389,9 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           e.stopPropagation();
         }}
         onMouseUp={e => {
-          handleDragEnd();
+          if (isDragging) {
+            handleDragEnd();
+          }
           e.stopPropagation();
         }}
         role="toolbar"
