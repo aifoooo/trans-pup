@@ -1,4 +1,4 @@
-import SpeakerLoop from '@/lib/components/SpeakerLoop';
+import { SpeakerLoop } from '@/lib/components/SpeakerLoop';
 import { WordActionMenu } from '@/lib/components/WordActionMenu';
 import { useState, useRef } from 'react';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa6';

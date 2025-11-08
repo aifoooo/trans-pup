@@ -166,6 +166,8 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
   }, [wordEntry]);
 
   // 使用 useMemo 稳定 options，避免 translate 函数频繁变化
+  // 只依赖 options 的两个关键属性，而不是整个 options 对象
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableOptions = useMemo(() => options, [options.useMessageForWordStatus, options.vocabularyStorage]);
 
   // 订阅 storage 变化，自动更新单词状态
