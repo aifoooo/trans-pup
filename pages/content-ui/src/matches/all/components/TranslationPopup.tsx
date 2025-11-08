@@ -1,5 +1,5 @@
 import { useTranslation } from '@extension/shared';
-import { WordPanel, InlineLoadingSpinner } from '@extension/ui';
+import { WordPanel, InlineLoadingSpinner, TranslationStatusCard } from '@extension/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoClose } from 'react-icons/io5';
 import type { Position } from '@extension/shared';
@@ -314,11 +314,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           </div>
         )}
 
-        {!loading && error && (
-          <div className="p-4 text-center text-sm text-red-500">
-            <p>{error}</p>
-          </div>
-        )}
+        {!loading && error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
 
         {!loading && !error && wordEntry && (
           <WordPanel
@@ -330,10 +326,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         )}
 
         {!loading && !error && !wordEntry && translatedText && (
-          <div className="p-4">
-            <div className="mb-2 text-sm font-semibold text-gray-600">翻译结果：</div>
-            <div className="text-gray-800">{translatedText}</div>
-          </div>
+          <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
         )}
       </div>
     </div>
