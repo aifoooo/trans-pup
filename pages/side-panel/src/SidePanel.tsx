@@ -32,6 +32,7 @@ const SidePanel = () => {
 
   // 获取单词列表
   const fetchWords = useCallback(async (page: number, search: string, listFilter: 'all' | WordStatus) => {
+    console.log(`[SidePanel] fetchWords called: page=${page}, search=${search}, listFilter=${listFilter}`);
     setLoading(true);
     try {
       // 根据选择的列表类型获取单词
@@ -39,6 +40,8 @@ const SidePanel = () => {
         listFilter === 'all'
           ? await vocabularyStorage.getWords(page, 20, search)
           : await vocabularyStorage.getWordsByStatus(listFilter, page, 20, search);
+
+      console.log(`[SidePanel] Fetched ${result.words?.length || 0} words from storage`);
 
       // 检查 result.words 是否存在且为数组
       if (!result.words || !Array.isArray(result.words)) {
@@ -49,6 +52,7 @@ const SidePanel = () => {
       }
 
       // 保存 CollectedWord 数组（包含状态信息）
+      console.log(`[SidePanel] Setting collectedWords with ${result.words.length} words`);
       setCollectedWords(page === 1 ? result.words : prevWords => [...prevWords, ...result.words]);
 
       // 提取单词列表（适配新的 CollectedWord 结构）
@@ -121,6 +125,7 @@ const SidePanel = () => {
 
   // 监听词汇存储变化以刷新数据
   const handleVocabularyChange = useCallback(() => {
+    console.log('[SidePanel] Vocabulary storage changed, refreshing...');
     setVocabularyUpdateCount(prev => prev + 1);
   }, []);
 
@@ -206,8 +211,8 @@ const SidePanel = () => {
           <ul className="flex-1 divide-y divide-gray-200 border-t border-gray-200">
             {words.length > 0 ? (
               words.map((item, index) => {
-                // 从 collectedWords 中获取对应的状态信息
-                const collectedWord = collectedWords[index];
+                // 从 collectedWords 中获取对应的状态信息（通过 word 字段匹配，避免索引不一致）
+                const collectedWord = collectedWords.find(cw => cw.word === item.word.toLowerCase());
                 const currentStatus = collectedWord?.status || null;
 
                 return (

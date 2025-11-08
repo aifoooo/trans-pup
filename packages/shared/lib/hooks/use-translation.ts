@@ -168,6 +168,49 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
   // 使用 useMemo 稳定 options，避免 translate 函数频繁变化
   const stableOptions = useMemo(() => options, [options.useMessageForWordStatus, options.vocabularyStorage]);
 
+  // 订阅 storage 变化，自动更新单词状态
+  useEffect(() => {
+    // 如果没有 wordEntry，不需要订阅
+    if (!wordEntry) {
+      return;
+    }
+
+    const currentWord = wordEntry.word;
+
+    // 监听 chrome.storage.onChanged 事件
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
+      // 只监听 local storage 的变化
+      if (areaName !== 'local') {
+        return;
+      }
+
+      // 检查是否是 vocabulary-storage-key 的变化
+      if (changes['vocabulary-storage-key']) {
+        console.log('[useTranslation] Vocabulary storage changed, updating word status for:', currentWord);
+        // 重新查询单词状态
+        queryWordStatus(currentWord, stableOptions)
+          .then(newStatus => {
+            // 检查单词是否仍然是当前显示的单词（可能在 storage 变化期间已经切换了）
+            if (wordEntryRef.current && wordEntryRef.current.word === currentWord) {
+              console.log('[useTranslation] Word status updated:', currentWord, '->', newStatus);
+              setWordStatus(newStatus);
+            }
+          })
+          .catch(error => {
+            console.error('[useTranslation] Failed to update word status from storage change:', error);
+          });
+      }
+    };
+
+    // 添加监听器
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
+    // 清理函数
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, [wordEntry, stableOptions]);
+
   /**
    * 执行翻译或查询
    */

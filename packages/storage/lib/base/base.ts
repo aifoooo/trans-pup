@@ -128,11 +128,16 @@ export const createStorage = <D = string>(
     // Check if the key we are listening for is in the changes object
     if (changes[key] === undefined) return;
 
+    console.log(`[storage:${key}] Storage changed, updating cache...`);
     const valueOrUpdate: ValueOrUpdateType<D> = deserialize(changes[key].newValue);
 
-    if (cache === valueOrUpdate) return;
+    if (cache === valueOrUpdate) {
+      console.log(`[storage:${key}] Cache unchanged (reference equality), skipping emit`);
+      return;
+    }
 
     cache = await updateCache(valueOrUpdate, cache);
+    console.log(`[storage:${key}] Cache updated, emitting change to ${listeners.length} listeners`);
 
     _emitChange();
   };
