@@ -215,15 +215,15 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       };
     }
 
-    const popupWidth = 400;
-    const popupHeight = 434;
+    const popupWidth = 360;
+    const popupHeight = 200;
     const padding = 10;
 
     // 将文档坐标转换为视口坐标
     const viewportX = position.x - (window.scrollX || window.pageXOffset);
     const viewportY = position.y - (window.scrollY || window.pageYOffset);
 
-    let left: number | undefined = viewportX - popupWidth / 2;
+    let left: number | undefined = viewportX - 60;
     let top: number | undefined = viewportY + 10;
     let right: number | undefined;
     let bottom: number | undefined;
@@ -231,7 +231,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     // 检查右边界
     if (left + popupWidth > window.innerWidth - padding) {
       // 右侧超出，使用 right 定位
-      right = window.innerWidth - viewportX - popupWidth / 2;
+      right = window.innerWidth - viewportX - 300;
       // 确保right不会导致弹窗超出左边界
       if (right < padding) {
         right = padding;
@@ -298,22 +298,22 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         }
 
         // 否则使用 getPopupPosition 计算的位置（使用最新的 position）
-        const popupWidth = 400;
-        const popupHeight = 434;
+        const popupWidth = 360;
+        const popupHeight = 200;
         const padding = 10;
 
         // 将文档坐标转换为视口坐标
         const viewportX = position.x - (window.scrollX || window.pageXOffset);
         const viewportY = position.y - (window.scrollY || window.pageYOffset);
 
-        let left: number | undefined = viewportX - popupWidth / 2;
+        let left: number | undefined = viewportX - 60;
         let top: number | undefined = viewportY + 10;
         let right: number | undefined;
         let bottom: number | undefined;
 
         // 检查右边界
         if (left + popupWidth > window.innerWidth - padding) {
-          right = window.innerWidth - viewportX - popupWidth / 2;
+          right = window.innerWidth - viewportX - 300;
           if (right < padding) {
             right = padding;
           }
@@ -374,7 +374,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       role="presentation"
       aria-label="翻译弹窗"
       tabIndex={-1}
-      className="fixed z-[10000] w-[400px] rounded-lg border border-gray-200 bg-white shadow-2xl"
+      className="fixed z-[10000] w-[360px] rounded-lg border border-gray-200 bg-white shadow-2xl"
       style={{
         left: popupPosition.left !== undefined ? `${popupPosition.left}px` : undefined,
         top: popupPosition.top !== undefined ? `${popupPosition.top}px` : undefined,
@@ -416,7 +416,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       </div>
 
       {/* 内容区域 */}
-      <div className="max-h-[400px] overflow-y-auto">
+      <div className="max-h-[166px] overflow-y-auto">
         {loading && (
           <div className="flex items-center justify-center p-8">
             <InlineLoadingSpinner />
@@ -428,6 +428,8 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
         {!loading && !error && wordEntry && (
           <WordPanel
             entry={wordEntry}
+            showTags={false}
+            showExchanges={false}
             currentStatus={currentWordStatus}
             onRemove={() => handleRemoveWord(wordEntry.word)}
             onStatusChange={newStatus => handleStatusChange(wordEntry.word, newStatus)}

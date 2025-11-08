@@ -166,6 +166,8 @@ const Popup = () => {
           <div className="border-t border-gray-200 p-1">
             <WordPanel
               entry={localWordEntry}
+              showTags={false}
+              showExchanges={false}
               currentStatus={currentWordStatus}
               onRemove={() => handleRemoveWord(localWordEntry.word)}
               onStatusChange={newStatus => handleStatusChange(localWordEntry.word, newStatus)}
