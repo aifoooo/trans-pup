@@ -42,13 +42,85 @@ export const WordPanel: React.FC<{
 
   const speakWord = (word: string, lang: 'en-GB' | 'en-US') => {
     if (playing) return; // 防止重复点击
-    setPlaying(lang);
-    const synth = window.speechSynthesis;
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = lang;
-    // console.log('[speakWord] Playing word:', word, 'lang:', lang, 'voices', synth.getVoices());
-    utterance.onend = () => setPlaying(null); // 播放结束时重置状态
-    synth.speak(utterance);
+
+    try {
+      // 检查浏览器是否支持 speechSynthesis API
+      if (!('speechSynthesis' in window)) {
+        console.warn('[WordPanel] Speech synthesis not supported');
+        return;
+      }
+
+      const synth = window.speechSynthesis;
+
+      // 检查 speechSynthesis 是否可用
+      if (!synth) {
+        console.warn('[WordPanel] Speech synthesis not available');
+        return;
+      }
+
+      setPlaying(lang);
+
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = lang;
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      // 播放结束时重置状态
+      utterance.onend = () => {
+        setPlaying(null);
+      };
+
+      // 捕获播放错误
+      utterance.onerror = event => {
+        console.error('[WordPanel] Speech synthesis error:', event.error);
+        setPlaying(null);
+      };
+
+      // 播放音频的函数
+      const playAudio = () => {
+        try {
+          const voices = synth.getVoices();
+          // 尝试找到匹配语言的语音
+          const englishVoice = voices.find(voice => voice.lang === lang);
+          console.log('[WordPanel] English voice:', englishVoice);
+          if (englishVoice) {
+            utterance.voice = englishVoice;
+          }
+          synth.speak(utterance);
+        } catch (error) {
+          console.error('[WordPanel] Failed to play audio:', error);
+          setPlaying(null);
+        }
+      };
+
+      // 检查语音是否已经加载
+      const voices = synth.getVoices();
+      if (voices.length > 0) {
+        // 语音已加载，直接播放
+        playAudio();
+      } else {
+        // 语音未加载，等待加载完成
+        const handleVoicesChanged = () => {
+          playAudio();
+          synth.onvoiceschanged = null; // 移除监听器，避免重复触发
+        };
+        synth.onvoiceschanged = handleVoicesChanged;
+
+        // 设置超时，避免一直等待
+        setTimeout(() => {
+          if (synth.onvoiceschanged === handleVoicesChanged) {
+            synth.onvoiceschanged = null;
+            // 即使没有语音，也尝试播放（使用默认语音）
+            playAudio();
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      // 捕获所有可能的异常，防止系统崩溃
+      console.error('[WordPanel] Failed to play audio:', error);
+      setPlaying(null);
+    }
   };
 
   // 菜单操作处理函数
