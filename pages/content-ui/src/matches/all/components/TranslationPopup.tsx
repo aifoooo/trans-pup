@@ -222,7 +222,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     }
 
     const popupWidth = 400;
-    const popupHeight = 400;
+    const popupHeight = 434;
     const padding = 10;
 
     // 将文档坐标转换为视口坐标
