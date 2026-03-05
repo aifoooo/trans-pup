@@ -3,7 +3,6 @@ import { useState, useCallback } from 'react';
 import type { WordEntry } from '@extension/dictionary';
 
 export interface TranslationResult {
-  wordEntry: WordEntry | null;
   translatedText: string;
   error: string;
 }
@@ -56,6 +55,45 @@ export const queryLocalDictionary = async (word: string): Promise<WordEntry | nu
     console.error('[useTranslation] Local dictionary query failed:', error);
     return null;
   }
+};
+
+/**
+ * 格式化单词条目为显示字符串
+ */
+export const formatWordEntry = (entry: WordEntry): string => {
+  const parts: string[] = [];
+  
+  // 单词和音标
+  if (entry.phonetic) {
+    parts.push(`${entry.word} /${entry.phonetic}/`);
+  } else {
+    parts.push(entry.word);
+  }
+  
+  // 中文释义
+  if (entry.translation) {
+    parts.push(`释义：${entry.translation}`);
+  }
+  
+  // 英文释义
+  if (entry.definition) {
+    parts.push(`英文释义：${entry.definition}`);
+  }
+  
+  // 词性
+  if (entry.pos) {
+    parts.push(`词性：${entry.pos}`);
+  }
+  
+  // 标签
+  if (entry.tag) {
+    parts.push(`标签：${entry.tag}`);
+  }
+  
+  // 数据来源标记
+  parts.push('数据来源：本地词典（无需网络）');
+  
+  return parts.join('\n');
 };
 
 /**
@@ -117,7 +155,6 @@ export const translateText = async (text: string, useMessageForTranslation: bool
  */
 export const useTranslation = (options: UseTranslationOptions = {}) => {
   const [loading, setLoading] = useState(false);
-  const [wordEntry, setWordEntry] = useState<WordEntry | null>(null);
   const [translatedText, setTranslatedText] = useState('');
   const [error, setError] = useState('');
 
@@ -127,7 +164,6 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
   const translate = useCallback(
     async (text: string) => {
       // 清除之前的状态
-      setWordEntry(null);
       setTranslatedText('');
       setError('');
 
@@ -147,7 +183,8 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
           const entry = await queryLocalDictionary(text);
           if (entry) {
             // 找到单词，显示单词卡片
-            setWordEntry(entry);
+            const formattedText = formatWordEntry(entry);
+            setTranslatedText(formattedText);
             setLoading(false);
             return;
           }
@@ -171,7 +208,6 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
    * 清除所有状态
    */
   const clear = useCallback(() => {
-    setWordEntry(null);
     setTranslatedText('');
     setError('');
     setLoading(false);
@@ -179,7 +215,6 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
 
   return {
     loading,
-    wordEntry,
     translatedText,
     error,
     translate,
