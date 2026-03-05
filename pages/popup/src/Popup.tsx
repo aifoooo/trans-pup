@@ -21,7 +21,6 @@ const Popup = () => {
   // 使用翻译 hook（popup 环境）
   const {
     loading: isLoading,
-    wordEntry,
     translatedText,
     error,
     translate: translateText,
@@ -94,7 +93,7 @@ const Popup = () => {
             />
             {isLoading && <InlineLoadingSpinner position="absolute bottom-2 right-1" />}
           </div>
-          {!wordEntry && !translatedText && !error && (
+          {!translatedText && !error && (
             <div className="space-y-3 rounded-lg border border-gray-200 p-4">
               <ToggleSwitch
                 label="划词翻译"
@@ -104,46 +103,12 @@ const Popup = () => {
             </div>
           )}
         </div>
-        {wordEntry && (
-          <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200 p-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-800">{wordEntry.word}</h3>
-                {wordEntry.phonetic && <span className="text-gray-500">/{wordEntry.phonetic}/</span>}
-              </div>
-              {wordEntry.translation && (
-                <div className="text-gray-700">
-                  <span className="font-medium">释义：</span>
-                  {wordEntry.translation}
-                </div>
-              )}
-              {wordEntry.definition && (
-                <div className="text-gray-700">
-                  <span className="font-medium">英文释义：</span>
-                  {wordEntry.definition}
-                </div>
-              )}
-              {wordEntry.pos && (
-                <div className="text-gray-700">
-                  <span className="font-medium">词性：</span>
-                  {wordEntry.pos}
-                </div>
-              )}
-              {wordEntry.tag && (
-                <div className="text-gray-700">
-                  <span className="font-medium">标签：</span>
-                  {wordEntry.tag}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        {!wordEntry && translatedText && (
+        {translatedText && (
           <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
           </div>
         )}
-        {!wordEntry && error && (
+        {error && (
           <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
           </div>
