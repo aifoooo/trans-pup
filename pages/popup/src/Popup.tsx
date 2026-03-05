@@ -1,13 +1,7 @@
 import '@src/Popup.css';
 import { useStorage, useTranslation, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
-import {
-  ErrorDisplay,
-  ToggleSwitch,
-  LoadingSpinner,
-  InlineLoadingSpinner,
-  TranslationStatusCard,
-} from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, TranslationStatusCard } from '@extension/ui';
 import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 
@@ -95,7 +89,7 @@ const Popup = () => {
               onKeyDown={handleTranslate}
               className="w-full resize-none rounded-lg border border-gray-200 px-4 py-3 text-sm"
               placeholder="按下 Enter 翻译文本"
-              rows={2}
+              rows={3}
             />
             {isLoading && <InlineLoadingSpinner position="absolute bottom-2 right-1" />}
           </div>
