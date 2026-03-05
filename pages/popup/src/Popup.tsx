@@ -1,7 +1,7 @@
 import '@src/Popup.css';
 import { useStorage, useTranslation, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, TranslationStatusCard } from '@extension/ui';
+import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, TranslationStatusCard, WordPanel } from '@extension/ui';
 import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 
@@ -21,6 +21,7 @@ const Popup = () => {
   // 使用翻译 hook（popup 环境）
   const {
     loading: isLoading,
+    wordEntry,
     translatedText,
     error,
     translate: translateText,
@@ -93,7 +94,7 @@ const Popup = () => {
             />
             {isLoading && <InlineLoadingSpinner position="absolute bottom-2 right-1" />}
           </div>
-          {!translatedText && !error && (
+          {!wordEntry && !translatedText && !error && (
             <div className="space-y-3 rounded-lg border border-gray-200 p-4">
               <ToggleSwitch
                 label="划词翻译"
@@ -103,12 +104,17 @@ const Popup = () => {
             </div>
           )}
         </div>
-        {translatedText && (
+        {wordEntry && (
+          <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
+            <WordPanel entry={wordEntry} />
+          </div>
+        )}
+        {!wordEntry && translatedText && (
           <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
           </div>
         )}
-        {error && (
+        {!wordEntry && error && (
           <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
           </div>

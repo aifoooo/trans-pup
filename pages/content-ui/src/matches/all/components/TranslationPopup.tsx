@@ -1,5 +1,5 @@
 import { useTranslation } from '@extension/shared';
-import { InlineLoadingSpinner, TranslationStatusCard } from '@extension/ui';
+import { InlineLoadingSpinner, TranslationStatusCard, WordPanel } from '@extension/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoClose } from 'react-icons/io5';
 import type { Position } from '@extension/shared';
@@ -27,7 +27,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
 
   // 使用翻译 hook（content-ui 环境，使用消息传递）
-  const { loading, translatedText, error, translate } = useTranslation({
+  const { loading, wordEntry, translatedText, error, translate } = useTranslation({
     useMessageForTranslation: true,
   });
 
@@ -351,16 +351,22 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       </div>
 
       {/* 内容区域 */}
-      <div className="max-h-[166px] overflow-y-auto">
+      <div className="max-h-[320px] overflow-y-auto">
         {loading && (
           <div className="flex items-center justify-center p-8">
             <InlineLoadingSpinner />
           </div>
         )}
 
-        {!loading && error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
+        {!loading && wordEntry && (
+          <WordPanel entry={wordEntry} />
+        )}
 
-        {!loading && !error && translatedText && (
+        {!loading && !wordEntry && error && (
+          <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
+        )}
+
+        {!loading && !wordEntry && !error && translatedText && (
           <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
         )}
       </div>
