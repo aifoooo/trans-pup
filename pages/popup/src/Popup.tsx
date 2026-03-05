@@ -1,17 +1,15 @@
 import '@src/Popup.css';
 import { useStorage, useTranslation, withErrorBoundary, withSuspense } from '@extension/shared';
-import { globalConfigStorage, tencentTranslatorConfigStorage, vocabularyStorage } from '@extension/storage';
+import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
 import {
   ErrorDisplay,
   ToggleSwitch,
   LoadingSpinner,
   InlineLoadingSpinner,
   TranslationStatusCard,
-  WordPanel,
 } from '@extension/ui';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
-import type { WordStatus } from '@extension/storage';
 
 const Popup = () => {
   const logo = chrome.runtime.getURL('icon-34.png');
@@ -24,21 +22,17 @@ const Popup = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 配置状态
-  const { autoAnnotation, autoCollection, wordTranslation } = useStorage(globalConfigStorage);
+  const { wordTranslation } = useStorage(globalConfigStorage);
 
-  // 使用翻译 hook（popup 环境，直接使用 vocabularyStorage）
+  // 使用翻译 hook（popup 环境）
   const {
     loading: isLoading,
-    wordEntry: localWordEntry,
     translatedText,
     error,
-    wordStatus: currentWordStatus,
     translate: translateText,
     clear: clearTranslation,
-    updateWordStatus,
   } = useTranslation({
-    useMessageForWordStatus: false,
-    vocabularyStorage,
+    useMessageForTranslation: false,
   });
 
   // 检查是否存在有效的翻译器配置
@@ -63,42 +57,6 @@ const Popup = () => {
 
     checkTranslator();
   }, []);
-
-  // 处理单词删除
-  const handleRemoveWord = useCallback(
-    async (word: string) => {
-      try {
-        await vocabularyStorage.removeWord(word);
-        console.log('[Popup] Word removed:', word);
-        // 只更新状态，不重新翻译
-        await updateWordStatus(word);
-      } catch (error) {
-        console.error('[Popup] Failed to remove word:', error);
-      }
-    },
-    [updateWordStatus],
-  );
-
-  // 处理单词状态改变
-  const handleStatusChange = useCallback(
-    async (word: string, newStatus: WordStatus) => {
-      try {
-        // 如果单词不在列表中，需要先添加单词
-        if (currentWordStatus === null) {
-          await vocabularyStorage.addWord(word);
-        }
-
-        // 更新单词状态
-        await vocabularyStorage.updateWordStatus(word, newStatus);
-
-        // 只更新状态，不重新翻译
-        await updateWordStatus(word);
-      } catch (error) {
-        console.error('[Popup] Failed to update word status:', error);
-      }
-    },
-    [currentWordStatus, updateWordStatus],
-  );
 
   const handleTranslate = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -141,18 +99,8 @@ const Popup = () => {
             />
             {isLoading && <InlineLoadingSpinner position="absolute bottom-2 right-1" />}
           </div>
-          {!localWordEntry && !translatedText && !error && (
+          {!translatedText && !error && (
             <div className="space-y-3 rounded-lg border border-gray-200 p-4">
-              <ToggleSwitch
-                label="自动收集"
-                checked={autoCollection}
-                onChange={globalConfigStorage.toggleAutoCollection}
-              />
-              <ToggleSwitch
-                label="自动标注"
-                checked={autoAnnotation}
-                onChange={globalConfigStorage.toggleAutoAnnotation}
-              />
               <ToggleSwitch
                 label="划词翻译"
                 checked={wordTranslation}
@@ -161,18 +109,6 @@ const Popup = () => {
             </div>
           )}
         </div>
-        {localWordEntry && (
-          <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
-            <WordPanel
-              entry={localWordEntry}
-              showTags={false}
-              showExchanges={false}
-              currentStatus={currentWordStatus}
-              onRemove={() => handleRemoveWord(localWordEntry.word)}
-              onStatusChange={newStatus => handleStatusChange(localWordEntry.word, newStatus)}
-            />
-          </div>
-        )}
         {translatedText && (
           <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
             <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
@@ -187,29 +123,7 @@ const Popup = () => {
 
       <footer className="mt-auto flex items-center justify-between border-t border-gray-200 px-5 py-3 text-xs text-gray-500">
         <span>v0.5.0</span>
-        <button
-          onClick={async () => {
-            try {
-              // 获取当前标签页信息
-              const [tab] = await chrome.tabs.query({
-                active: true,
-                currentWindow: true,
-              });
-
-              if (!tab?.id) {
-                throw new Error('无法获取当前标签页信息');
-              }
-
-              // 打开侧边栏
-              await chrome.sidePanel.open({ tabId: tab.id });
-            } catch (error) {
-              console.error('[popup] 打开单词本失败:', error);
-              alert(`打开单词本失败: ${error instanceof Error ? error.message : '未知错误'}`);
-            }
-          }}
-          className="rounded-full border border-blue-500 px-1.5 py-0.5 font-semibold text-blue-500 hover:bg-gray-100">
-          单词本
-        </button>
+        <div className="text-gray-400">专注翻译 · 简洁高效</div>
       </footer>
     </div>
   );
