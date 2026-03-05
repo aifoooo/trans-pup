@@ -1,8 +1,6 @@
 import 'webextension-polyfill';
 import { WordLookup } from '@extension/dictionary';
-import { vocabularyStorage } from '@extension/storage';
 import { createTranslator } from '@extension/translator';
-import type { WordStatus } from '@extension/storage';
 
 let wordLookupInstance: WordLookup | null = null;
 
@@ -36,11 +34,10 @@ const processMessageQueue = () => {
 };
 
 const handleMessage = (message: unknown, sendResponse: (response?: unknown) => void) => {
-  const { action, word, words, status, text } = message as {
+  const { action, word, words, text } = message as {
     action: string;
     word: string | undefined;
     words: string[] | undefined;
-    status: WordStatus | undefined;
     text: string | undefined;
   };
 
@@ -77,30 +74,6 @@ const handleMessage = (message: unknown, sendResponse: (response?: unknown) => v
     } else {
       sendResponse(null);
     }
-  } else if (action === 'removeWord' && word) {
-    // 删除单词
-    vocabularyStorage.removeWord(word).then(() => {
-      sendResponse({ success: true });
-    });
-  } else if (action === 'getWordStatus' && word) {
-    // 获取单词状态
-    vocabularyStorage.hasWord(word).then(wordData => {
-      sendResponse({ status: wordData?.status || null });
-    });
-  } else if (action === 'updateWordStatus' && word && status) {
-    // 更新单词状态
-    vocabularyStorage
-      .hasWord(word)
-      .then(wordData => {
-        if (!wordData) {
-          return vocabularyStorage.addWord(word);
-        }
-        return undefined;
-      })
-      .then(() => vocabularyStorage.updateWordStatus(word, status))
-      .then(() => {
-        sendResponse({ success: true });
-      });
   } else if (action === 'translate' && text) {
     // 翻译文本（通过 background script 代理，避免 CORS 问题）
     const translatorInstance = createTranslator();

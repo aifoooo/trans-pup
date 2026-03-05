@@ -1,9 +1,8 @@
 import { useTranslation } from '@extension/shared';
-import { WordPanel, InlineLoadingSpinner, TranslationStatusCard } from '@extension/ui';
+import { InlineLoadingSpinner, TranslationStatusCard } from '@extension/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { IoClose } from 'react-icons/io5';
 import type { Position } from '@extension/shared';
-import type { WordStatus } from '@extension/storage';
 import type React from 'react';
 
 interface TranslationPopupProps {
@@ -13,9 +12,8 @@ interface TranslationPopupProps {
 }
 
 /**
- * 翻译弹窗组件
- * 1. 如果是单词，先查询本地词典
- * 2. 如果不是单词或查不到，使用翻译API
+ * 翻译弹窗组件 - 简化版
+ * 只显示翻译结果，无单词学习功能
  */
 export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, position, onClose }) => {
   const popupRef = useRef<HTMLDivElement>(null);
@@ -31,14 +29,11 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   // 使用翻译 hook（content-ui 环境，使用消息传递）
   const {
     loading,
-    wordEntry,
     translatedText,
     error,
-    wordStatus: currentWordStatus,
     translate,
-    updateWordStatus,
   } = useTranslation({
-    useMessageForWordStatus: true,
+    useMessageForTranslation: true,
   });
 
   // 组件卸载时标记
@@ -56,58 +51,6 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
-
-  // 处理单词删除
-  const handleRemoveWord = useCallback(
-    async (word: string) => {
-      if (!isMounted.current) return;
-
-      try {
-        await new Promise<void>((resolve, reject) => {
-          chrome.runtime.sendMessage({ action: 'removeWord', word }, () => {
-            if (chrome.runtime.lastError) {
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve();
-            }
-          });
-        });
-        // 只更新状态，不重新翻译（仅在组件仍挂载时）
-        if (isMounted.current) {
-          await updateWordStatus(word);
-        }
-      } catch (error) {
-        console.error('[TranslationPopup] Failed to remove word:', error);
-      }
-    },
-    [updateWordStatus],
-  );
-
-  // 处理单词状态改变
-  const handleStatusChange = useCallback(
-    async (word: string, newStatus: WordStatus) => {
-      if (!isMounted.current) return;
-
-      try {
-        await new Promise<void>((resolve, reject) => {
-          chrome.runtime.sendMessage({ action: 'updateWordStatus', word, status: newStatus }, () => {
-            if (chrome.runtime.lastError) {
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve();
-            }
-          });
-        });
-        // 只更新状态，不重新翻译（仅在组件仍挂载时）
-        if (isMounted.current) {
-          await updateWordStatus(word);
-        }
-      } catch (error) {
-        console.error('[TranslationPopup] Failed to update word status:', error);
-      }
-    },
-    [updateWordStatus],
-  );
 
   // 点击外部关闭
   useEffect(() => {
@@ -213,7 +156,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
     }
 
     const popupWidth = 360;
-    const popupHeight = 200;
+    const popupHeight = 150;
     const padding = 10;
 
     // 将文档坐标转换为视口坐标
@@ -296,7 +239,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
 
         // 否则使用 getPopupPosition 计算的位置（使用最新的 position）
         const popupWidth = 360;
-        const popupHeight = 200;
+        const popupHeight = 150;
         const padding = 10;
 
         // 将文档坐标转换为视口坐标
@@ -413,28 +356,17 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       </div>
 
       {/* 内容区域 */}
-      <div className="max-h-[166px] overflow-y-auto">
+      <div className="max-h-[118px] overflow-y-auto p-4">
         {loading && (
-          <div className="flex items-center justify-center p-8">
+          <div className="flex items-center justify-center p-4">
             <InlineLoadingSpinner />
           </div>
         )}
 
-        {!loading && error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
+        {!loading && error && <TranslationStatusCard type="error" title="翻译" message={error} />}
 
-        {!loading && !error && wordEntry && (
-          <WordPanel
-            entry={wordEntry}
-            showTags={false}
-            showExchanges={false}
-            currentStatus={currentWordStatus}
-            onRemove={() => handleRemoveWord(wordEntry.word)}
-            onStatusChange={newStatus => handleStatusChange(wordEntry.word, newStatus)}
-          />
-        )}
-
-        {!loading && !error && !wordEntry && translatedText && (
-          <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
+        {!loading && !error && translatedText && (
+          <TranslationStatusCard type="success" title="翻译" message={translatedText} />
         )}
       </div>
     </div>

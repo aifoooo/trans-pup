@@ -6,6 +6,3 @@ export type BaseStorageType<D> = {
   getSnapshot: () => D | null;
   subscribe: (listener: () => void) => () => void;
 };
-
-// 导出词汇相关类型
-export type { WordStatus, CollectedWord, WordsResult, StatusCounts } from './base/vocabulary-types.js';
