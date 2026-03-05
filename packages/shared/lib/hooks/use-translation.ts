@@ -1,7 +1,9 @@
 import { createTranslator, translator } from '@extension/translator';
 import { useState, useCallback } from 'react';
+import type { WordEntry } from '@extension/dictionary';
 
 export interface TranslationResult {
+  wordEntry: WordEntry | null;
   translatedText: string;
   error: string;
 }
@@ -14,9 +16,47 @@ export interface UseTranslationOptions {
   useMessageForTranslation?: boolean;
 }
 
+/**
+ * 判断文本是否为单个英文单词
+ */
+export const isWord = (text: string): boolean => /^[a-zA-Z]+$/.test(text.trim());
 
+/**
+ * 查询本地词典
+ */
+export const queryLocalDictionary = async (word: string): Promise<WordEntry | null> => {
+  try {
+    const response = await new Promise<WordEntry>((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: 'queryWord', word }, response => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(response);
+        }
+      });
+    });
 
-
+    if (response && response.word) {
+      return {
+        word: response.word || '',
+        phonetic: response.phonetic || '',
+        definition: response.definition || '',
+        translation: response.translation || '',
+        pos: response.pos || '',
+        collins: response.collins || '',
+        oxford: response.oxford || '',
+        tag: response.tag || '',
+        bnc: response.bnc || '',
+        frq: response.frq || '',
+        exchange: response.exchange || '',
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('[useTranslation] Local dictionary query failed:', error);
+    return null;
+  }
+};
 
 /**
  * 翻译文本
@@ -77,6 +117,7 @@ export const translateText = async (text: string, useMessageForTranslation: bool
  */
 export const useTranslation = (options: UseTranslationOptions = {}) => {
   const [loading, setLoading] = useState(false);
+  const [wordEntry, setWordEntry] = useState<WordEntry | null>(null);
   const [translatedText, setTranslatedText] = useState('');
   const [error, setError] = useState('');
 
@@ -86,6 +127,7 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
   const translate = useCallback(
     async (text: string) => {
       // 清除之前的状态
+      setWordEntry(null);
       setTranslatedText('');
       setError('');
 
@@ -97,6 +139,21 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
       setLoading(true);
 
       try {
+        // 判断是否为单词
+        const isWordText = isWord(text);
+
+        if (isWordText) {
+          // 查询本地词典
+          const entry = await queryLocalDictionary(text);
+          if (entry) {
+            // 找到单词，显示单词卡片
+            setWordEntry(entry);
+            setLoading(false);
+            return;
+          }
+          // 词典中没有，继续使用翻译API
+        }
+
         // 使用翻译API
         const result = await translateText(text, options.useMessageForTranslation);
         setTranslatedText(result);
@@ -114,6 +171,7 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
    * 清除所有状态
    */
   const clear = useCallback(() => {
+    setWordEntry(null);
     setTranslatedText('');
     setError('');
     setLoading(false);
@@ -121,6 +179,7 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
 
   return {
     loading,
+    wordEntry,
     translatedText,
     error,
     translate,

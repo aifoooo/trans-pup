@@ -27,7 +27,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
 
   // 使用翻译 hook（content-ui 环境，使用消息传递）
-  const { loading, translatedText, error, translate } = useTranslation({
+  const { loading, wordEntry, translatedText, error, translate } = useTranslation({
     useMessageForTranslation: true,
   });
 
@@ -351,16 +351,54 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       </div>
 
       {/* 内容区域 */}
-      <div className="max-h-[166px] overflow-y-auto">
+      <div className="max-h-[320px] overflow-y-auto p-4">
         {loading && (
           <div className="flex items-center justify-center p-8">
             <InlineLoadingSpinner />
           </div>
         )}
 
-        {!loading && error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
+        {!loading && wordEntry && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-800">{wordEntry.word}</h3>
+              {wordEntry.phonetic && <span className="text-gray-500">/{wordEntry.phonetic}/</span>}
+            </div>
+            {wordEntry.translation && (
+              <div className="text-gray-700">
+                <span className="font-medium">释义：</span>
+                {wordEntry.translation}
+              </div>
+            )}
+            {wordEntry.definition && (
+              <div className="text-gray-700">
+                <span className="font-medium">英文释义：</span>
+                {wordEntry.definition}
+              </div>
+            )}
+            {wordEntry.pos && (
+              <div className="text-gray-700">
+                <span className="font-medium">词性：</span>
+                {wordEntry.pos}
+              </div>
+            )}
+            {wordEntry.tag && (
+              <div className="text-gray-700">
+                <span className="font-medium">标签：</span>
+                {wordEntry.tag}
+              </div>
+            )}
+            <div className="text-xs text-gray-500">
+              <span className="font-medium">数据来源：</span>本地词典（无需网络）
+            </div>
+          </div>
+        )}
 
-        {!loading && !error && translatedText && (
+        {!loading && !wordEntry && error && (
+          <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
+        )}
+
+        {!loading && !wordEntry && !error && translatedText && (
           <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
         )}
       </div>
