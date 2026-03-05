@@ -14,11 +14,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          target: main
-          exclude: dev
-          change-to: dev
+          target: master
+          exclude: robot
+          change-to: robot
           comment: |
-            Your PR's base branch was set to `main`, PRs should be set to target `dev`.
-            The base branch of this PR has been automatically changed to `dev`, please check that there are no merge conflicts.
+            Your PR's base branch was set to `master`, PRs should be set to target `robot`.
+            The base branch of this PR has been automatically changed to `robot`, please check that there are no merge conflicts.
           already-exists-action: close_this
           already-exists-comment: "Closing, because {url} basing on the same branch"
