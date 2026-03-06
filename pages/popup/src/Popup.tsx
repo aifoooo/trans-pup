@@ -1,7 +1,14 @@
 import '@src/Popup.css';
 import { useStorage, useTranslation, withErrorBoundary, withSuspense } from '@extension/shared';
 import { globalConfigStorage, tencentTranslatorConfigStorage } from '@extension/storage';
-import { ErrorDisplay, ToggleSwitch, LoadingSpinner, InlineLoadingSpinner, TranslationStatusCard, WordPanel } from '@extension/ui';
+import {
+  ErrorDisplay,
+  ToggleSwitch,
+  LoadingSpinner,
+  InlineLoadingSpinner,
+  TranslationStatusCard,
+  WordPanel,
+} from '@extension/ui';
 import { useState, useRef, useEffect } from 'react';
 import { IoSettingsOutline } from 'react-icons/io5';
 
@@ -106,7 +113,7 @@ const Popup = () => {
         </div>
         {wordEntry && (
           <div className="mx-5 -mt-1 mb-6 rounded-lg border border-gray-200">
-            <WordPanel entry={wordEntry} />
+            <WordPanel entry={wordEntry} showTags={false} showExchanges={false} />
           </div>
         )}
         {!wordEntry && translatedText && (

@@ -358,13 +358,9 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           </div>
         )}
 
-        {!loading && wordEntry && (
-          <WordPanel entry={wordEntry} />
-        )}
+        {!loading && wordEntry && <WordPanel entry={wordEntry} showTags={false} showExchanges={false} />}
 
-        {!loading && !wordEntry && error && (
-          <TranslationStatusCard type="error" title="腾讯翻译" message={error} />
-        )}
+        {!loading && !wordEntry && error && <TranslationStatusCard type="error" title="腾讯翻译" message={error} />}
 
         {!loading && !wordEntry && !error && translatedText && (
           <TranslationStatusCard type="success" title="腾讯翻译" message={translatedText} />
