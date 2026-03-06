@@ -100,19 +100,21 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       background-color: transparent !important;
     }
     
-    /* 腾讯翻译图标特别保护 - 添加背景色确保可见 */
+    /* 腾讯翻译图标特别保护 - 恢复圆形并保持可见 */
     #shadow-root-${id} img[alt="腾讯云"] {
-      background-color: #f3f4f6 !important;
-      border-radius: 4px !important;
+      background-color: #6b7280 !important; /* 灰色背景，确保可见 */
+      border-radius: 9999px !important; /* 恢复rounded-full效果 */
+      border: 1px solid #d1d5db !important;
+      /* 确保宽高生效 */
+      min-width: 20px !important;
+      min-height: 20px !important;
+      padding: 2px !important; /* 恢复p-0.5效果 */
     }
     
-    /* 字体粗细保护 - 只保护真正需要的，避免过度干预 */
-    #shadow-root-${id} .font-bold { font-weight: 700 !important; }
-    #shadow-root-${id} .font-semibold { font-weight: 600 !important; }
+    /* 字体粗细保护 - 完全移除，让Tailwind自然控制 */
+    /* 移除所有字体粗细强制设置，尊重CSS原本层叠 */
     
-    /* 移除强制的font-medium和font-normal，让Tailwind自然工作 */
-    
-    /* 红色字体保护 - 只设置颜色，不强制字体粗细 */
+    /* 红色字体保护 - 只设置颜色，不碰字体粗细 */
     #shadow-root-${id} .text-red-500 { 
       color: #ef4444 !important; 
     }
