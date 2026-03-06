@@ -357,7 +357,7 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       <div className="overflow-y-auto" style={{ maxHeight: '320px' }}>
         {loading && (
           <div className="flex items-center justify-center" style={{ padding: '32px' }}>
-            <InlineLoadingSpinner />
+            <InlineLoadingSpinner position="static" />
           </div>
         )}
 
