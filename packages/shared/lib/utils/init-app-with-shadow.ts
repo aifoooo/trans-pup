@@ -96,16 +96,15 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       background-image: none !important;
     }
     
-    /* 字体粗细保护 */
+    /* 字体粗细保护 - 只保护真正需要的，避免过度干预 */
     #shadow-root-${id} .font-bold { font-weight: 700 !important; }
     #shadow-root-${id} .font-semibold { font-weight: 600 !important; }
-    #shadow-root-${id} .font-medium { font-weight: 500 !important; }
-    #shadow-root-${id} .font-normal { font-weight: 400 !important; }
     
-    /* 红色字体特别保护 */
+    /* 移除强制的font-medium和font-normal，让Tailwind自然工作 */
+    
+    /* 红色字体保护 - 只设置颜色，不强制字体粗细 */
     #shadow-root-${id} .text-red-500 { 
       color: #ef4444 !important; 
-      font-weight: 500 !important;
     }
     
     ${inlineCss}
