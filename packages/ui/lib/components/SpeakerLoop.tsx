@@ -1,8 +1,8 @@
 import { RxSpeakerModerate, RxSpeakerLoud } from 'react-icons/rx';
 
 export const SpeakerLoop = ({ size = '3' }: { size?: string }) => {
-  // 计算容器尺寸（根据传入的 size 动态生成，如 size=3 对应 0.75rem）
-  const containerSize = `${parseFloat(size) * 0.25}rem`;
+  // 计算容器尺寸（根据传入的 size 动态生成，如 size=3 对应 12px）
+  const containerSize = `${parseFloat(size) * 4}px`;
 
   return (
     <div

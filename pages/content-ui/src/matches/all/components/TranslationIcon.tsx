@@ -35,7 +35,7 @@ export const TranslationIcon: React.FC<TranslationIconProps> = ({ position, onTr
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        transform: 'translate(0.75rem, 0.75rem)',
+        transform: 'translate(12px, 12px)',
       }}
       onMouseDown={e => e.stopPropagation()}
       onMouseUp={e => e.stopPropagation()}
@@ -54,7 +54,7 @@ export const TranslationIcon: React.FC<TranslationIconProps> = ({ position, onTr
       aria-label="翻译">
       {/* 翻译图标 */}
       <div>
-        <img src={logo} className="h-5 w-5" alt="Logo" />
+        <img src={logo} className="h-5 w-5" style={{ width: '20px', height: '20px' }} alt="Logo" />
       </div>
     </div>
   );
