@@ -64,8 +64,14 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       border-width: inherit !important;
       border-style: inherit !important;
       border-radius: inherit !important;
-      /* 确保这些属性不会被页面!important规则覆盖 */
-      all: revert !important;
+    }
+    
+    /* 保护图片和SVG元素不被重置 */
+    :host img,
+    :host svg {
+      display: inline-block !important;
+      max-width: 100% !important;
+      height: auto !important;
     }
     
     /* 首先注入Tailwind CSS */
