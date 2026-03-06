@@ -87,6 +87,27 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
     /* eslint-disable-next-line no-useless-escape */
     #shadow-root-${id} .p-0\.5 { padding: 2px !important; }
     
+    /* 保护图标和图片 */
+    #shadow-root-${id} img,
+    #shadow-root-${id} svg {
+      display: inline-block !important;
+      max-width: 100% !important;
+      height: auto !important;
+      background-image: none !important;
+    }
+    
+    /* 字体粗细保护 */
+    #shadow-root-${id} .font-bold { font-weight: 700 !important; }
+    #shadow-root-${id} .font-semibold { font-weight: 600 !important; }
+    #shadow-root-${id} .font-medium { font-weight: 500 !important; }
+    #shadow-root-${id} .font-normal { font-weight: 400 !important; }
+    
+    /* 红色字体特别保护 */
+    #shadow-root-${id} .text-red-500 { 
+      color: #ef4444 !important; 
+      font-weight: 500 !important;
+    }
+    
     ${inlineCss}
   `;
 
