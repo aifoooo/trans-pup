@@ -102,7 +102,7 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
     
     /* 腾讯翻译图标特别保护 - 恢复圆形并保持可见 */
     #shadow-root-${id} img[alt="腾讯云"] {
-      background-color: #6b7280 !important; /* 灰色背景，确保可见 */
+      background-color: #ffffff !important; /* 白色背景，更美观 */
       border-radius: 9999px !important; /* 恢复rounded-full效果 */
       border: 1px solid #d1d5db !important;
       /* 确保宽高生效 */
