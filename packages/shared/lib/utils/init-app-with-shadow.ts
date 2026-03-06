@@ -64,6 +64,13 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       border-width: inherit !important;
       border-style: inherit !important;
       border-radius: inherit !important;
+      /* 保持默认display，不强制重置 */
+      display: revert-layer !important;
+      /* 保持溢出行为 */
+      overflow: revert-layer !important;
+      /* 保持尺寸限制 */
+      max-width: revert-layer !important;
+      max-height: revert-layer !important;
     }
     
     /* 保护图片和SVG元素不被重置 */
