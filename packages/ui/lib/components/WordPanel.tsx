@@ -249,7 +249,7 @@ export const WordPanel: React.FC<{
                 return (
                   <span
                     key={index}
-                    className="scrollbar-hide h-[3.625rem] cursor-default overflow-auto rounded-md border border-gray-200 px-2 py-2 text-sm text-gray-700">
+                    className="scrollbar-hide h-[58px] cursor-default overflow-auto rounded-md border border-gray-200 px-2 py-2 text-sm text-gray-700">
                     {`${exchangeMap[prefix]}: ${content}`}
                   </span>
                 );
