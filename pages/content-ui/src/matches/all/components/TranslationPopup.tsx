@@ -309,16 +309,18 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
       role="presentation"
       aria-label="翻译弹窗"
       tabIndex={-1}
-      className="fixed z-[10000] w-[360px] rounded-xl border border-gray-200 bg-white shadow-2xl"
+      className="fixed z-[10000] rounded-xl border border-gray-200 bg-white shadow-2xl"
       style={{
         left: popupPosition.left !== undefined ? `${popupPosition.left}px` : undefined,
         top: popupPosition.top !== undefined ? `${popupPosition.top}px` : undefined,
         right: popupPosition.right !== undefined ? `${popupPosition.right}px` : undefined,
         bottom: popupPosition.bottom !== undefined ? `${popupPosition.bottom}px` : undefined,
+        width: '360px',
       }}>
       {/* 拖拽标题栏 */}
       <div
-        className={`flex h-8 w-full items-center justify-between rounded-t-xl bg-gray-50 p-1 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
+        className={`flex w-full items-center justify-between rounded-t-xl bg-gray-50 ${isDragging ? 'cursor-move' : 'cursor-default'}`}
+        style={{ height: '32px', padding: '4px' }}
         onMouseDown={e => {
           handleDragStart(e);
           e.stopPropagation();
@@ -344,16 +346,17 @@ export const TranslationPopup: React.FC<TranslationPopupProps> = ({ text, positi
           onMouseDown={e => e.stopPropagation()}
           onMouseUp={e => e.stopPropagation()}
           onClick={onClose}
-          className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
+          className="flex items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
+          style={{ width: '24px', height: '24px' }}
           aria-label="关闭">
-          <IoClose className="h-4 w-4" />
+          <IoClose style={{ width: '16px', height: '16px' }} />
         </button>
       </div>
 
       {/* 内容区域 */}
-      <div className="max-h-[320px] overflow-y-auto">
+      <div className="overflow-y-auto" style={{ maxHeight: '320px' }}>
         {loading && (
-          <div className="flex items-center justify-center p-8">
+          <div className="flex items-center justify-center" style={{ padding: '32px' }}>
             <InlineLoadingSpinner />
           </div>
         )}
