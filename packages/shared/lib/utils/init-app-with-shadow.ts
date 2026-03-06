@@ -25,7 +25,7 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       font-size: 16px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
       line-height: 1.5;
-      color: #000000;
+      color: #374151;  /* gray-700，更柔和的深灰 */
       box-sizing: border-box;
     }
     
