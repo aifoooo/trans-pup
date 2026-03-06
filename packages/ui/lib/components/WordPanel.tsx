@@ -1,10 +1,7 @@
 import { SpeakerLoop } from '@/lib/components/SpeakerLoop';
-import { WordActionMenu } from '@/lib/components/WordActionMenu';
-import { useState, useRef } from 'react';
-import { FaBookmark, FaRegBookmark } from 'react-icons/fa6';
+import { useState } from 'react';
 import { RxSpeakerLoud } from 'react-icons/rx';
 import type { WordEntry } from '@extension/dictionary';
-import type { WordStatus } from '@extension/storage';
 import type React from 'react';
 
 const tagMap: Record<string, string> = {
@@ -32,13 +29,8 @@ export const WordPanel: React.FC<{
   entry: WordEntry;
   showTags?: boolean;
   showExchanges?: boolean;
-  currentStatus?: WordStatus | null; // 当前单词所在的列表状态
-  onRemove?: () => void; // 删除单词的回调
-  onStatusChange?: (newStatus: WordStatus) => void; // 改变单词状态的回调
-}> = ({ entry, showTags = true, showExchanges = true, currentStatus = null, onRemove, onStatusChange }) => {
+}> = ({ entry, showTags = true, showExchanges = true }) => {
   const [playing, setPlaying] = useState<'en-GB' | 'en-US' | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const bookmarkRef = useRef<HTMLButtonElement>(null);
 
   const speakWord = (word: string, lang: 'en-GB' | 'en-US') => {
     if (playing) return; // 防止重复点击
@@ -122,41 +114,6 @@ export const WordPanel: React.FC<{
     }
   };
 
-  // 菜单操作处理函数
-  const handleRemove = () => {
-    setIsMenuOpen(false);
-    onRemove?.();
-  };
-
-  const handleMoveToNew = () => {
-    setIsMenuOpen(false);
-    onStatusChange?.('new');
-  };
-
-  const handleMoveToLearning = () => {
-    setIsMenuOpen(false);
-    onStatusChange?.('learning');
-  };
-
-  const handleMoveToMastered = () => {
-    setIsMenuOpen(false);
-    onStatusChange?.('mastered');
-  };
-
-  // 根据单词状态获取书签图标颜色类名
-  const getBookmarkColor = () => {
-    switch (currentStatus) {
-      case 'new':
-        return 'text-green-500'; // 新单词 - 绿色
-      case 'learning':
-        return 'text-red-500'; // 学习中 - 红色
-      case 'mastered':
-        return 'text-yellow-500'; // 已掌握 - 黄色
-      default:
-        return 'text-gray-500'; // 不在列表中 - 白底灰边
-    }
-  };
-
   return (
     <div className="px-4 pb-5 pt-4">
       <div className="space-y-4">
@@ -200,27 +157,7 @@ export const WordPanel: React.FC<{
         <div className="flex flex-col gap-1">
           <div className="flex w-full items-center justify-between">
             <span className="text-lg font-bold">{entry.word}</span>
-            <button
-              ref={bookmarkRef}
-              onMouseDown={e => e.stopPropagation()}
-              onMouseUp={e => e.stopPropagation()}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setIsMenuOpen(!isMenuOpen);
-                }
-              }}
-              className="flex cursor-pointer items-center"
-              aria-label="单词操作菜单"
-              aria-expanded={isMenuOpen}
-              tabIndex={0}>
-              {currentStatus === null ? (
-                <FaRegBookmark className={`h-[0.875rem] w-[0.875rem] ${getBookmarkColor()}`} />
-              ) : (
-                <FaBookmark className={`h-[0.875rem] w-[0.875rem] ${getBookmarkColor()}`} />
-              )}
-            </button>
+            {/* 右上角的书签按钮已移除 */}
           </div>
           {entry.phonetic && (
             <div className="flex items-center gap-3">
@@ -320,18 +257,6 @@ export const WordPanel: React.FC<{
             </div>
           )}
       </div>
-
-      {/* 单词操作菜单 */}
-      <WordActionMenu
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        currentStatus={currentStatus}
-        onRemove={handleRemove}
-        onMoveToNew={handleMoveToNew}
-        onMoveToLearning={handleMoveToLearning}
-        onMoveToMastered={handleMoveToMastered}
-        anchorEl={bookmarkRef.current}
-      />
     </div>
   );
 };

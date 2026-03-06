@@ -2,11 +2,10 @@ import '@src/Options.css';
 
 import { withErrorBoundary, withSuspense, calculateBreakpoints } from '@extension/shared';
 import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
-import GeneralSettings from '@src/components/GeneralSettings';
 import SidebarMenu from '@src/components/SidebarMenu';
 import TranslationService from '@src/components/TranslationService';
 import { useState, useEffect, useRef } from 'react';
-import { IoSettingsOutline, IoMenuOutline } from 'react-icons/io5';
+import { IoMenuOutline } from 'react-icons/io5';
 import { MdOutlineTranslate } from 'react-icons/md';
 import type { MenuItem } from '@src/components/SidebarMenu';
 
@@ -34,7 +33,7 @@ const Options = () => {
 
   // 状态变量
   const [, setWindowWidth] = useState(window.innerWidth);
-  const [activeMenu, setActiveMenu] = useState('general');
+  const [activeMenu, setActiveMenu] = useState('translation-service');
   const [isMenuVisible, setIsMenuVisible] = useState(() => {
     const { isMenuPinned } = calculateMenuPinningInfo();
     return isMenuPinned;
@@ -114,16 +113,6 @@ const Options = () => {
 
   const menuItems: MenuItem[] = [
     {
-      id: 'general',
-      label: '基本设置',
-      icon: (
-        <IoSettingsOutline
-          size={18}
-          className={cn('mr-6', activeMenu === 'general' ? 'text-blue-600' : 'text-gray-700')}
-        />
-      ),
-    },
-    {
       id: 'translation-service',
       label: '翻译服务',
       icon: (
@@ -199,7 +188,6 @@ const Options = () => {
         {/* 右侧内容区 */}
         <div ref={contentAreaRef} className="mt-16 flex-1 overflow-y-auto pt-2">
           <div className="min-w-2xl mx-auto max-w-2xl bg-white">
-            {activeMenu === 'general' && <GeneralSettings />}
             {activeMenu === 'translation-service' && <TranslationService />}
           </div>
         </div>

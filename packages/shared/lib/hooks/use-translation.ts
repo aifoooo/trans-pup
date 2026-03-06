@@ -1,27 +1,19 @@
 import { createTranslator, translator } from '@extension/translator';
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import type { WordEntry } from '@extension/dictionary';
-import type { WordStatus } from '@extension/storage';
 
 export interface TranslationResult {
   wordEntry: WordEntry | null;
   translatedText: string;
   error: string;
-  wordStatus: WordStatus | null;
 }
 
 export interface UseTranslationOptions {
   /**
-   * 是否使用消息传递方式查询单词状态和翻译（用于 content script 环境）
-   * 如果为 false，则直接使用 vocabularyStorage 和 translator（需要传入）
+   * 是否使用消息传递方式翻译（用于 content script 环境）
+   * 如果为 false，则直接使用 translator（popup/options 环境）
    */
-  useMessageForWordStatus?: boolean;
-  /**
-   * vocabularyStorage 实例（仅在 useMessageForWordStatus 为 false 时使用）
-   */
-  vocabularyStorage?: {
-    hasWord: (word: string) => Promise<{ status: WordStatus } | null>;
-  };
+  useMessageForTranslation?: boolean;
 }
 
 /**
@@ -67,41 +59,12 @@ export const queryLocalDictionary = async (word: string): Promise<WordEntry | nu
 };
 
 /**
- * 查询单词状态
- */
-export const queryWordStatus = async (word: string, options: UseTranslationOptions): Promise<WordStatus | null> => {
-  try {
-    if (options.useMessageForWordStatus) {
-      // 使用消息传递方式（content script 环境）
-      const response = await new Promise<{ status: WordStatus } | null>((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: 'getWordStatus', word }, response => {
-          if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-          } else {
-            resolve(response?.status ? { status: response.status } : null);
-          }
-        });
-      });
-      return response?.status || null;
-    } else if (options.vocabularyStorage) {
-      // 直接使用 storage（popup 环境）
-      const wordData = await options.vocabularyStorage.hasWord(word);
-      return wordData?.status || null;
-    }
-    return null;
-  } catch (error) {
-    console.error('[useTranslation] Failed to query word status:', error);
-    return null;
-  }
-};
-
-/**
  * 翻译文本
  * @param text 待翻译文本
- * @param useMessage 是否使用消息传递方式（content script 环境）
+ * @param useMessageForTranslation 是否使用消息传递方式（content script 环境）
  */
-export const translateText = async (text: string, useMessage: boolean = false): Promise<string> => {
-  if (useMessage) {
+export const translateText = async (text: string, useMessageForTranslation: boolean = false): Promise<string> => {
+  if (useMessageForTranslation) {
     // 使用消息传递方式（content script 环境，避免 CORS 问题）
     try {
       const response = await new Promise<{ result?: string; error?: string }>((resolve, reject) => {
@@ -150,75 +113,21 @@ export const translateText = async (text: string, useMessage: boolean = false): 
 
 /**
  * 翻译功能的自定义 Hook
- * 统一处理单词查询、翻译和状态管理
+ * 统一处理翻译功能
  */
 export const useTranslation = (options: UseTranslationOptions = {}) => {
   const [loading, setLoading] = useState(false);
   const [wordEntry, setWordEntry] = useState<WordEntry | null>(null);
   const [translatedText, setTranslatedText] = useState('');
   const [error, setError] = useState('');
-  const [wordStatus, setWordStatus] = useState<WordStatus | null>(null);
-
-  // 使用 ref 存储 wordEntry，避免 updateWordStatus 函数引用变化
-  const wordEntryRef = useRef<WordEntry | null>(null);
-  useEffect(() => {
-    wordEntryRef.current = wordEntry;
-  }, [wordEntry]);
-
-  // 使用 useMemo 稳定 options，避免 translate 函数频繁变化
-  // 只依赖 options 的两个关键属性，而不是整个 options 对象
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stableOptions = useMemo(() => options, [options.useMessageForWordStatus, options.vocabularyStorage]);
-
-  // 订阅 storage 变化，自动更新单词状态
-  useEffect(() => {
-    // 如果没有 wordEntry，不需要订阅
-    if (!wordEntry) {
-      return;
-    }
-
-    const currentWord = wordEntry.word;
-
-    // 监听 chrome.storage.onChanged 事件
-    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
-      // 只监听 local storage 的变化
-      if (areaName !== 'local') {
-        return;
-      }
-
-      // 检查是否是 vocabulary-storage-key 的变化
-      if (changes['vocabulary-storage-key']) {
-        // 重新查询单词状态
-        queryWordStatus(currentWord, stableOptions)
-          .then(newStatus => {
-            // 检查单词是否仍然是当前显示的单词（可能在 storage 变化期间已经切换了）
-            if (wordEntryRef.current && wordEntryRef.current.word === currentWord) {
-              setWordStatus(newStatus);
-            }
-          })
-          .catch(error => {
-            console.error('[useTranslation] Failed to update word status from storage change:', error);
-          });
-      }
-    };
-
-    // 添加监听器
-    chrome.storage.onChanged.addListener(handleStorageChange);
-
-    // 清理函数
-    return () => {
-      chrome.storage.onChanged.removeListener(handleStorageChange);
-    };
-  }, [wordEntry, stableOptions]);
 
   /**
-   * 执行翻译或查询
+   * 执行翻译
    */
   const translate = useCallback(
     async (text: string) => {
       // 清除之前的状态
       setWordEntry(null);
-      setWordStatus(null);
       setTranslatedText('');
       setError('');
 
@@ -239,17 +148,14 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
           if (entry) {
             // 找到单词，显示单词卡片
             setWordEntry(entry);
-
-            // 查询单词状态
-            const status = await queryWordStatus(text, stableOptions);
-            setWordStatus(status);
+            setLoading(false);
             return;
           }
           // 词典中没有，继续使用翻译API
         }
 
         // 使用翻译API
-        const result = await translateText(text, stableOptions.useMessageForWordStatus);
+        const result = await translateText(text, options.useMessageForTranslation);
         setTranslatedText(result);
       } catch (err) {
         console.error('[useTranslation] Translation error:', err);
@@ -258,7 +164,7 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
         setLoading(false);
       }
     },
-    [stableOptions],
+    [options.useMessageForTranslation],
   );
 
   /**
@@ -266,36 +172,17 @@ export const useTranslation = (options: UseTranslationOptions = {}) => {
    */
   const clear = useCallback(() => {
     setWordEntry(null);
-    setWordStatus(null);
     setTranslatedText('');
     setError('');
     setLoading(false);
   }, []);
-
-  /**
-   * 只更新单词状态，不重新执行翻译
-   * 用于在单词状态改变后快速更新 UI，避免重新执行整个翻译流程
-   */
-  const updateWordStatus = useCallback(
-    async (word: string) => {
-      // 只在当前显示的是单词时才更新状态
-      // 使用 ref 来获取最新的 wordEntry，避免函数引用变化
-      if (wordEntryRef.current && wordEntryRef.current.word === word) {
-        const status = await queryWordStatus(word, stableOptions);
-        setWordStatus(status);
-      }
-    },
-    [stableOptions],
-  );
 
   return {
     loading,
     wordEntry,
     translatedText,
     error,
-    wordStatus,
     translate,
     clear,
-    updateWordStatus,
   };
 };
