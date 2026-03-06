@@ -28,6 +28,8 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       line-height: 1.5;
       color: #374151;
       box-sizing: border-box;
+      /* 设置默认字体粗细，恢复CSS本来含义 */
+      font-weight: 400 !important;
     }
     
     #shadow-root-${id} * {
@@ -94,6 +96,14 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
       max-width: 100% !important;
       height: auto !important;
       background-image: none !important;
+      /* 确保图标有合适的背景 */
+      background-color: transparent !important;
+    }
+    
+    /* 腾讯翻译图标特别保护 - 添加背景色确保可见 */
+    #shadow-root-${id} img[alt="腾讯云"] {
+      background-color: #f3f4f6 !important;
+      border-radius: 4px !important;
     }
     
     /* 字体粗细保护 - 只保护真正需要的，避免过度干预 */
