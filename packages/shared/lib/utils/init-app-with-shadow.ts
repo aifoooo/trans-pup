@@ -62,11 +62,15 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
     #shadow-root-${id} .pb-3 { padding-bottom: 12px !important; }
     #shadow-root-${id} .pb-5 { padding-bottom: 20px !important; }
     #shadow-root-${id} .mr-1 { margin-right: 4px !important; }
+    #shadow-root-${id} .mb-1 { margin-bottom: 4px !important; }
     
     /* 间距gap - 固定px值 */
     #shadow-root-${id} .gap-1 { gap: 4px !important; }
     #shadow-root-${id} .gap-2 { gap: 8px !important; }
     #shadow-root-${id} .gap-3 { gap: 12px !important; }
+    
+    /* Space 间距 - 固定px值 */
+    #shadow-root-${id} .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 16px !important; }
     
     /* 尺寸 - 固定px值 */
     #shadow-root-${id} .h-4 { height: 16px !important; }
@@ -88,6 +92,10 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
     #shadow-root-${id} .border { border-width: 1px !important; }
     /* eslint-disable-next-line no-useless-escape */
     #shadow-root-${id} .p-0\.5 { padding: 2px !important; }
+    
+    /* 位置相关 - 固定px值 */
+    #shadow-root-${id} .right-1 { right: 4px !important; }
+    #shadow-root-${id} .bottom-1 { bottom: 4px !important; }
     
     /* 保护图标和图片 */
     #shadow-root-${id} img,
@@ -115,9 +123,9 @@ export const initAppWithShadow = ({ id, app, inlineCss }: { id: string; inlineCs
     /* 移除所有字体粗细强制设置，尊重CSS原本层叠 */
     
     /* 红色字体保护 - 只设置颜色，不碰字体粗细 */
-    #shadow-root-${id} .text-red-500 { 
-      color: #ef4444 !important; 
-    }
+    #shadow-root-${id} .text-gray-500 { color: #6b7280 !important; }
+    #shadow-root-${id} .text-gray-700 { color: #374151 !important; }
+    #shadow-root-${id} .text-red-500 { color: #ef4444 !important; }
     
     ${inlineCss}
   `;
